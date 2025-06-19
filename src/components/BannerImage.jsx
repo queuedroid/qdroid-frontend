@@ -61,11 +61,12 @@ function BannerImage() {
           background: 'none',
           display: 'flex',
           flexDirection: 'column',
-          p: 4,
+          p: { md: 4, xs: 1 },
           position: 'relative',
-          overflow: 'visible'
+          overflow: 'visible',
           //border: '1px solid #ececec',
           //boxShadow: 2
+          mt: { md: 0, xs: 4 }
         }}
       >
         {/* Decorative tilted boxes with animation */}
@@ -77,7 +78,7 @@ function BannerImage() {
           style={{
             position: 'absolute',
             top: 0,
-            right: -22,
+            right: { md: -22, xs: -10 },
             width: 32,
             height: 32,
             zIndex: 1
@@ -108,7 +109,17 @@ function BannerImage() {
             {/* <Typography variant="subtitle1" sx={{ p: 2, fontWeight: 'bold' }}>
           API ACESS
         </Typography> */}
-            <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#f0f0f0', borderRadius: 1 }}>
+            <Box
+              sx={{
+                p: { md: 2, xs: 0 },
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                bgcolor: '#f0f0f0',
+                borderRadius: 1,
+                overflow: 'hidden'
+              }}
+            >
               <Typography variant="subtitle2" sx={{ p: 2 }}>
                 AyKtn_sYeEJdniPNdft_dEXihlWqQLXC
               </Typography>
@@ -134,7 +145,7 @@ function BannerImage() {
                 bgcolor: '#E3F2FD',
                 color: '#1565C0',
                 border: '1.5px solid #1565C0',
-                mr: 1
+                m: 1
               }}
               label="Accessible API"
             />
@@ -144,7 +155,7 @@ function BannerImage() {
                 bgcolor: '#FFF3E0',
                 color: '#EF6C00',
                 border: '1.5px solid #EF6C00',
-                mr: 1
+                m: 1
               }}
               label="Open Source"
             />
@@ -154,7 +165,7 @@ function BannerImage() {
                 bgcolor: '#E8F5E9',
                 color: '#2E7D32',
                 border: '1.5px solid #2E7D32',
-                mr: 1
+                m: 1
               }}
               label="Queue Management"
             />
@@ -175,7 +186,8 @@ function BannerImage() {
               p: 2,
               my: 3,
               transform: 'rotate(-2deg)',
-              boxShadow: 2
+              boxShadow: 2,
+              display: { xs: 'none', md: 'block' }
             }}
           >
             {/* <Typography variant="subtitle1" sx={{ p: 2, fontWeight: 'bold' }}>

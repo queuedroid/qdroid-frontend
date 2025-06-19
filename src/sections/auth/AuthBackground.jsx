@@ -11,13 +11,13 @@ export default function AuthBackground() {
     <Box
       sx={{
         position: 'absolute',
-        filter: 'blur(10px)',
+        filter: 'blur(15px)',
         zIndex: -1,
         bottom: 0,
         transform: 'inherit'
       }}
     >
-      <Box component="img" src="/background.png" alt="background" width="100%" height="100%" />
+      <Box component="img" src="/background.png" alt="background" width="90%" height="100%" />
     </Box>
   );
 }
