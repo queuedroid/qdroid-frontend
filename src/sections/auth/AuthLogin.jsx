@@ -24,6 +24,7 @@ import axios from 'axios';
 // project imports
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
+import { API_BASE_URL } from 'config';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
@@ -51,12 +52,12 @@ export default function AuthLogin({ isDemo = false }) {
     <>
       <Formik
         initialValues={{
-          username: '',
+          email: '',
           password: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string().max(255).required('Username is required'),
+          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string()
             .required('Password is required')
             .test('no-leading-trailing-whitespace', 'Password cannot start or end with spaces', (value) => value === value.trim())
@@ -67,19 +68,17 @@ export default function AuthLogin({ isDemo = false }) {
           setSuccessMsg('');
           setLoading(true);
           try {
-            const res = await axios.post('https://sherlockwisdom.com:8080/login', {
-              username: values.username,
+            const res = await axios.post(`${API_BASE_URL}/auth/login`, {
+              email: values.email,
               password: values.password
             });
             console.log('Login server response:', res.data);
-            if (res.data?.access_token && res.data?.status === 'logged in') {
+            if (res.data?.session_token && res.data?.message === 'Login successful') {
               localStorage.setItem('isAuthenticated', 'true');
-              localStorage.setItem('token', res.data.access_token);
-              localStorage.setItem('username', values.username); // Save username
+              localStorage.setItem('token', res.data.session_token);
+              localStorage.setItem('email', values.email);
               setSuccessMsg('Login successful! Redirecting...');
-              setTimeout(() => {
-                navigate('/dashboard');
-              }, 1000);
+              navigate('/dashboard');
             } else {
               setApiError('Login failed: Unexpected server response');
               console.error('Login failed: Unexpected server response', res.data);
@@ -103,27 +102,27 @@ export default function AuthLogin({ isDemo = false }) {
               )}
               {successMsg && (
                 <Grid size={12}>
-                  <FormHelperText>{successMsg}</FormHelperText>
+                  <FormHelperText sx={{ color: 'success.main' }}>{successMsg}</FormHelperText>
                 </Grid>
               )}
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>
-                  <InputLabel htmlFor="username-login">Username</InputLabel>
+                  <InputLabel htmlFor="email-login">Email</InputLabel>
                   <OutlinedInput
-                    id="username-login"
-                    type="text"
-                    value={values.username}
-                    name="username"
+                    id="email-login"
+                    type="email"
+                    value={values.email}
+                    name="email"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Enter username"
+                    placeholder="Enter email"
                     fullWidth
-                    error={Boolean(touched.username && errors.username)}
+                    error={Boolean(touched.email && errors.email)}
                   />
                 </Stack>
-                {touched.username && errors.username && (
-                  <FormHelperText error id="standard-weight-helper-text-username-login">
-                    {errors.username}
+                {touched.email && errors.email && (
+                  <FormHelperText error id="standard-weight-helper-text-email-login">
+                    {errors.email}
                   </FormHelperText>
                 )}
               </Grid>

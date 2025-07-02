@@ -33,7 +33,9 @@ const FeatureCard = ({ title, description, icon }) => (
         variant="outlined"
         sx={{
           height: '100%',
-          bgcolor: '#ffffff',
+          bgcolor: 'secondary.dark',
+          borderColor: 'secondary[800]',
+          color: '#ffffff',
           transition: 'transform 0.3s, box-shadow 0.3s',
           '&:hover': {
             transform: 'translateY(-8px)',
@@ -72,7 +74,7 @@ const Nav = () => {
     >
       {/* Logo + Name */}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Box component="img" src="/orange.png" alt="Logo" sx={{ width: 30, mr: 1 }} />
+        <Box component="img" src="/white.png" alt="Logo" sx={{ width: 30, mr: 1 }} />
         <Typography variant="h6" className="header" sx={{ fontWeight: 'bold', fontSize: { xs: 12, md: 20 } }}>
           QueueDriod
         </Typography>
@@ -112,15 +114,19 @@ const Footer = () => (
   </Box>
 );
 
-const Landing = () => {
+const Home = () => {
   return (
     <>
       <Box
+        bgcolor="secondary.darker"
+        className="home"
         sx={{
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          bgclor: 'secondary.darker',
+          color: '#ffffff'
         }}
       >
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -145,7 +151,7 @@ const Landing = () => {
                       fontWeight: 800,
                       fontSize: { xs: '3.5rem', sm: '5rem', md: '5.5rem' },
                       mixBlendMode: 'hard-light',
-                      color: 'black',
+                      //   color: 'black',
                       textAlign: { xs: 'center', md: 'left' }
                     }}
                     className="header"
@@ -182,10 +188,11 @@ const Landing = () => {
                         size="large"
                         sx={{
                           borderRadius: 1,
-                          color: '#ffffff',
-                          backgroundColor: '#000000',
+                          color: '#000000',
+                          backgroundColor: '#ffffff',
                           hover: {
-                            backgroundColor: '#E38E05'
+                            bgcolor: '#E38E05',
+                            color: '#ffffff'
                           },
                           textTransform: 'none',
                           px: { xs: 2, sm: 4, md: 8 },
@@ -251,8 +258,8 @@ const Landing = () => {
             // px: 2,
             px: { xs: 2, md: 15, sm: 10, lg: 25 },
             zIndex: 1,
-            position: 'relative',
-            bgcolor: '#F3F3F3'
+            position: 'relative'
+            // bgcolor: '#F3F3F3'
           }}
         >
           <Typography className="header" variant="h3">
@@ -298,4 +305,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default Home;

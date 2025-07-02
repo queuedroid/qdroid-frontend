@@ -29,7 +29,7 @@ export const useThemeCustomization = () => {
 export default function ThemeCustomization({ children }) {
   const [mode, setMode] = useState(() => {
     const storedMode = localStorage.getItem('themeMode');
-    return storedMode === 'dark' ? 'dark' : 'light';
+    return storedMode === 'dark' ? 'light' : 'dark';
   });
 
   useEffect(() => {
@@ -37,10 +37,10 @@ export default function ThemeCustomization({ children }) {
   }, [mode]);
 
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    setMode((prevMode) => (prevMode === 'dark' ? 'light' : 'dark'));
   };
 
-  const theme = Palette(mode, 'default');
+  const theme = Palette(mode, 'dark');
   const themeTypography = Typography('Public Sans', 'sans-serif');
   const themeCustomShadows = useMemo(() => CustomShadows(theme), [theme]);
 
