@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Card, CardContent, Paper, TextField, CardMedia, Avatar, Divider, Grid2, IconButton } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, Paper, TextField, CardMedia, Avatar, Divider, IconButton } from '@mui/material';
 import { Tabs, Tab } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import { motion } from 'framer-motion';
 import {
   ApiOutlined,
