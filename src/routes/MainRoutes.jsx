@@ -7,6 +7,7 @@ import RequireAuth from '../components/RequireAuth';
 import RequireOnboarding from '../components/RequireOnboarding';
 import Landing from '../pages/main/landing';
 import NotFound from '../pages/extra-pages/notfound';
+import Home from '../pages/main/home';
 
 // render- Dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
@@ -17,7 +18,7 @@ const Typography = Loadable(lazy(() => import('pages/component-overview/typograp
 const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
 
 // render - other pages
-const ApiKeys = Loadable(lazy(() => import('pages/apiKeys/index')));
+const Exchange = Loadable(lazy(() => import('pages/exchange/index')));
 const Posts = Loadable(lazy(() => import('pages/posts/index')));
 const Platforms = Loadable(lazy(() => import('pages/platforms/index')));
 const Analytics = Loadable(lazy(() => import('pages/analytics/index')));
@@ -56,7 +57,7 @@ const MainRoutes = {
         { path: 'posts', element: <Posts /> },
         { path: 'platforms', element: <Platforms /> },
         { path: 'analytics', element: <Analytics /> },
-        { path: 'api-keys', element: <ApiKeys /> },
+        { path: 'exchange', element: <Exchange /> },
         { path: 'subscription', element: <Subscription /> },
         { path: 'settings', element: <Settings /> },
         { path: 'documentation', element: <Documentation /> },

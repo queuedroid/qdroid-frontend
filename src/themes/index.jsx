@@ -2,8 +2,7 @@ import PropTypes from 'prop-types';
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 
 // material-ui
-import StyledEngineProvider from '@mui/material/StyledEngineProvider';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { StyledEngineProvider, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 // project imports
@@ -29,7 +28,7 @@ export const useThemeCustomization = () => {
 export default function ThemeCustomization({ children }) {
   const [mode, setMode] = useState(() => {
     const storedMode = localStorage.getItem('themeMode');
-    return storedMode === 'dark' ? 'dark' : 'light';
+    return storedMode === 'dark' ? 'light' : 'dark';
   });
 
   useEffect(() => {
@@ -37,10 +36,10 @@ export default function ThemeCustomization({ children }) {
   }, [mode]);
 
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    setMode((prevMode) => (prevMode === 'dark' ? 'light' : 'dark'));
   };
 
-  const theme = Palette(mode, 'default');
+  const theme = Palette(mode, 'dark');
   const themeTypography = Typography('Public Sans', 'sans-serif');
   const themeCustomShadows = useMemo(() => CustomShadows(theme), [theme]);
 

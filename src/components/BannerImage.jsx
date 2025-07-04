@@ -101,7 +101,7 @@ function BannerImage() {
             sx={{
               p: 2,
               my: 3,
-              //bgcolor: '#0069D3',
+              bgcolor: 'secondary.dark',
               transform: 'rotate(-3deg)',
               boxShadow: 4
             }}
@@ -111,13 +111,14 @@ function BannerImage() {
         </Typography> */}
             <Box
               sx={{
-                p: { md: 2, xs: 0 },
+                p: { md: 1, xs: 0 },
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                bgcolor: '#f0f0f0',
+                bgcolor: 'secondary.600',
                 borderRadius: 1,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                color: '#ffffff'
               }}
             >
               <Typography variant="subtitle2" sx={{ p: 2 }}>
@@ -136,7 +137,8 @@ function BannerImage() {
               py: 3,
               transform: 'rotate(2.5deg)',
               boxShadow: 3,
-              my: 3
+              my: 3,
+              bgcolor: 'secondary.dark'
             }}
           >
             <Chip
@@ -187,15 +189,16 @@ function BannerImage() {
               my: 3,
               transform: 'rotate(-2deg)',
               boxShadow: 2,
-              display: { xs: 'none', md: 'block' }
+              display: { xs: 'none', md: 'block' },
+              bgcolor: 'secondary.dark'
             }}
           >
             {/* <Typography variant="subtitle1" sx={{ p: 2, fontWeight: 'bold' }}>
           MESSAGE QUEING
         </Typography> */}
-            <TableContainer component={Paper}>
+            <TableContainer className="aria-disabled" component={Paper} sx={{ bgcolor: 'secondary.600' }}>
               <Table size="small" aria-label="a dense table">
-                <TableHead>
+                <TableHead sx={{ bgcolor: 'secondary.main' }}>
                   <TableRow>
                     <TableCell>Date</TableCell>
                     <TableCell align="right">MSISDN</TableCell>

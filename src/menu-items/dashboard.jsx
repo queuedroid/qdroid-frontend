@@ -64,10 +64,10 @@ const dashboard = {
     //   breadcrumbs: false
     // },
     {
-      id: 'api-keys',
-      title: 'API Keys',
+      id: 'exchange',
+      title: 'Exchange',
       type: 'item',
-      url: '/api-keys',
+      url: '/exchange',
       icon: icons.ApiOutlined,
       breadcrumbs: false
     },
