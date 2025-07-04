@@ -158,7 +158,7 @@ const Landing = () => {
                     <motion.path
                       d="M5 12c15-3 25-8 45-6 20 2 30 8 50 6 25-3 35-10 55-8 20 2 25 5 40 4 15-1 20-2 30-1 10 1 15 2 20 1 5-1 10-2 15-1"
                       stroke="#98880B"
-                      strokeWidth="2.5"
+                      strokeWidth="3.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       fill="none"
@@ -290,6 +290,469 @@ const Landing = () => {
           `}
         </style>
       </Box>
+      {/* Why Use QueueDriod Section */}
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        sx={{
+          py: 8,
+          px: { xs: 2, md: 4 },
+          backgroundColor: 'background.default'
+        }}
+      >
+        <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
+          {/* Section Header */}
+          <Box sx={{ textAlign: 'center', mb: 8 }}>
+            <Typography
+              variant="h2"
+              component={motion.h2}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              sx={{
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                fontWeight: 'bold',
+                mb: 2,
+                color: 'primary.main'
+              }}
+            >
+              Why Choose QueueDriod?
+            </Typography>
+            <Typography
+              variant="h6"
+              component={motion.p}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              sx={{
+                fontSize: { xs: '1rem', md: '1.2rem' },
+                color: 'text.secondary',
+                maxWidth: '700px',
+                mx: 'auto',
+                lineHeight: 1.6
+              }}
+            >
+              Join thousands of businesses already saving money and improving their SMS delivery rates with our intelligent platform
+            </Typography>
+          </Box>
+
+          {/* Features List */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* Feature 1 */}
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 4,
+                flexDirection: { xs: 'column', md: 'row' },
+                textAlign: { xs: 'center', md: 'left' }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+                  Slash SMS Costs by 40%
+                </Typography>
+                <Typography variant="h6" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
+                  Our intelligent routing system automatically selects the most cost-effective carriers for each message, dramatically
+                  reducing your SMS expenses without compromising delivery quality.
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'success.main', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                  💰 Save up to $2,000 per month on SMS costs
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  width: { xs: '100%', md: '300px' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                {/* Image */}
+                <Box
+                  component="img"
+                  src="/orange.png"
+                  alt="Cost Optimization Dashboard"
+                  sx={{
+                    width: '100%',
+                    maxWidth: '250px',
+                    height: 'auto',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    mb: 2
+                  }}
+                />
+                {/* Half Circle */}
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 50,
+                    background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
+                    borderRadius: '50px 50px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 25px rgba(255, 107, 107, 0.3)',
+                    position: 'absolute',
+                    bottom: -10,
+                    right: -10
+                  }}
+                >
+                  <LineChartOutlined style={{ fontSize: '2rem', color: 'white' }} />
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Feature 2 */}
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 4,
+                flexDirection: { xs: 'column', md: 'row-reverse' },
+                textAlign: { xs: 'center', md: 'right' }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+                  99.9% Delivery Success Rate
+                </Typography>
+                <Typography variant="h6" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
+                  Advanced queuing with automatic retry mechanisms ensures your critical messages reach recipients even during peak traffic
+                  times or network issues.
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'success.main', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                  📈 Increase customer engagement by 25%
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  width: { xs: '100%', md: '300px' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                {/* Image */}
+                <Box
+                  component="img"
+                  src="/white.png"
+                  alt="Delivery Success Analytics"
+                  sx={{
+                    width: '100%',
+                    maxWidth: '250px',
+                    height: 'auto',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    mb: 2
+                  }}
+                />
+                {/* Half Circle */}
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 50,
+                    background: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
+                    borderRadius: '50px 50px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 25px rgba(78, 205, 196, 0.3)',
+                    position: 'absolute',
+                    bottom: -10,
+                    left: -10
+                  }}
+                >
+                  <SecurityScanOutlined style={{ fontSize: '2rem', color: 'white' }} />
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Feature 3 */}
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              viewport={{ once: true }}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 4,
+                flexDirection: { xs: 'column', md: 'row' },
+                textAlign: { xs: 'center', md: 'left' }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+                  5-Minute Setup
+                </Typography>
+                <Typography variant="h6" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
+                  Simple REST API with comprehensive documentation gets you up and running in minutes, not days. No complex configurations
+                  or lengthy onboarding processes.
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'success.main', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                  ⚡ Start sending SMS in under 5 minutes
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  width: { xs: '100%', md: '300px' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                {/* Image */}
+                <Box
+                  component="img"
+                  src="/dgroup.png"
+                  alt="Quick Setup Interface"
+                  sx={{
+                    width: '100%',
+                    maxWidth: '250px',
+                    height: 'auto',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    mb: 2
+                  }}
+                />
+                {/* Half Circle */}
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 50,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    borderRadius: '50px 50px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    position: 'absolute',
+                    bottom: -10,
+                    right: -10
+                  }}
+                >
+                  <DashboardOutlined style={{ fontSize: '2rem', color: 'white' }} />
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Feature 4 */}
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              viewport={{ once: true }}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 4,
+                flexDirection: { xs: 'column', md: 'row-reverse' },
+                textAlign: { xs: 'center', md: 'right' }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+                  Scale to Millions
+                </Typography>
+                <Typography variant="h6" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
+                  Handle massive marketing campaigns and notifications with our enterprise-grade infrastructure. From 100 to 10 million
+                  messages, we scale with your business.
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'success.main', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                  🚀 Process 10M+ messages per hour
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  width: { xs: '100%', md: '300px' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                {/* Image */}
+                <Box
+                  component="img"
+                  src="/background.png"
+                  alt="Enterprise Scale Infrastructure"
+                  sx={{
+                    width: '100%',
+                    maxWidth: '250px',
+                    height: 'auto',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    mb: 2
+                  }}
+                />
+                {/* Half Circle */}
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 50,
+                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    borderRadius: '50px 50px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 25px rgba(240, 147, 251, 0.3)',
+                    position: 'absolute',
+                    bottom: -10,
+                    left: -10
+                  }}
+                >
+                  <UsergroupAddOutlined style={{ fontSize: '2rem', color: 'white' }} />
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Feature 5 */}
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 1.0 }}
+              viewport={{ once: true }}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 4,
+                flexDirection: { xs: 'column', md: 'row' },
+                textAlign: { xs: 'center', md: 'left' }
+              }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+                  AI-Powered Scheduling
+                </Typography>
+                <Typography variant="h6" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
+                  Machine learning algorithms analyze recipient behavior patterns and time zones to schedule messages for maximum engagement
+                  and conversion rates.
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'success.main', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                  📊 Boost open rates by 35%
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  width: { xs: '100%', md: '300px' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                {/* Image */}
+                <Box
+                  component="img"
+                  src="/orange.png"
+                  alt="AI Scheduling Dashboard"
+                  sx={{
+                    width: '100%',
+                    maxWidth: '250px',
+                    height: 'auto',
+                    borderRadius: 2,
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    mb: 2
+                  }}
+                />
+                {/* Half Circle */}
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 50,
+                    background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                    borderRadius: '50px 50px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 25px rgba(252, 182, 159, 0.3)',
+                    position: 'absolute',
+                    bottom: -10,
+                    right: -10
+                  }}
+                >
+                  <DashOutlined style={{ fontSize: '2rem', color: '#d67230' }} />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Call to Action */}
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+            viewport={{ once: true }}
+            sx={{
+              textAlign: 'center',
+              mt: 8,
+              p: 4,
+              borderRadius: 4,
+              background: 'linear-gradient(135deg, rgba(182, 59, 22, 0.1) 0%, rgba(141, 57, 8, 0.1) 100%)',
+              border: '2px solid',
+              borderColor: 'primary.main'
+            }}
+          >
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+              Ready to Transform Your SMS Strategy?
+            </Typography>
+            <Typography variant="h6" sx={{ color: 'text.secondary', mb: 4, lineHeight: 1.6 }}>
+              Join over 5,000+ businesses already saving money and improving delivery rates
+            </Typography>
+            <AnimateButton>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<MessageOutlined />}
+                sx={{
+                  px: 6,
+                  py: 2,
+                  fontSize: '1.2rem',
+                  borderRadius: '50px',
+                  background: 'linear-gradient(45deg, #B63B16 30%, #8D3908 90%)',
+                  boxShadow: '0 8px 30px rgba(182, 59, 22, 0.3)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #8D3908 30%, #B63B16 90%)',
+                    boxShadow: '0 12px 40px rgba(182, 59, 22, 0.4)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+              >
+                Start Free Trial Now
+              </Button>
+            </AnimateButton>
+          </Box>
+        </Box>
+      </Box>
+
       <Footer />
     </>
   );

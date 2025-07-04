@@ -6,6 +6,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
+// project imports
+import { handleLogout as centralizedLogout } from 'utils/api';
+
 // assets
 import EditOutlined from '@ant-design/icons/EditOutlined';
 import ProfileOutlined from '@ant-design/icons/ProfileOutlined';
@@ -21,10 +24,7 @@ export default function ProfileTab() {
 
   // Logout handler
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href = '/login';
+    centralizedLogout();
   };
 
   return (

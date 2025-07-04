@@ -23,6 +23,7 @@ import Avatar from 'components/@extended/Avatar';
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 import IconButton from 'components/@extended/IconButton';
+import { handleLogout as centralizedLogout } from 'utils/api';
 
 // assets
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
@@ -71,10 +72,7 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href = '/login';
+    centralizedLogout();
   };
 
   const username = localStorage.getItem('username') || 'User';

@@ -27,6 +27,61 @@ const createHeaders = (includeAuth = true) => {
 };
 
 /**
+ * Logout user and redirect to login page
+ */
+const handleLogout = () => {
+  // Clear all authentication data
+  localStorage.removeItem('isAuthenticated');
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  localStorage.removeItem('email');
+
+  // Clear any other user-related data
+  localStorage.removeItem('userProfile');
+  localStorage.removeItem('onboardingComplete');
+
+  // Show a message to the user
+  console.log('🚨 Session expired. Logging out user and redirecting to login...');
+
+  // Create a visual notification for the user
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #f44336;
+    color: white;
+    padding: 16px;
+    border-radius: 4px;
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    max-width: 300px;
+  `;
+  notification.innerHTML = `
+    <div style="font-weight: bold; margin-bottom: 4px;">Session Expired</div>
+    <div>Your session has expired. Please log in again.</div>
+  `;
+  document.body.appendChild(notification);
+
+  // Remove notification after 4 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 4000);
+
+  // Redirect to login page with a small delay to ensure the user sees the notification
+  setTimeout(() => {
+    // Try React Router first if available, fallback to window.location
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  }, 500);
+};
+
+/**
  * Make an API request
  */
 const apiRequest = async (endpoint, options = {}) => {
@@ -51,6 +106,13 @@ const apiRequest = async (endpoint, options = {}) => {
       ok: response.ok,
       headers: Object.fromEntries(response.headers.entries())
     });
+
+    // Check for 401 Unauthorized error
+    if (response.status === 401) {
+      console.error('401 Unauthorized - Session expired. Logging out user.');
+      handleLogout();
+      return; // Don't continue processing the response
+    }
 
     return response;
   } catch (error) {
@@ -103,4 +165,4 @@ export const exchangeAPI = {
     })
 };
 
-export { API_BASE_URL, getAuthToken, createHeaders, apiRequest };
+export { API_BASE_URL, getAuthToken, createHeaders, apiRequest, handleLogout };

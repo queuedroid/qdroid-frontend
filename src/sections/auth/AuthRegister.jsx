@@ -13,11 +13,19 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 
 // third-party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import axios from 'axios';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { getCountryCallingCode } from 'libphonenumber-js';
+import countries from 'i18n-iso-countries';
+import enCountries from 'i18n-iso-countries/langs/en.json';
 
 // project imports
 import IconButton from 'components/@extended/IconButton';
@@ -38,7 +46,45 @@ export default function AuthRegister() {
   const [apiError, setApiError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [phoneValue, setPhoneValue] = useState();
+  const [selectedCountry, setSelectedCountry] = useState('');
   const navigate = useNavigate();
+
+  // Initialize countries
+  useEffect(() => {
+    countries.registerLocale(enCountries);
+  }, []);
+
+  // Get country list
+  const countryList = Object.entries(countries.getNames('en'))
+    .map(([code, name]) => ({
+      code,
+      name
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Function to get country code from phone number
+  const getCountryFromPhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return '';
+
+    // Extract country code from phone number
+    const match = phoneNumber.match(/^\+(\d{1,3})/);
+    if (!match) return '';
+
+    const callingCode = match[1];
+
+    // Find country by calling code
+    const country = countryList.find((country) => {
+      try {
+        return getCountryCallingCode(country.code) === callingCode;
+      } catch (e) {
+        return false;
+      }
+    });
+
+    return country ? country.code : '';
+  };
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -52,6 +98,15 @@ export default function AuthRegister() {
     setLevel(strengthColor(temp));
   };
 
+  // Handle phone number change and auto-fill country
+  const handlePhoneChange = (value) => {
+    setPhoneValue(value);
+    const detectedCountry = getCountryFromPhoneNumber(value);
+    if (detectedCountry && detectedCountry !== selectedCountry) {
+      setSelectedCountry(detectedCountry);
+    }
+  };
+
   const [searchParams] = useSearchParams();
   const auth = searchParams.get('auth');
 
@@ -63,33 +118,45 @@ export default function AuthRegister() {
     <>
       <Formik
         initialValues={{
+          name: '',
           email: '',
           password: '',
           repeatPassword: '',
-          phone_number: '',
+          country: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
+          name: Yup.string().max(100, 'Name must be less than 100 characters'),
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          phone_number: Yup.string().required('Phone number is required'),
           password: Yup.string()
             .required('Password is required')
             .test('no-leading-trailing-whitespace', 'Password cannot start or end with spaces', (value) => value === value.trim())
             .max(64, 'Password must be less than 64 characters'),
           repeatPassword: Yup.string()
             .required('Repeat Password is required')
-            .oneOf([Yup.ref('password'), null], 'Passwords must match')
+            .oneOf([Yup.ref('password'), null], 'Passwords must match'),
+          country: Yup.string()
         })}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
           setApiError('');
           setSuccessMsg('');
           setLoading(true);
           try {
-            const res = await axios.post(`${API_BASE_URL}/auth/signup`, {
+            const requestData = {
               email: values.email,
               password: values.password,
-              phone_number: values.phone_number
-            });
+              phone_number: phoneValue
+            };
+
+            // Add optional fields only if they have values
+            if (values.name.trim()) {
+              requestData.name = values.name;
+            }
+            if (selectedCountry) {
+              requestData.country = selectedCountry;
+            }
+
+            const res = await axios.post(`${API_BASE_URL}/auth/signup`, requestData);
             console.log('Register server response:', res.data);
             const sessionTokenValid =
               res.data?.session_token && (res.data?.message === 'Registration successful' || res.data?.message === 'Login successful');
@@ -100,6 +167,10 @@ export default function AuthRegister() {
               localStorage.setItem('isAuthenticated', 'true');
               localStorage.setItem('token', res.data.session_token || res.data.access_token || 'signup_successful');
               localStorage.setItem('email', values.email);
+              // Save username for dashboard use
+              if (values.name.trim()) {
+                localStorage.setItem('username', values.name.trim());
+              }
               setSuccessMsg('Signup successful! Redirecting...');
               resetForm();
               navigate('/dashboard');
@@ -136,6 +207,27 @@ export default function AuthRegister() {
               )}
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>
+                  <InputLabel htmlFor="name-signup">Name</InputLabel>
+                  <OutlinedInput
+                    fullWidth
+                    error={Boolean(touched.name && errors.name)}
+                    id="name-signup"
+                    type="text"
+                    value={values.name}
+                    name="name"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    placeholder="Enter your name"
+                  />
+                </Stack>
+                {touched.name && errors.name && (
+                  <FormHelperText error id="helper-text-name-signup">
+                    {errors.name}
+                  </FormHelperText>
+                )}
+              </Grid>
+              <Grid size={12}>
+                <Stack sx={{ gap: 1 }}>
                   <InputLabel htmlFor="email-signup">Email*</InputLabel>
                   <OutlinedInput
                     fullWidth
@@ -157,24 +249,73 @@ export default function AuthRegister() {
               </Grid>
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>
-                  <InputLabel htmlFor="phone-signup">Phone Number*</InputLabel>
-                  <OutlinedInput
-                    fullWidth
-                    error={Boolean(touched.phone_number && errors.phone_number)}
-                    id="phone-signup"
-                    type="tel"
-                    value={values.phone_number}
-                    name="phone_number"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    placeholder="Enter phone number (e.g., +2371234567890)"
-                  />
+                  <InputLabel htmlFor="phone-signup">Phone Number (Optional)</InputLabel>
+                  <Box
+                    sx={{
+                      '& .PhoneInput': {
+                        border: '1px solid #d3d4d5',
+                        borderRadius: '4px',
+                        padding: '8px 12px',
+                        fontSize: '14px',
+                        '&:focus-within': {
+                          borderColor: '#1976d2',
+                          borderWidth: '2px'
+                        }
+                      },
+                      '& .PhoneInputInput': {
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '14px',
+                        marginLeft: '8px'
+                      },
+                      '& .PhoneInputCountrySelect': {
+                        border: 'none',
+                        outline: 'none',
+                        marginRight: '8px'
+                      }
+                    }}
+                  >
+                    <PhoneInput
+                      id="phone-signup"
+                      placeholder="Enter phone number"
+                      value={phoneValue}
+                      onChange={handlePhoneChange}
+                      defaultCountry="CM"
+                      international
+                      countryCallingCodeEditable={false}
+                    />
+                  </Box>
                 </Stack>
-                {touched.phone_number && errors.phone_number && (
-                  <FormHelperText error id="helper-text-phone-signup">
-                    {errors.phone_number}
-                  </FormHelperText>
-                )}
+              </Grid>
+              <Grid size={12}>
+                <Stack sx={{ gap: 1 }}>
+                  <InputLabel htmlFor="country-signup">Country (Optional)</InputLabel>
+                  <FormControl fullWidth>
+                    <Select
+                      id="country-signup"
+                      value={selectedCountry}
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      displayEmpty
+                      sx={{
+                        '& .MuiSelect-select': {
+                          fontSize: '14px'
+                        }
+                      }}
+                    >
+                      <MenuItem value="">
+                        <em>Select a country</em>
+                      </MenuItem>
+                      {countryList.map((country) => (
+                        <MenuItem key={country.code} value={country.code}>
+                          {country.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Typography variant="caption" color="textSecondary">
+                    Auto-fills based on your phone number, but you can change it manually
+                  </Typography>
+                </Stack>
               </Grid>
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>
