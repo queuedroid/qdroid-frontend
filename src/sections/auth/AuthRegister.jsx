@@ -5,7 +5,7 @@ import { Link as RouterLink, useSearchParams, useNavigate } from 'react-router-d
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
@@ -22,6 +22,7 @@ import axios from 'axios';
 // project imports
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
+import { API_BASE_URL } from 'config';
 
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
@@ -62,13 +63,15 @@ export default function AuthRegister() {
     <>
       <Formik
         initialValues={{
-          username: '',
+          email: '',
           password: '',
           repeatPassword: '',
+          phone_number: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string().max(255).required('Username is required'),
+          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+          phone_number: Yup.string().required('Phone number is required'),
           password: Yup.string()
             .required('Password is required')
             .test('no-leading-trailing-whitespace', 'Password cannot start or end with spaces', (value) => value === value.trim())
@@ -82,20 +85,24 @@ export default function AuthRegister() {
           setSuccessMsg('');
           setLoading(true);
           try {
-            const res = await axios.post('https://sherlockwisdom.com:8080/', {
-              username: values.username,
-              password: values.password
+            const res = await axios.post(`${API_BASE_URL}/auth/signup`, {
+              email: values.email,
+              password: values.password,
+              phone_number: values.phone_number
             });
             console.log('Register server response:', res.data);
-            if (res.data?.access_token && (res.data?.status === 'created' || res.data?.status === 'logged in')) {
+            const sessionTokenValid =
+              res.data?.session_token && (res.data?.message === 'Registration successful' || res.data?.message === 'Login successful');
+            const accessTokenValid = res.data?.access_token && (res.data?.status === 'created' || res.data?.status === 'logged in');
+            const signupSuccessful = res.data?.message === 'Signup successful';
+
+            if (sessionTokenValid || accessTokenValid || signupSuccessful) {
               localStorage.setItem('isAuthenticated', 'true');
-              localStorage.setItem('token', res.data.access_token);
-              localStorage.setItem('username', values.username); // Save username
+              localStorage.setItem('token', res.data.session_token || res.data.access_token || 'signup_successful');
+              localStorage.setItem('email', values.email);
               setSuccessMsg('Signup successful! Redirecting...');
-              setTimeout(() => {
-                resetForm();
-                navigate('/dashboard');
-              }, 1000);
+              resetForm();
+              navigate('/dashboard');
             } else {
               setApiError(res.data?.message || 'Signup failed: Unexpected server response');
               console.error('Signup failed: Unexpected server response', res.data);
@@ -124,27 +131,48 @@ export default function AuthRegister() {
               )}
               {successMsg && (
                 <Grid size={12}>
-                  <FormHelperText>{successMsg}</FormHelperText>
+                  <FormHelperText sx={{ color: 'success.main' }}>{successMsg}</FormHelperText>
                 </Grid>
               )}
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>
-                  <InputLabel htmlFor="username-signup">Username*</InputLabel>
+                  <InputLabel htmlFor="email-signup">Email*</InputLabel>
                   <OutlinedInput
                     fullWidth
-                    error={Boolean(touched.username && errors.username)}
-                    id="username-signup"
-                    type="text"
-                    value={values.username}
-                    name="username"
+                    error={Boolean(touched.email && errors.email)}
+                    id="email-signup"
+                    type="email"
+                    value={values.email}
+                    name="email"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Enter username"
+                    placeholder="Enter email"
                   />
                 </Stack>
-                {touched.username && errors.username && (
-                  <FormHelperText error id="helper-text-username-signup">
-                    {errors.username}
+                {touched.email && errors.email && (
+                  <FormHelperText error id="helper-text-email-signup">
+                    {errors.email}
+                  </FormHelperText>
+                )}
+              </Grid>
+              <Grid size={12}>
+                <Stack sx={{ gap: 1 }}>
+                  <InputLabel htmlFor="phone-signup">Phone Number*</InputLabel>
+                  <OutlinedInput
+                    fullWidth
+                    error={Boolean(touched.phone_number && errors.phone_number)}
+                    id="phone-signup"
+                    type="tel"
+                    value={values.phone_number}
+                    name="phone_number"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    placeholder="Enter phone number (e.g., +2371234567890)"
+                  />
+                </Stack>
+                {touched.phone_number && errors.phone_number && (
+                  <FormHelperText error id="helper-text-phone-signup">
+                    {errors.phone_number}
                   </FormHelperText>
                 )}
               </Grid>
