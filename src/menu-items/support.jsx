@@ -20,7 +20,7 @@ const support = {
       id: 'documentation',
       title: 'Documentation',
       type: 'item',
-      url: '/documentation',
+      url: '/dashboard/documentation',
       icon: icons.FileSearchOutlined,
       breadcrumbs: false
     },
@@ -28,7 +28,7 @@ const support = {
       id: 'help',
       title: 'help',
       type: 'item',
-      url: '/help',
+      url: '/dashboard/help',
       icon: icons.QuestionOutlined
     }
   ]

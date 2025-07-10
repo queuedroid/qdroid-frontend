@@ -19,8 +19,7 @@ const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
 
 // render - other pages
 const Exchange = Loadable(lazy(() => import('pages/exchange/index')));
-const Posts = Loadable(lazy(() => import('pages/posts/index')));
-const Platforms = Loadable(lazy(() => import('pages/platforms/index')));
+const Message = Loadable(lazy(() => import('pages/messages/index')));
 const Analytics = Loadable(lazy(() => import('pages/analytics/index')));
 const Subscription = Loadable(lazy(() => import('pages/subscription/index')));
 const Settings = Loadable(lazy(() => import('pages/settings/index')));
@@ -42,10 +41,11 @@ const MainRoutes = {
       element: <NotFound />
     },
     {
+      path: 'dashboard',
       element: <DashboardLayout />,
       children: [
         {
-          path: 'dashboard',
+          path: '',
           element: (
             <RequireAuth>
               {/* <RequireOnboarding> */}
@@ -54,8 +54,7 @@ const MainRoutes = {
             </RequireAuth>
           )
         },
-        { path: 'posts', element: <Posts /> },
-        { path: 'platforms', element: <Platforms /> },
+        { path: 'messages', element: <Message /> },
         { path: 'analytics', element: <Analytics /> },
         { path: 'exchange', element: <Exchange /> },
         { path: 'subscription', element: <Subscription /> },

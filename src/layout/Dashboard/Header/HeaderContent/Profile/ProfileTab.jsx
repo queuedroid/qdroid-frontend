@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import List from '@mui/material/List';
@@ -6,54 +7,52 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
+// project imports
+import { handleLogout as centralizedLogout } from 'utils/api';
+
 // assets
 import EditOutlined from '@ant-design/icons/EditOutlined';
 import ProfileOutlined from '@ant-design/icons/ProfileOutlined';
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
+import SettingOutlined from '@ant-design/icons/SettingOutlined';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
 export default function ProfileTab() {
-  // Get username from localStorage
-  const username = localStorage.getItem('username') || 'User';
+  const navigate = useNavigate();
 
   // Logout handler
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href = '/login';
+    centralizedLogout();
+  };
+
+  // Navigate to settings page
+  const handleEditProfile = () => {
+    navigate('/dashboard/settings');
+  };
+
+  const handleSettings = () => {
+    navigate('/dashboard/settings');
   };
 
   return (
     <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
-      <ListItemButton>
+      <ListItemButton onClick={handleEditProfile}>
         <ListItemIcon>
           <EditOutlined />
         </ListItemIcon>
         <ListItemText primary="Edit Profile" />
       </ListItemButton>
-      {/* <ListItemButton>
-        <ListItemIcon>
-          <UserOutlined />
-        </ListItemIcon>
-        <ListItemText primary="View Profile" />
-      </ListItemButton> */}
 
-      {/* <ListItemButton>
+      <ListItemButton onClick={handleSettings}>
         <ListItemIcon>
-          <ProfileOutlined />
+          <SettingOutlined />
         </ListItemIcon>
-        <ListItemText primary="Social Profile" />
-      </ListItemButton> */}
-      {/* <ListItemButton>
-        <ListItemIcon>
-          <WalletOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Billing" />
-      </ListItemButton> */}
+        <ListItemText primary="Settings" />
+      </ListItemButton>
+
       <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
           <LogoutOutlined />
