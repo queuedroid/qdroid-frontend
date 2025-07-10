@@ -20,8 +20,10 @@ export const withErrorHandling = (apiCall) => {
           message: error.response.data?.message || error.message
         });
 
-        // Call logout function
-        handleLogout();
+        // Call logout function (async)
+        handleLogout().catch((logoutError) => {
+          console.error('Error during logout:', logoutError);
+        });
       }
 
       // Re-throw the error so calling code can handle it
@@ -43,7 +45,9 @@ export const handle401Error = (error) => {
       message: error.response.data?.message || error.message
     });
 
-    handleLogout();
+    handleLogout().catch((logoutError) => {
+      console.error('Error during logout:', logoutError);
+    });
     return true; // Indicates that 401 was handled
   }
 

@@ -29,8 +29,33 @@ const createHeaders = (includeAuth = true) => {
 /**
  * Logout user and redirect to login page
  */
-const handleLogout = () => {
-  // Clear all authentication data
+const handleLogout = async () => {
+  try {
+    // Get the auth token before clearing it
+    const token = getAuthToken();
+
+    if (token) {
+      // Call the logout API endpoint to invalidate the session
+      const logoutUrl = `${import.meta.env.VITE_APP_BASE_API || 'http://localhost:8080/v1'}/auth/logout`;
+
+      try {
+        await fetch(logoutUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('✅ Successfully logged out from server');
+      } catch (apiError) {
+        console.warn('⚠️ Failed to call logout API, but continuing with local logout:', apiError);
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ Error during logout API call, but continuing with local logout:', error);
+  }
+
+  // Always clear all authentication data regardless of API call success
   localStorage.removeItem('isAuthenticated');
   localStorage.removeItem('token');
   localStorage.removeItem('username');
@@ -110,11 +135,22 @@ const apiRequest = async (endpoint, options = {}) => {
     // Check for 401 Unauthorized error
     if (response.status === 401) {
       console.error('401 Unauthorized - Session expired. Logging out user.');
-      handleLogout();
+      handleLogout().catch((logoutError) => {
+        console.error('Error during logout:', logoutError);
+      });
       return; // Don't continue processing the response
     }
 
-    return response;
+    // Check if response is ok
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    // Parse JSON response
+    const data = await response.json();
+    console.log('Parsed API Data:', data);
+    return data;
   } catch (error) {
     console.error('API request failed:', error);
     throw error;
@@ -162,6 +198,25 @@ export const exchangeAPI = {
   deleteQueue: (exchangeId, queueId) =>
     apiRequest(`/exchanges/${exchangeId}/queues/${queueId}`, {
       method: 'DELETE'
+    })
+};
+
+/**
+ * API methods for messages
+ */
+export const messageAPI = {
+  // Send single message
+  sendSingle: (messageData) =>
+    apiRequest('/messages/send', {
+      method: 'POST',
+      body: JSON.stringify(messageData)
+    }),
+
+  // Send multiple messages in bulk
+  sendBulk: (bulkMessageData) =>
+    apiRequest('/messages/bulk-send', {
+      method: 'POST',
+      body: JSON.stringify(bulkMessageData)
     })
 };
 

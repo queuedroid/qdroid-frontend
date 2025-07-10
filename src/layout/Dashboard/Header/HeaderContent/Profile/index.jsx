@@ -71,8 +71,13 @@ export default function Profile() {
     setValue(newValue);
   };
 
-  const handleLogout = () => {
-    centralizedLogout();
+  const handleLogout = async () => {
+    try {
+      await centralizedLogout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Even if there's an error, the centralizedLogout function will handle cleanup
+    }
   };
 
   const username = localStorage.getItem('username') || 'User';

@@ -57,8 +57,10 @@ export const setupAxiosInterceptors = () => {
         if (!isLoggingOut) {
           isLoggingOut = true;
 
-          // Call the centralized logout function
-          handleLogout();
+          // Call the centralized logout function (async)
+          handleLogout().catch((logoutError) => {
+            console.error('Error during logout:', logoutError);
+          });
 
           // Reset the flag after a delay to allow for potential retries
           setTimeout(() => {

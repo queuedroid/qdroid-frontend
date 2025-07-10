@@ -40,14 +40,6 @@ const dashboard = {
       breadcrumbs: false
     },
     // {
-    //   id: 'posts',
-    //   title: 'Posts',
-    //   type: 'item',
-    //   url: '/posts',
-    //   icon: icons.CommentOutlined,
-    //   breadcrumbs: false
-    // },
-    // {
     //   id: 'platforms',
     //   title: 'Platforms',
     //   type: 'item',
@@ -69,6 +61,14 @@ const dashboard = {
       type: 'item',
       url: '/exchange',
       icon: icons.ApiOutlined,
+      breadcrumbs: false
+    },
+    {
+      id: 'messages',
+      title: 'Message',
+      type: 'item',
+      url: '/message',
+      icon: icons.CommentOutlined,
       breadcrumbs: false
     },
     // {

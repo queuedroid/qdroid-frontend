@@ -153,7 +153,7 @@ export default function AuthRegister() {
               requestData.name = values.name;
             }
             if (selectedCountry) {
-              requestData.country = selectedCountry;
+              requestData.country_code = selectedCountry;
             }
 
             const res = await axios.post(`${API_BASE_URL}/auth/signup`, requestData);
