@@ -37,12 +37,12 @@ const Nav = () => {
         right: 0,
         zIndex: 1000, // Ensure the nav is above other content
         backdropFilter: 'blur(10px)', // Optional: adds a blur effect to the background
-        color: 'white' // Change text color to white for better contrast
+        color: '#000' // Change text color to white for better contrast
       }}
     >
       {/* Logo + Name */}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Box component="img" src="/white.png" alt="Logo" sx={{ width: 30, mr: 1 }} />
+        <Box component="img" src="/logo.png" alt="Logo" sx={{ width: 30, mr: 1 }} />
         <Typography variant="h6" className="header" sx={{ fontWeight: 'bold', fontSize: { xs: 12, md: 20 } }}>
           QueueDriod
         </Typography>
@@ -55,13 +55,13 @@ const Nav = () => {
           href="/dashboard"
           target="_blank"
           variant="contained"
-          sx={{ textTransform: 'none', borderRadius: 7, px: 4, bgcolor: 'white', color: 'black' }}
+          sx={{ textTransform: 'none', borderRadius: 7, px: 4, bgcolor: 'black', color: 'white' }}
         >
           Login
         </Button>
         <a href="https://github.com/QueueDriod" target="_blank">
           {' '}
-          <GithubOutlined style={{ fontSize: 27, color: 'white' }} />{' '}
+          <GithubOutlined style={{ fontSize: 27, color: 'black' }} />{' '}
         </a>
         <IconButton onClick={handleThemeToggle}>{mode === 'light' ? <SunOutlined /> : <MoonOutlined />}</IconButton>
       </Box>

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -23,12 +23,18 @@ import Avatar from 'components/@extended/Avatar';
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 import IconButton from 'components/@extended/IconButton';
+import { handleLogout as centralizedLogout } from 'utils/api';
+import { useUserDetails } from 'hooks/useUserDetails';
 
 // assets
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
-import avatar1 from 'assets/images/users/avatar-1.png';
+import avatar1 from 'assets/images/users/user-1.jpg';
+import avatar2 from 'assets/images/users/user-2.jpg';
+import avatar3 from 'assets/images/users/user-3.jpg';
+import avatar4 from 'assets/images/users/user-4.jpg';
+import avatar5 from 'assets/images/users/user-5.jpg';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -50,9 +56,35 @@ function a11yProps(index) {
 
 export default function Profile() {
   const theme = useTheme();
+  const { userDetails, fetchUserDetails } = useUserDetails();
 
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
+
+  // Fetch user details on component mount
+  useEffect(() => {
+    fetchUserDetails();
+  }, [fetchUserDetails]);
+
+  // Add event listener to close dropdown when clicking anywhere on the page
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (open && anchorRef.current && !anchorRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [open]);
+
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
@@ -70,14 +102,30 @@ export default function Profile() {
     setValue(newValue);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    try {
+      await centralizedLogout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Even if there's an error, the centralizedLogout function will handle cleanup
+    }
   };
 
-  const username = localStorage.getItem('username') || 'User';
+  // Use actual user name from API, fallback to localStorage, then to 'User'
+  const displayName = userDetails.name || localStorage.getItem('username') || 'User';
+
+  // Get user's selected avatar
+  const getUserAvatar = () => {
+    const savedAvatar = localStorage.getItem('userAvatar') || 'user-5';
+    const avatarMap = {
+      'user-1': avatar1,
+      'user-2': avatar2,
+      'user-3': avatar3,
+      'user-4': avatar4,
+      'user-6': avatar5
+    };
+    return avatarMap[savedAvatar] || avatar1;
+  };
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -97,9 +145,9 @@ export default function Profile() {
         onClick={handleToggle}
       >
         <Stack direction="row" sx={{ gap: 1.25, alignItems: 'center', p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} size="sm" />
+          <Avatar alt="profile user" src={getUserAvatar()} size="sm" />
           <Typography variant="subtitle1" sx={{ textTransform: 'capitalize' }}>
-            {username}
+            {displayName}
           </Typography>
         </Stack>
       </ButtonBase>
@@ -130,10 +178,10 @@ export default function Profile() {
                     <Grid container justifyContent="space-between" alignItems="center">
                       <Grid>
                         <Stack direction="row" sx={{ gap: 1.25, alignItems: 'center' }}>
-                          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                          <Avatar alt="profile user" src={getUserAvatar()} sx={{ width: 32, height: 32 }} />
                           <Stack>
                             <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>
-                              {username}
+                              {displayName}
                             </Typography>
                             {/* <Typography variant="body2" color="text.secondary">
                               UI/UX Designer
