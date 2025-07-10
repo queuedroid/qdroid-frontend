@@ -41,10 +41,11 @@ const MainRoutes = {
       element: <NotFound />
     },
     {
+      path: 'dashboard',
       element: <DashboardLayout />,
       children: [
         {
-          path: 'dashboard',
+          path: '',
           element: (
             <RequireAuth>
               {/* <RequireOnboarding> */}
@@ -53,7 +54,7 @@ const MainRoutes = {
             </RequireAuth>
           )
         },
-        { path: 'message', element: <Message /> },
+        { path: 'messages', element: <Message /> },
         { path: 'analytics', element: <Analytics /> },
         { path: 'exchange', element: <Exchange /> },
         { path: 'subscription', element: <Subscription /> },

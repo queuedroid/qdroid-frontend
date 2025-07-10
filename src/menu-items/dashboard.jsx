@@ -59,7 +59,7 @@ const dashboard = {
       id: 'exchange',
       title: 'Exchange',
       type: 'item',
-      url: '/exchange',
+      url: '/dashboard/exchange',
       icon: icons.ApiOutlined,
       breadcrumbs: false
     },
@@ -67,7 +67,7 @@ const dashboard = {
       id: 'messages',
       title: 'Message',
       type: 'item',
-      url: '/message',
+      url: '/dashboard/messages',
       icon: icons.CommentOutlined,
       breadcrumbs: false
     },
@@ -75,7 +75,7 @@ const dashboard = {
     //   id: 'subscription',
     //   title: 'Subscription & Billing',
     //   type: 'item',
-    //   url: '/subscription',
+    //   url: '/dashboard/subscription',
     //   icon: icons.CreditCardOutlined,
     //   breadcrumbs: false
     // },
@@ -83,7 +83,7 @@ const dashboard = {
       id: 'settings',
       title: 'Settings',
       type: 'item',
-      url: '/settings',
+      url: '/dashboard/settings',
       icon: icons.SettingOutlined,
       breadcrumbs: false
     }

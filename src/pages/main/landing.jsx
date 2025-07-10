@@ -577,7 +577,7 @@ const Landing = () => {
                 my: 20,
                 borderRadius: 4,
                 background: 'rgba(255, 255, 255, 0.05)',
-                border: '30px solid rgba(241, 109, 76, 0.47)',
+                border: '30px solid rgba(15, 15, 13, 0.47)',
                 backdropFilter: 'blur(10px)',
                 boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
               }}
@@ -604,7 +604,6 @@ const Landing = () => {
                       sx={{
                         width: '100%',
                         height: '100%',
-                        borderRadius: '16px 0 0 16px', // Top-left, top-right, bottom-right, bottom-left
                         filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1))'
                       }}
                     />
@@ -620,7 +619,7 @@ const Landing = () => {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     viewport={{ once: true }}
                     sx={{
-                      textAlign: { xs: 'center', md: 'left' }
+                      textAlign: { xs: 'center', md: 'left' },
                     }}
                     justifyContent="center"
                     alignItems="center"

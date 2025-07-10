@@ -383,7 +383,7 @@ export default function Exchange() {
                     {exchange.description || 'No description'}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    <Chip label={`ID: ${exchange.exchange_id || exchange.id}`} size="small" />
+                    ID: <Chip label={`${exchange.exchange_id || exchange.id}`} size="small" />
                     <Tooltip title="Copy Exchange ID">
                       <IconButton
                         size="small"
@@ -410,6 +410,14 @@ export default function Exchange() {
                     </Button>
                     <Button size="small" startIcon={<EditOutlined />} onClick={() => handleDialogOpen('edit', exchange)}>
                       Edit
+                    </Button>
+                    <Button 
+                      size="small" 
+                      startIcon={<DeleteIcon />} 
+                      color="error" 
+                      onClick={() => handleDialogOpen('delete', exchange)}
+                    >
+                      Delete
                     </Button>
                   </Box>
                 </MainCard>
