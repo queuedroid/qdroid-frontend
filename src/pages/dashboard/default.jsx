@@ -9,6 +9,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 
 // project imports
 import MainCard from 'components/MainCard';
@@ -21,6 +23,7 @@ import { useUserDetails } from '../../hooks/useUserDetails';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import CopyOutlined from '@ant-design/icons/CopyOutlined';
+import { UndoOutlined } from '@ant-design/icons';
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
@@ -46,9 +49,11 @@ export default function DashboardDefault() {
     console.log('User details:', userDetails);
     console.log('User loading:', userLoading);
     console.log('User error:', userError);
+    console.log('Exchange stats:', exchangeStats);
+    console.log('Exchange stats loading:', loading);
     console.log('Token from localStorage:', localStorage.getItem('token'));
     console.log('Account token from userDetails:', userDetails.account_token);
-  }, [userDetails, userLoading, userError]);
+  }, [userDetails, userLoading, userError, exchangeStats, loading]);
 
   // Handle token copy
   const handleCopyToken = async () => {
@@ -67,9 +72,16 @@ export default function DashboardDefault() {
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* row 1 */}
       <Grid sx={{ mb: -2.25 }} size={12}>
-        <Typography variant="h5" sx={{ textTransform: 'capitalize' }}>
-          Hi{userDetails?.full_name ? `, ${userDetails.full_name}` : ''}!👋🏼
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" sx={{ textTransform: 'capitalize' }}>
+            Hi{userDetails?.full_name ? `, ${userDetails.full_name}` : ''}!👋🏼
+          </Typography>
+          <Tooltip title="Refresh dashboard statistics">
+            <Button variant="outlined" startIcon={<UndoOutlined />} onClick={fetchStats} disabled={loading} size="small">
+              Refresh
+            </Button>
+          </Tooltip>
+        </Box>
       </Grid>
 
       {/* Statistics Cards */}
@@ -91,16 +103,16 @@ export default function DashboardDefault() {
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
-          title="Messages Sent"
+          title="Total Events"
           count={loading ? '...' : exchangeStats.messagesSent.toLocaleString()}
-          extra="This month"
+          extra="From event logs"
           isLoss={false}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
           title="Messages Queued"
-          count={loading ? '...' : exchangeStats.messagesQueued.toString()}
+          count={loading ? '...' : exchangeStats.messagesQueued.toLocaleString()}
           extra="Pending delivery"
           isLoss={false}
         />

@@ -24,7 +24,7 @@ const Nav = () => {
       sx={{
         p: { xs: 2, sm: 3, md: 3 },
         bgcolor: 'rgba(255, 255, 255, 0.14)',
-        mx: 8,
+        mx: { md: 8, xs: 2 },
         mt: 2,
         borderRadius: 2,
         boxShadow: 3,
@@ -42,20 +42,21 @@ const Nav = () => {
     >
       {/* Logo + Name */}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Box component="img" src="/logo.png" alt="Logo" sx={{ width: 30, mr: 1 }} />
+        <Box component="img" src="/logo.png" alt="Logo" sx={{ width: { md: 30, xs: 20 }, mr: 1 }} />
         <Typography variant="h6" className="header" sx={{ fontWeight: 'bold', fontSize: { xs: 12, md: 20 } }}>
           QueueDriod
         </Typography>
       </Box>
 
       {/* Buttons + GitHub */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { md: 2, xs: 1 } }}>
         <Button
+          size="small"
           component="a"
           href="/dashboard"
           target="_blank"
           variant="contained"
-          sx={{ textTransform: 'none', borderRadius: 7, px: 4, bgcolor: 'black', color: 'white' }}
+          sx={{ textTransform: 'none', borderRadius: 7, px: { md: 4, xs: 2 }, bgcolor: 'black', color: 'white' }}
         >
           Login
         </Button>
@@ -63,7 +64,7 @@ const Nav = () => {
           {' '}
           <GithubOutlined style={{ fontSize: 27, color: 'black' }} />{' '}
         </a>
-        <IconButton onClick={handleThemeToggle}>{mode === 'light' ? <SunOutlined /> : <MoonOutlined />}</IconButton>
+        {/* <IconButton onClick={handleThemeToggle}>{mode === 'light' ? <SunOutlined /> : <MoonOutlined />}</IconButton> */}
       </Box>
     </Box>
   );
