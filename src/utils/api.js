@@ -1,5 +1,5 @@
 // API configuration and utility functions
-const API_BASE_URL = import.meta.env.VITE_APP_BASE_API || 'http://localhost:8080/v1';
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8080/v1';
 
 /**
  * Get the authorization token from localStorage
@@ -36,7 +36,7 @@ const handleLogout = async () => {
 
     if (token) {
       // Call the logout API endpoint to invalidate the session
-      const logoutUrl = `${import.meta.env.VITE_APP_BASE_API || 'http://localhost:8080/v1'}/auth/logout`;
+      const logoutUrl = `${import.meta.env.VITE_APP_API_URL || 'http://localhost:8080/v1'}/auth/logout`;
 
       try {
         await fetch(logoutUrl, {

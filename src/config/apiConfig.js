@@ -6,5 +6,5 @@ export const apiConfig = {
 };
 
 export const getApiBaseUrl = () => {
-  return import.meta.env.VITE_APP_BASE_API || 'http://localhost:8080/v1';
+  return import.meta.env.VITE_APP_API_URL || 'http://localhost:8080/v1';
 };
