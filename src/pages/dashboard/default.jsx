@@ -25,7 +25,6 @@ import CopyOutlined from '@ant-design/icons/CopyOutlined';
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 export default function DashboardDefault() {
-  const username = localStorage.getItem('username');
   const { exchangeStats, loading, fetchStats } = useDashboardStats();
   const { userDetails, loading: userLoading, error: userError, fetchUserDetails } = useUserDetails();
   const [showToken, setShowToken] = useState(false);
@@ -69,7 +68,7 @@ export default function DashboardDefault() {
       {/* row 1 */}
       <Grid sx={{ mb: -2.25 }} size={12}>
         <Typography variant="h5" sx={{ textTransform: 'capitalize' }}>
-          Hi {username ? `, ${username}` : ''}!👋🏼
+          Hi{userDetails?.full_name ? `, ${userDetails.full_name}` : ''}!👋🏼
         </Typography>
       </Grid>
 

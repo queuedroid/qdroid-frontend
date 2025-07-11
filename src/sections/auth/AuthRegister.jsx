@@ -118,7 +118,7 @@ export default function AuthRegister() {
     <>
       <Formik
         initialValues={{
-          name: '',
+          full_name: '',
           email: '',
           password: '',
           repeatPassword: '',
@@ -126,7 +126,9 @@ export default function AuthRegister() {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          name: Yup.string().max(100, 'Name must be less than 100 characters'),
+          full_name: Yup.string()
+            .max(100, 'Name must be less than 100 characters')
+            .matches(/^[a-zA-Z\s]*$/, 'Name can only contain letters and spaces'),
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string()
             .required('Password is required')
@@ -149,8 +151,8 @@ export default function AuthRegister() {
             };
 
             // Add optional fields only if they have values
-            if (values.name.trim()) {
-              requestData.name = values.name;
+            if (values.full_name && values.full_name.trim()) {
+              requestData.full_name = values.full_name.trim();
             }
             if (selectedCountry) {
               requestData.country_code = selectedCountry;
@@ -167,10 +169,6 @@ export default function AuthRegister() {
               localStorage.setItem('isAuthenticated', 'true');
               localStorage.setItem('token', res.data.session_token || res.data.access_token || 'signup_successful');
               localStorage.setItem('email', values.email);
-              // Save username for dashboard use
-              if (values.name.trim()) {
-                localStorage.setItem('username', values.name.trim());
-              }
               setSuccessMsg('Signup successful! Redirecting...');
               resetForm();
               navigate('/dashboard');
@@ -210,19 +208,19 @@ export default function AuthRegister() {
                   <InputLabel htmlFor="name-signup">Name</InputLabel>
                   <OutlinedInput
                     fullWidth
-                    error={Boolean(touched.name && errors.name)}
+                    error={Boolean(touched.full_name && errors.full_name)}
                     id="name-signup"
                     type="text"
-                    value={values.name}
-                    name="name"
+                    value={values.full_name}
+                    name="full_name"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     placeholder="Enter your name"
                   />
                 </Stack>
-                {touched.name && errors.name && (
+                {touched.full_name && errors.full_name && (
                   <FormHelperText error id="helper-text-name-signup">
-                    {errors.name}
+                    {errors.full_name}
                   </FormHelperText>
                 )}
               </Grid>
