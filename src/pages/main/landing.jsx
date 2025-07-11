@@ -42,7 +42,6 @@ const Landing = () => {
           flexDirection: 'column',
           minHeight: '100vh',
           overflow: 'hidden'
-          //background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)'
         }}
       >
         {/* Hero Section */}
@@ -56,49 +55,11 @@ const Landing = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            //background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)',
+            background: 'linear-gradient(135deg,rgb(247, 232, 228) 0%,rgb(214, 214, 214) 100%)',
             position: 'relative',
             overflow: 'hidden'
           }}
         >
-          {/* Background decorative elements */}
-          {/* <Box
-            sx={{
-              position: 'absolute',
-              top: '10%',
-              left: '5%',
-              width: '200px',
-              height: '200px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.1)',
-              animation: 'float 6s ease-in-out infinite'
-            }}
-          /> */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: '15%',
-              right: '10%',
-              width: '150px',
-              height: '150px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.08)',
-              animation: 'float 8s ease-in-out infinite reverse'
-            }}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '30%',
-              right: '20%',
-              width: '100px',
-              height: '100px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.06)',
-              animation: 'float 7s ease-in-out infinite'
-            }}
-          />
-
           {/* Main content */}
           <Grid container spacing={4} sx={{ alignItems: 'center', zIndex: 1, px: { xs: 2, md: 25 } }}>
             {/* Text Content - Left Side */}
@@ -113,7 +74,8 @@ const Landing = () => {
                   sx={{
                     fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem', lg: '6rem' },
                     fontWeight: 800,
-                    mb: 5
+                    mb: { md: 5, xs: 3 },
+                    mt: { xs: 30, md: 0 }
                   }}
                 >
                   QueueDriod
@@ -179,7 +141,7 @@ const Landing = () => {
                   transition={{ duration: 0.8, delay: 0.6 }}
                   sx={{
                     fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
-                    mb: 10,
+                    mb: { md: 10, xs: 4 },
                     opacity: 0.8,
                     lineHeight: 1.6
                   }}
@@ -195,10 +157,10 @@ const Landing = () => {
                   transition={{ duration: 0.8, delay: 0.8 }}
                   sx={{
                     display: 'flex',
-                    gap: 3,
+                    gap: { xs: 2, md: 3 },
                     justifyContent: { xs: 'center', md: 'flex-start' },
-                    flexWrap: 'wrap',
-                    mb: 4
+                    flexWrap: 'nowrap',
+                    mb: { md: 4, xs: 0 }
                   }}
                 >
                   <AnimateButton>
@@ -209,9 +171,9 @@ const Landing = () => {
                       size="large"
                       startIcon={<MessageOutlined />}
                       sx={{
-                        px: 4,
-                        py: 2,
-                        fontSize: '1.1rem',
+                        px: { xs: 2, md: 4 },
+                        py: { md: 2, xs: 1.4 },
+                        fontSize: { xs: '0.9rem', md: '1.1rem' },
                         color: '#fff',
                         borderRadius: '50px',
                         background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)',
@@ -235,9 +197,9 @@ const Landing = () => {
                       size="large"
                       startIcon={<ApiOutlined />}
                       sx={{
-                        px: 4,
-                        py: 2,
-                        fontSize: '1.1rem',
+                        px: { xs: 2, md: 4 },
+                        py: { md: 2, xs: 1.4 },
+                        fontSize: { xs: '0.9rem', md: '1.1rem' },
                         borderRadius: '50px',
                         borderColor: 'black',
                         color: 'black',
@@ -268,38 +230,39 @@ const Landing = () => {
                   alignItems: 'center',
                   height: '100%',
                   position: 'relative',
-                  mb: 15
+                  mb: { xs: 5, md: 15 },
+                  px: { xs: 2, md: 0 }
                 }}
               >
                 {/* Tilted box behind the image */}
                 <Box
                   sx={{
                     position: 'absolute',
-                    width: { xs: '280px', md: '500px' },
-                    height: { xs: '280px', md: '500px' },
+                    width: { xs: '240px', sm: '320px', md: '500px' },
+                    height: { xs: '240px', sm: '320px', md: '500px' },
                     background: 'linear-gradient(135deg, rgba(245, 57, 57, 0.94) 0%, rgba(151, 66, 1, 0.97) 100%)',
                     borderRadius: '20px',
-                    transform: 'rotate(8deg)',
+                    transform: { xs: 'rotate(6deg)', md: 'rotate(8deg)' },
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
                     zIndex: 0,
-                    mt: 35
+                    mt: { xs: 15, md: 35 }
                   }}
                 />
                 <Box
                   sx={{
                     position: 'absolute',
-                    width: { xs: '280px', md: '500px' },
-                    height: { xs: '280px', md: '500px' },
+                    width: { xs: '240px', sm: '320px', md: '500px' },
+                    height: { xs: '240px', sm: '320px', md: '500px' },
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 245, 240, 0.97) 100%)',
                     borderRadius: '20px',
-                    transform: 'rotate(-8deg)',
+                    transform: { xs: 'rotate(-6deg)', md: 'rotate(-8deg)' },
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
                     zIndex: 0,
-                    mt: 35
+                    mt: { xs: 15, md: 35 }
                   }}
                 />
 
@@ -308,7 +271,9 @@ const Landing = () => {
                   src="/3d.png"
                   alt="QueueDriod System Illustration"
                   sx={{
-                    width: { md: '65%', xs: '100%' },
+                    width: { xs: '80%', sm: '75%', md: '65%' },
+                    maxWidth: '400px',
+                    height: 'auto',
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2))',
                     position: 'relative',
                     zIndex: 1
@@ -352,7 +317,7 @@ const Landing = () => {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 viewport={{ once: true }}
                 sx={{
-                  fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
+                  fontSize: { xs: '1.8rem', sm: '2.5rem', md: '2.8rem' },
                   fontWeight: 'bold',
                   mb: 2
                 }}
@@ -574,10 +539,10 @@ const Landing = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               viewport={{ once: true }}
               sx={{
-                my: 20,
+                my: { xs: 10, md: 20 },
                 borderRadius: 4,
                 background: 'rgba(255, 255, 255, 0.05)',
-                border: '30px solid rgba(15, 15, 13, 0.47)',
+                border: { xs: '10px solid rgba(15, 15, 13, 0.47)', md: '30px solid rgba(15, 15, 13, 0.47)' },
                 backdropFilter: 'blur(10px)',
                 boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
               }}
@@ -619,16 +584,17 @@ const Landing = () => {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     viewport={{ once: true }}
                     sx={{
-                      textAlign: { xs: 'center', md: 'left' },
+                      textAlign: { xs: 'center', md: 'left' }
                     }}
                     justifyContent="center"
                     alignItems="center"
-                    px={7}
+                    px={{ xs: 3, md: 7 }}
+                    py={{ xs: 3, md: 0 }}
                   >
                     <Typography
                       variant="h2"
                       sx={{
-                        fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' },
+                        fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' },
                         fontWeight: 'bold',
                         mb: 3
                       }}
@@ -638,7 +604,7 @@ const Landing = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        fontSize: { xs: '0.7rem', md: '1rem' },
+                        fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
                         mb: 2,
                         opacity: 0.9,
                         lineHeight: 1.6
@@ -650,7 +616,7 @@ const Landing = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        fontSize: { xs: '0.7rem', md: '1rem' },
+                        fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
                         mb: 3,
                         opacity: 0.8,
                         lineHeight: 1.6
@@ -667,9 +633,9 @@ const Landing = () => {
                         size="large"
                         startIcon={<DashboardOutlined />}
                         sx={{
-                          px: 6,
-                          py: 2.5,
-                          fontSize: '1.1rem',
+                          px: { xs: 4, md: 6 },
+                          py: { xs: 1.4, md: 1.8 },
+                          fontSize: { xs: '1rem', md: '1.1rem' },
                           borderRadius: '50px',
                           color: '#fff',
                           background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)',

@@ -47,11 +47,31 @@ export default function Exchange() {
   const [selectedExchange, setSelectedExchange] = useState(null);
   const [dialogType, setDialogType] = useState('create'); // create, edit, delete
   const [formData, setFormData] = useState({ label: '', description: '' });
+  const [formErrors, setFormErrors] = useState({ label: '', description: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [anchorEl, setAnchorEl] = useState(null);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalExchanges, setTotalExchanges] = useState(0);
+
+  // Validate form data
+  const validateForm = () => {
+    const errors = { label: '', description: '' };
+    let isValid = true;
+
+    if (!formData.label.trim()) {
+      errors.label = 'Label is required';
+      isValid = false;
+    }
+
+    if (!formData.description.trim()) {
+      errors.description = 'Description is required';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
 
   // Copy to clipboard function
   const copyToClipboard = async (text) => {
@@ -117,12 +137,18 @@ export default function Exchange() {
 
   // Create exchange
   const createExchange = async () => {
+    if (!validateForm()) {
+      showSnackbar('Please fill in all required fields', 'error');
+      return;
+    }
+
     try {
       await apiConfig.exchanges.create(formData);
       showSnackbar('Exchange created successfully', 'success');
       setOpenDialog(false);
       fetchExchanges();
       setFormData({ label: '', description: '' });
+      setFormErrors({ label: '', description: '' });
     } catch (error) {
       console.error('Error creating exchange:', error);
       showSnackbar('Error creating exchange', 'error');
@@ -131,6 +157,11 @@ export default function Exchange() {
 
   // Update exchange
   const updateExchange = async () => {
+    if (!validateForm()) {
+      showSnackbar('Please fill in all required fields', 'error');
+      return;
+    }
+
     try {
       const exchangeId = selectedExchange.exchange_id || selectedExchange.id;
       await apiConfig.exchanges.update(exchangeId, formData);
@@ -138,6 +169,7 @@ export default function Exchange() {
       setOpenDialog(false);
       fetchExchanges();
       setFormData({ label: '', description: '' });
+      setFormErrors({ label: '', description: '' });
     } catch (error) {
       console.error('Error updating exchange:', error);
       showSnackbar('Error updating exchange', 'error');
@@ -170,6 +202,7 @@ export default function Exchange() {
     } else {
       setFormData({ label: '', description: '' });
     }
+    setFormErrors({ label: '', description: '' }); // Clear errors when opening dialog
     setOpenDialog(true);
   };
 
@@ -190,6 +223,14 @@ export default function Exchange() {
       updateExchange();
     } else if (dialogType === 'delete') {
       deleteExchange();
+    }
+  };
+
+  // Clear form errors when user types
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (formErrors[field]) {
+      setFormErrors({ ...formErrors, [field]: '' });
     }
   };
 
@@ -328,27 +369,36 @@ export default function Exchange() {
                 label="Label"
                 placeholder="E.g: New OTP Messages"
                 value={formData.label}
-                onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                onChange={(e) => handleInputChange('label', e.target.value)}
                 margin="normal"
                 required
+                error={!!formErrors.label}
+                helperText={formErrors.label || 'Enter a descriptive label for the exchange'}
               />
               <TextField
                 fullWidth
                 label="Description"
                 placeholder="E.g: This exchange handles new OTP messages."
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => handleInputChange('description', e.target.value)}
                 margin="normal"
                 multiline
                 rows={3}
-                helperText="Optional description for the exchange"
+                required
+                error={!!formErrors.description}
+                helperText={formErrors.description || 'Provide a detailed description for the exchange'}
               />
             </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color={dialogType === 'delete' ? 'error' : 'primary'}>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color={dialogType === 'delete' ? 'error' : 'primary'}
+            disabled={dialogType !== 'delete' && (!formData.label.trim() || !formData.description.trim())}
+          >
             {dialogType === 'create' && 'Create'}
             {dialogType === 'edit' && 'Update'}
             {dialogType === 'delete' && 'Delete'}
