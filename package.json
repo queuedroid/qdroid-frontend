@@ -39,6 +39,7 @@
     "@mui/x-date-pickers": "^8.1.0",
     "@vitejs/plugin-react": "4.3.4",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "formik": "2.4.6",
     "framer-motion": "^12.9.2",

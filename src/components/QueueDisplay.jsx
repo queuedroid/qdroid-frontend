@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon, Delete as DeleteIcon, Info as InfoIcon, ExpandLess } from '@mui/icons-material';
 
-const QueueDisplay = ({ queues = [], exchangeId, onDeleteQueue }) => {
+const QueueDisplay = ({ queues = [] }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleAccordionChange = (event, isExpanded) => {
@@ -29,7 +29,10 @@ const QueueDisplay = ({ queues = [], exchangeId, onDeleteQueue }) => {
   if (!queues || queues.length === 0) {
     return (
       <Box sx={{ mt: 1 }}>
-        <Chip label="No queues" size="small" variant="outlined" color="default" />
+        <Chip label="No queues configured" size="small" variant="outlined" color="default" />
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+          Queues are created automatically when needed
+        </Typography>
       </Box>
     );
   }
@@ -57,9 +60,9 @@ const QueueDisplay = ({ queues = [], exchangeId, onDeleteQueue }) => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-            <Chip label={`${queues.length} Queue${queues.length !== 1 ? 's' : ''}`} size="small" color="primary" />
+            <Chip label={`${queues.length} Queue${queues.length !== 1 ? 's' : ''} (Read-only)`} size="small" color="info" />
             <Typography variant="caption" color="text.secondary">
-              Click to view details
+              Queues are managed automatically
             </Typography>
             <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
               {expanded ? <ExpandLess fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
@@ -86,9 +89,6 @@ const QueueDisplay = ({ queues = [], exchangeId, onDeleteQueue }) => {
                   </TableCell>
                   <TableCell>
                     <strong>Routing Key</strong>
-                  </TableCell>
-                  <TableCell align="center">
-                    <strong>Actions</strong>
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -120,22 +120,6 @@ const QueueDisplay = ({ queues = [], exchangeId, onDeleteQueue }) => {
                       <Typography variant="body2" fontFamily="monospace" color="text.secondary">
                         {queue.routing_key || 'N/A'}
                       </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
-                        <Tooltip title="Queue Information">
-                          <IconButton size="small" color="info">
-                            <InfoIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        {onDeleteQueue && (
-                          <Tooltip title="Delete Queue">
-                            <IconButton size="small" color="error" onClick={() => onDeleteQueue(queue.id || queue.queue)}>
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}

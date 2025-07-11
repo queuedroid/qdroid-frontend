@@ -111,8 +111,8 @@ export default function Profile() {
     }
   };
 
-  // Use actual user name from API, fallback to localStorage, then to 'User'
-  const displayName = userDetails.name || localStorage.getItem('username') || 'User';
+  // Use actual user name from API, fallback to 'User'
+  const displayName = userDetails.full_name || 'User';
 
   // Get user's selected avatar
   const getUserAvatar = () => {

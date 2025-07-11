@@ -20,7 +20,7 @@ const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
 // render - other pages
 const Exchange = Loadable(lazy(() => import('pages/exchange/index')));
 const Message = Loadable(lazy(() => import('pages/messages/index')));
-const Analytics = Loadable(lazy(() => import('pages/analytics/index')));
+const EventLogs = Loadable(lazy(() => import('pages/event-logs/index')));
 const Subscription = Loadable(lazy(() => import('pages/subscription/index')));
 const Settings = Loadable(lazy(() => import('pages/settings/index')));
 const Documentation = Loadable(lazy(() => import('pages/extra-pages/documentation')));
@@ -55,7 +55,7 @@ const MainRoutes = {
           )
         },
         { path: 'messages', element: <Message /> },
-        { path: 'analytics', element: <Analytics /> },
+        { path: 'queues', element: <EventLogs /> },
         { path: 'exchange', element: <Exchange /> },
         { path: 'subscription', element: <Subscription /> },
         { path: 'settings', element: <Settings /> },

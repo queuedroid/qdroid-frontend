@@ -8,7 +8,8 @@ import {
   RiseOutlined,
   ApiOutlined,
   CreditCardOutlined,
-  SettingOutlined
+  SettingOutlined,
+  TableOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -21,7 +22,8 @@ const icons = {
   ApiOutlined,
   CreditCardOutlined,
   SettingOutlined,
-  CommentOutlined
+  CommentOutlined,
+  TableOutlined
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -63,12 +65,20 @@ const dashboard = {
       icon: icons.ApiOutlined,
       breadcrumbs: false
     },
+    // {
+    //   id: 'messages',
+    //   title: 'Message',
+    //   type: 'item',
+    //   url: '/dashboard/messages',
+    //   icon: icons.CommentOutlined,
+    //   breadcrumbs: false
+    // },
     {
-      id: 'messages',
-      title: 'Message',
+      id: 'queues',
+      title: 'Queues',
       type: 'item',
-      url: '/dashboard/messages',
-      icon: icons.CommentOutlined,
+      url: '/dashboard/queues',
+      icon: icons.TableOutlined,
       breadcrumbs: false
     },
     // {
