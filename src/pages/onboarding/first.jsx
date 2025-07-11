@@ -18,6 +18,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { CopyOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
+import { useUserDetails } from 'hooks/useUserDetails';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignalMessenger } from '@fortawesome/free-brands-svg-icons';
 
@@ -47,6 +48,7 @@ const OnboardingStepper = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [platform, setPlatform] = useState('');
   const [copied, setCopied] = useState(false);
+  const { userDetails } = useUserDetails();
   const [deviceMsg, setDeviceMsg] = useState('');
   const [deviceError, setDeviceError] = useState('');
   const [testMsg, setTestMsg] = useState('');
@@ -74,7 +76,7 @@ const OnboardingStepper = () => {
     }
     try {
       const access_token = localStorage.getItem('token');
-      const username = localStorage.getItem('username') || 'User';
+      const username = userDetails.full_name || 'User';
       let platformKey = name.toLowerCase();
       if (platformKey === 'whatsapp') platformKey = 'wa';
       const endpoint = `https://sherlockwisdom.com:8080/${platformKey}/devices/`;

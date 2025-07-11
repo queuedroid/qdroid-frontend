@@ -220,4 +220,20 @@ export const messageAPI = {
     })
 };
 
+/**
+ * API methods for event logs
+ */
+export const eventLogsAPI = {
+  getAll: (page = 1, pageSize = 10, category = null, status = null) => {
+    const params = new URLSearchParams({ page: page.toString(), page_size: pageSize.toString() });
+    if (category) params.append('category', category);
+    if (status) params.append('status', status);
+    return apiRequest(`/event-logs?${params.toString()}`);
+  },
+  getSummary: (category) => {
+    const params = new URLSearchParams({ category });
+    return apiRequest(`/event-logs/summary?${params.toString()}`);
+  }
+};
+
 export { API_BASE_URL, getAuthToken, createHeaders, apiRequest, handleLogout };

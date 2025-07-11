@@ -66,7 +66,7 @@ export default function Settings() {
   // Update form fields when userDetails changes
   useEffect(() => {
     if (userDetails) {
-      setProfileName(userDetails.name || '');
+      setProfileName(userDetails.full_name || '');
       setProfileEmail(userDetails.email || '');
       setProfilePhone(userDetails.phone_number || '');
 
@@ -88,28 +88,6 @@ export default function Settings() {
     localStorage.setItem('userAvatar', selectedAvatar);
     setOpenAvatarDialog(false);
     showSnackbar('Profile picture updated successfully!');
-  };
-
-  const handleProfileSave = async () => {
-    setSaving(true);
-    try {
-      // Here you would typically make an API call to update user profile
-      // For now, we'll just update localStorage
-      if (profileName.trim()) {
-        localStorage.setItem('username', profileName.trim());
-      }
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      showSnackbar('Profile updated successfully!');
-      fetchUserDetails(); // Refresh user details
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      showSnackbar('Failed to update profile', 'error');
-    } finally {
-      setSaving(false);
-    }
   };
 
   const getCurrentAvatarSrc = () => {
@@ -240,9 +218,7 @@ export default function Settings() {
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
                   <Avatar src={getCurrentAvatarSrc()} sx={{ width: 40, height: 40 }} />
-                  <Typography variant="body2">
-                    {avatarOptions.find((option) => option.id === selectedAvatar)?.name || 'Default Avatar'}
-                  </Typography>
+                  <Typography variant="body2">{profileName || 'User'}</Typography>
                 </Box>
               </Box>
 

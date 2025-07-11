@@ -14,13 +14,6 @@ import {
   TextField,
   IconButton,
   Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Alert,
   Snackbar,
   Fab,
@@ -36,28 +29,24 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
-  Queue as QueueIcon,
   Refresh as RefreshIcon,
   ContentCopy as ContentCopyIcon
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import MainCard from 'components/MainCard';
-import SimpleQueueCreationForm from 'components/SimpleQueueCreationForm';
 import QueueDisplay from 'components/QueueDisplay';
 import { EditOutlined, PlusOutlined, UndoOutlined } from '@ant-design/icons';
 import { apiConfig } from '../../config/apiConfig';
-import { mergeStoredQueues, addQueueToExchange, removeQueueFromExchange } from '../../utils/queuePersistence';
+import { mergeStoredQueues } from '../../utils/queuePersistence';
 import { CopyOutlined } from '@ant-design/icons/lib';
 
 export default function Exchange() {
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
-  const [openQueueDialog, setOpenQueueDialog] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState(null);
   const [dialogType, setDialogType] = useState('create'); // create, edit, delete
   const [formData, setFormData] = useState({ label: '', description: '' });
-  const [queueFormData, setQueueFormData] = useState({ country_code: '', mcc: '', mnc: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [anchorEl, setAnchorEl] = useState(null);
   const [page, setPage] = useState(1);
@@ -169,123 +158,6 @@ export default function Exchange() {
     }
   };
 
-  // Create and bind queue
-  const createQueue = async () => {
-    try {
-      const exchangeId = selectedExchange.exchange_id || selectedExchange.id;
-      const response = await apiConfig.exchanges.createQueue(exchangeId, queueFormData);
-
-      // Handle the response properly
-      if (response.ok) {
-        const queueResponse = await response.json();
-        console.log('Queue creation response:', queueResponse);
-
-        // Transform the response to match display format
-        const transformedQueue = transformQueueResponse(queueResponse, queueFormData);
-
-        // Persist the queue to localStorage
-        addQueueToExchange(exchangeId, transformedQueue);
-
-        // Update local state to include the new queue
-        setExchanges((prevExchanges) =>
-          prevExchanges.map((exchange) => {
-            if ((exchange.exchange_id || exchange.id) === exchangeId) {
-              return {
-                ...exchange,
-                queues: [...(exchange.queues || []), transformedQueue]
-              };
-            }
-            return exchange;
-          })
-        );
-
-        showSnackbar('Queue created and bound successfully', 'success');
-      } else {
-        const errorData = await response.json();
-        console.error('Queue creation failed:', errorData);
-        showSnackbar(`Error creating queue: ${errorData.message || 'Unknown error'}`, 'error');
-      }
-
-      setOpenQueueDialog(false);
-      setQueueFormData({ country_code: '', mcc: '', mnc: '' });
-    } catch (error) {
-      console.error('Error creating queue:', error);
-      showSnackbar('Error creating queue', 'error');
-    }
-  };
-
-  // Delete queue function
-  const deleteQueue = async (exchangeId, queueId) => {
-    try {
-      const response = await apiConfig.exchanges.deleteQueue(exchangeId, queueId);
-
-      if (response.ok) {
-        // Remove the queue from localStorage
-        removeQueueFromExchange(exchangeId, queueId);
-
-        // Update local state to remove the deleted queue
-        setExchanges((prevExchanges) =>
-          prevExchanges.map((exchange) => {
-            if ((exchange.exchange_id || exchange.id) === exchangeId) {
-              return {
-                ...exchange,
-                queues: (exchange.queues || []).filter((queue) => (queue.id || queue.queue) !== queueId)
-              };
-            }
-            return exchange;
-          })
-        );
-
-        showSnackbar('Queue deleted successfully', 'success');
-      } else {
-        const errorData = await response.json();
-        console.error('Queue deletion failed:', errorData);
-        showSnackbar(`Error deleting queue: ${errorData.message || 'Unknown error'}`, 'error');
-      }
-    } catch (error) {
-      console.error('Error deleting queue:', error);
-
-      // If API call fails, offer to delete locally
-      if (window.confirm('API call failed. Would you like to remove this queue locally? (It will be restored if you refresh the page)')) {
-        // Remove the queue from localStorage
-        removeQueueFromExchange(exchangeId, queueId);
-
-        // Update local state to remove the deleted queue
-        setExchanges((prevExchanges) =>
-          prevExchanges.map((exchange) => {
-            if ((exchange.exchange_id || exchange.id) === exchangeId) {
-              return {
-                ...exchange,
-                queues: (exchange.queues || []).filter((queue) => (queue.id || queue.queue) !== queueId)
-              };
-            }
-            return exchange;
-          })
-        );
-
-        showSnackbar('Queue removed locally', 'warning');
-      } else {
-        showSnackbar('Error deleting queue', 'error');
-      }
-    }
-  };
-
-  // Helper function to transform queue creation response to display format
-  const transformQueueResponse = (queueResponse, queueFormData) => {
-    return {
-      id: queueResponse.queue,
-      queue: queueResponse.queue,
-      queue_id: queueResponse.queue,
-      country_code: queueFormData.country_code,
-      mcc: queueFormData.mcc,
-      mnc: queueFormData.mnc,
-      routing_key: queueResponse.routing_key,
-      vhost: queueResponse.vhost,
-      exchange: queueResponse.exchange,
-      message: queueResponse.message
-    };
-  };
-
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
   };
@@ -299,11 +171,6 @@ export default function Exchange() {
       setFormData({ label: '', description: '' });
     }
     setOpenDialog(true);
-  };
-
-  const handleQueueDialogOpen = (exchange) => {
-    setSelectedExchange(exchange);
-    setOpenQueueDialog(true);
   };
 
   const handleMenuClick = (event, exchange) => {
@@ -398,25 +265,14 @@ export default function Exchange() {
                     Created: {new Date(exchange.created_at).toLocaleDateString()}
                   </Typography>
 
-                  {/* Queue Display */}
-                  <QueueDisplay
-                    queues={exchange.queues || []}
-                    exchangeId={exchange.exchange_id || exchange.id}
-                    onDeleteQueue={(queueId) => deleteQueue(exchange.exchange_id || exchange.id, queueId)}
-                  />
+                  {/* Queue Display - Read Only */}
+                  <QueueDisplay queues={exchange.queues || []} exchangeId={exchange.exchange_id || exchange.id} />
+                  
                   <Box sx={{ display: 'flex', gap: 1, pt: 1 }}>
-                    <Button size="small" startIcon={<QueueIcon />} onClick={() => handleQueueDialogOpen(exchange)}>
-                      Add Queue
-                    </Button>
                     <Button size="small" startIcon={<EditOutlined />} onClick={() => handleDialogOpen('edit', exchange)}>
                       Edit
                     </Button>
-                    <Button 
-                      size="small" 
-                      startIcon={<DeleteIcon />} 
-                      color="error" 
-                      onClick={() => handleDialogOpen('delete', exchange)}
-                    >
+                    <Button size="small" startIcon={<DeleteIcon />} color="error" onClick={() => handleDialogOpen('delete', exchange)}>
                       Delete
                     </Button>
                   </Box>
@@ -439,17 +295,6 @@ export default function Exchange() {
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Edit</ListItemText>
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleQueueDialogOpen(selectedExchange);
-            handleMenuClose();
-          }}
-        >
-          <ListItemIcon>
-            <QueueIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Add Queue</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -507,24 +352,6 @@ export default function Exchange() {
             {dialogType === 'create' && 'Create'}
             {dialogType === 'edit' && 'Update'}
             {dialogType === 'delete' && 'Delete'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Create Queue Dialog */}
-      <Dialog open={openQueueDialog} onClose={() => setOpenQueueDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Create and Bind Queue</DialogTitle>
-        <DialogContent>
-          <SimpleQueueCreationForm formData={queueFormData} onChange={setQueueFormData} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenQueueDialog(false)}>Cancel</Button>
-          <Button
-            onClick={createQueue}
-            variant="contained"
-            disabled={!queueFormData.country_code || !queueFormData.mcc || !queueFormData.mnc}
-          >
-            Create Queue
           </Button>
         </DialogActions>
       </Dialog>

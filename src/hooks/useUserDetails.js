@@ -37,13 +37,8 @@ export const useUserDetails = () => {
           account_token: response.data.account_token || '',
           email: response.data.email || '',
           phone_number: response.data.phone_number || '',
-          name: response.data.name || ''
+          full_name: response.data.full_name || ''
         });
-
-        // Update username in localStorage if available
-        if (response.data.name) {
-          localStorage.setItem('username', response.data.name);
-        }
       }
     } catch (err) {
       console.error('Error fetching user details:', err);

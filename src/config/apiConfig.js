@@ -1,7 +1,8 @@
-import { exchangeAPI } from '../utils/api';
+import { exchangeAPI, eventLogsAPI } from '../utils/api';
 
 export const apiConfig = {
-  exchanges: exchangeAPI
+  exchanges: exchangeAPI,
+  eventLogs: eventLogsAPI
 };
 
 export const getApiBaseUrl = () => {
