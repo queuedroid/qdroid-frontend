@@ -23,23 +23,23 @@ const logs = {
       url: '/dashboard/logs/messages',
       icon: icons.MessageOutlined,
       breadcrumbs: false
-    },
-    {
-      id: 'payment-logs',
-      title: 'Payment Logs',
-      type: 'item',
-      url: '/dashboard/logs/payments',
-      icon: icons.DollarOutlined,
-      breadcrumbs: false
-    },
-    {
-      id: 'auth-logs',
-      title: 'Auth Logs',
-      type: 'item',
-      url: '/dashboard/logs/auth',
-      icon: icons.SafetyCertificateOutlined,
-      breadcrumbs: false
     }
+    // {
+    //   id: 'payment-logs',
+    //   title: 'Payment Logs',
+    //   type: 'item',
+    //   url: '/dashboard/logs/payments',
+    //   icon: icons.DollarOutlined,
+    //   breadcrumbs: false
+    // },
+    // {
+    //   id: 'auth-logs',
+    //   title: 'Auth Logs',
+    //   type: 'item',
+    //   url: '/dashboard/logs/auth',
+    //   icon: icons.SafetyCertificateOutlined,
+    //   breadcrumbs: false
+    // }
   ]
 };
 

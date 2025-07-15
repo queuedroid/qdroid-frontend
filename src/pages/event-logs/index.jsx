@@ -133,23 +133,8 @@ const MessageLogs = () => {
     switch (status) {
       case 'QUEUED':
         return 'success';
-      case 'PENDING':
-        return 'warning';
       case 'FAILED':
         return 'error';
-      default:
-        return 'default';
-    }
-  };
-
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case 'MESSAGE':
-        return 'primary';
-      case 'PAYMENT':
-        return 'secondary';
-      case 'AUTH':
-        return 'info';
       default:
         return 'default';
     }
@@ -249,7 +234,6 @@ const MessageLogs = () => {
               <InputLabel>Status</InputLabel>
               <Select value={status} onChange={handleStatusChange} label="Status">
                 <MenuItem value="">All Statuses</MenuItem>
-                <MenuItem value="PENDING">PENDING</MenuItem>
                 <MenuItem value="QUEUED">QUEUED</MenuItem>
                 <MenuItem value="FAILED">FAILED</MenuItem>
               </Select>
@@ -275,8 +259,7 @@ const MessageLogs = () => {
                   <TableCell>Queue</TableCell>
                   <TableCell>Carrier</TableCell>
                   <TableCell>Recipient</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell align="center">Actions</TableCell>
+                  <TableCell>Date</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -337,13 +320,6 @@ const MessageLogs = () => {
                       <TableCell>{log.to || '-'}</TableCell>
                       <TableCell>
                         <Typography variant="body2">{formatDate(log.created_at)}</Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Tooltip title="View Details">
-                          <IconButton size="small" onClick={() => showSnackbar(`Event ID: ${log.eid}`, 'info')}>
-                            <Info sx={{ color: 'grey' }} fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))

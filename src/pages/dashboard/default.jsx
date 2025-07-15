@@ -357,24 +357,24 @@ export default function DashboardDefault() {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Event ID</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Description</TableCell>
                     <TableCell>Queue</TableCell>
-                    <TableCell>Created</TableCell>
-                    <TableCell align="center">Actions</TableCell>
+                    <TableCell>Carrier</TableCell>
+                    <TableCell>Recipient</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell align="center">More</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {eventLogsLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} align="center">
+                      <TableCell colSpan={6} align="center">
                         <CircularProgress size={24} />
                       </TableCell>
                     </TableRow>
                   ) : eventLogsError ? (
                     <TableRow>
-                      <TableCell colSpan={7} align="center">
+                      <TableCell colSpan={6} align="center">
                         <Alert severity="error" sx={{ border: 'none' }}>
                           {eventLogsError}
                         </Alert>
@@ -382,11 +382,11 @@ export default function DashboardDefault() {
                     </TableRow>
                   ) : eventLogs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} align="center">
+                      <TableCell colSpan={6} align="center">
                         <Box sx={{ py: 3, textAlign: 'center' }}>
                           <EventIcon sx={{ fontSize: 32, color: 'text.disabled', mb: 1 }} />
                           <Typography variant="body2" color="text.secondary">
-                            No recent events found
+                            No recent messages found
                           </Typography>
                         </Box>
                       </TableCell>
@@ -395,21 +395,7 @@ export default function DashboardDefault() {
                     eventLogs.map((log) => (
                       <TableRow key={log.eid} hover>
                         <TableCell>
-                          <Tooltip title={log.eid}>
-                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                              {log.eid?.substring(0, 8)}...
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
                           <Chip label={log.status} color={getStatusColor(log.status)} size="small" />
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={log.description}>
-                            <Typography variant="body2" noWrap>
-                              {truncateText(log.description, 25)}
-                            </Typography>
-                          </Tooltip>
                         </TableCell>
                         <TableCell>
                           <Tooltip title={log.queue_id}>
@@ -417,6 +403,12 @@ export default function DashboardDefault() {
                               {truncateText(log.queue_name || log.queue_id, 15)}
                             </Typography>
                           </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">{log.carrier || '-'}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">{log.to || '-'}</Typography>
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">{formatDate(log.created_at)}</Typography>

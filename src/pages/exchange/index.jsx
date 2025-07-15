@@ -37,7 +37,6 @@ import MainCard from 'components/MainCard';
 import QueueDisplay from 'components/QueueDisplay';
 import { EditOutlined, PlusOutlined, UndoOutlined } from '@ant-design/icons';
 import { apiConfig } from '../../config/apiConfig';
-import { mergeStoredQueues } from '../../utils/queuePersistence';
 import { CopyOutlined } from '@ant-design/icons/lib';
 
 export default function Exchange() {
@@ -84,7 +83,7 @@ export default function Exchange() {
     }
   };
 
-  // Fetch exchanges
+  // Fetch exchanges and their queues
   const fetchExchanges = async () => {
     try {
       setLoading(true);
@@ -108,8 +107,28 @@ export default function Exchange() {
           setTotalExchanges(data.total || 0);
         }
 
-        // Merge stored queues with exchange data
-        const exchangesWithQueues = mergeStoredQueues(exchangeData);
+        // Fetch queues for each exchange
+        const exchangesWithQueues = await Promise.all(
+          exchangeData.map(async (exchange) => {
+            try {
+              const exchangeId = exchange.exchange_id || exchange.id;
+              console.log(`Fetching queues for exchange ${exchangeId}...`);
+              const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100); // Fetch up to 100 queues
+
+              return {
+                ...exchange,
+                queues: queuesResponse.data || []
+              };
+            } catch (error) {
+              console.error(`Error fetching queues for exchange ${exchange.exchange_id || exchange.id}:`, error);
+              return {
+                ...exchange,
+                queues: [] // Return empty array if queue fetching fails
+              };
+            }
+          })
+        );
+
         setExchanges(exchangesWithQueues);
       } else {
         // Response is already parsed JSON
@@ -123,8 +142,28 @@ export default function Exchange() {
           setTotalExchanges(response.total || 0);
         }
 
-        // Merge stored queues with exchange data
-        const exchangesWithQueues = mergeStoredQueues(exchangeData);
+        // Fetch queues for each exchange
+        const exchangesWithQueues = await Promise.all(
+          exchangeData.map(async (exchange) => {
+            try {
+              const exchangeId = exchange.exchange_id || exchange.id;
+              console.log(`Fetching queues for exchange ${exchangeId}...`);
+              const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100); // Fetch up to 100 queues
+
+              return {
+                ...exchange,
+                queues: queuesResponse.data || []
+              };
+            } catch (error) {
+              console.error(`Error fetching queues for exchange ${exchange.exchange_id || exchange.id}:`, error);
+              return {
+                ...exchange,
+                queues: [] // Return empty array if queue fetching fails
+              };
+            }
+          })
+        );
+
         setExchanges(exchangesWithQueues);
       }
     } catch (error) {
@@ -187,6 +226,26 @@ export default function Exchange() {
     } catch (error) {
       console.error('Error deleting exchange:', error);
       showSnackbar('Error deleting exchange', 'error');
+    }
+  };
+
+  // Refresh queues for a specific exchange
+  const refreshQueuesForExchange = async (exchangeId) => {
+    try {
+      console.log(`Refreshing queues for exchange ${exchangeId}...`);
+      const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100);
+
+      // Update the specific exchange with new queue data
+      setExchanges((prevExchanges) =>
+        prevExchanges.map((exchange) =>
+          exchange.exchange_id === exchangeId || exchange.id === exchangeId ? { ...exchange, queues: queuesResponse.data || [] } : exchange
+        )
+      );
+
+      showSnackbar('Queues refreshed successfully', 'success');
+    } catch (error) {
+      console.error(`Error refreshing queues for exchange ${exchangeId}:`, error);
+      showSnackbar('Error refreshing queues', 'error');
     }
   };
 
@@ -280,8 +339,8 @@ export default function Exchange() {
               <Grid size={{ xs: 12, sm: 6, md: 12 }} key={exchange.exchange_id || exchange.id}>
                 <MainCard sx={{ height: '100%' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Typography variant="h6" component="h2">
-                      {exchange.label || exchange.exchange_id}
+                    <Typography variant="h5" component="h2">
+                      Exhange Label: {exchange.label || exchange.exchange_id}
                     </Typography>
                     {/* <IconButton sx={{ p: 0.5, color: '#000' }} size="small" onClick={(e) => handleMenuClick(e, exchange)}>
                       <MoreVertIcon />
@@ -291,7 +350,7 @@ export default function Exchange() {
                     {exchange.description || 'No description'}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    ID: <Chip label={`${exchange.exchange_id || exchange.id}`} size="small" />
+                    ID: <Chip sx={{ bgcolor: '#F1E8B8' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
                     <Tooltip title="Copy Exchange ID">
                       <IconButton
                         size="small"
@@ -303,12 +362,16 @@ export default function Exchange() {
                     </Tooltip>
                   </Box>
                   <Typography variant="caption" color="text.secondary" sx={{ mb: 2 }}>
-                    Created: {new Date(exchange.created_at).toLocaleDateString()}
+                    Created at: {new Date(exchange.created_at).toLocaleDateString()}
                   </Typography>
 
                   {/* Queue Display - Read Only */}
-                  <QueueDisplay queues={exchange.queues || []} exchangeId={exchange.exchange_id || exchange.id} />
-                  
+                  <QueueDisplay
+                    queues={exchange.queues || []}
+                    exchangeId={exchange.exchange_id || exchange.id}
+                    onRefresh={() => refreshQueuesForExchange(exchange.exchange_id || exchange.id)}
+                  />
+
                   <Box sx={{ display: 'flex', gap: 1, pt: 1 }}>
                     <Button size="small" startIcon={<EditOutlined />} onClick={() => handleDialogOpen('edit', exchange)}>
                       Edit
