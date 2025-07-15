@@ -28,7 +28,7 @@ export const useThemeCustomization = () => {
 export default function ThemeCustomization({ children }) {
   const [mode, setMode] = useState(() => {
     const storedMode = localStorage.getItem('themeMode');
-    return storedMode === 'dark' ? 'light' : 'dark';
+    return storedMode === 'light' ? 'dark' : 'light';
   });
 
   useEffect(() => {
@@ -36,10 +36,10 @@ export default function ThemeCustomization({ children }) {
   }, [mode]);
 
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'dark' ? 'light' : 'dark'));
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
-  const theme = Palette(mode, 'dark');
+  const theme = Palette(mode, 'light');
   const themeTypography = Typography('Space Grotesk', 'sans-serif');
   const themeCustomShadows = useMemo(() => CustomShadows(theme), [theme]);
 

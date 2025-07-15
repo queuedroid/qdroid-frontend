@@ -11,19 +11,36 @@ import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 
 // project imports
 import MainCard from 'components/MainCard';
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDashboardStats } from '../../hooks/useDashboardStats';
 import { useUserDetails } from '../../hooks/useUserDetails';
+import { eventLogsAPI } from '../../utils/api';
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import CopyOutlined from '@ant-design/icons/CopyOutlined';
 import { UndoOutlined } from '@ant-design/icons';
+import { Event as EventIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import EventLogsChart from '../../sections/dashboard/default/EventLogsChart';
+import EventLogsPieChart from '../../sections/dashboard/default/EventLogsPieChart';
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
@@ -33,6 +50,75 @@ export default function DashboardDefault() {
   const [showToken, setShowToken] = useState(false);
   const [showAccountId, setShowAccountId] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
+  const navigate = useNavigate();
+
+  // Event logs state
+  const [eventLogs, setEventLogs] = useState([]);
+  const [eventLogsLoading, setEventLogsLoading] = useState(false);
+  const [eventLogsError, setEventLogsError] = useState('');
+
+  // Fetch recent event logs for dashboard
+  const fetchRecentEventLogs = useCallback(async () => {
+    try {
+      setEventLogsLoading(true);
+      setEventLogsError('');
+
+      const response = await eventLogsAPI.getAll(1, 5); // Get first 5 recent events
+      let data;
+      if (response && typeof response.json === 'function') {
+        data = await response.json();
+      } else {
+        data = response;
+      }
+
+      setEventLogs(data.data || []);
+    } catch (err) {
+      console.error('Error fetching recent event logs:', err);
+      setEventLogsError('Failed to load recent events');
+    } finally {
+      setEventLogsLoading(false);
+    }
+  }, []);
+
+  // Utility functions for event logs
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'QUEUED':
+        return 'success';
+      case 'PENDING':
+        return 'warning';
+      case 'FAILED':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case 'MESSAGE':
+        return 'primary';
+      case 'PAYMENT':
+        return 'secondary';
+      case 'AUTH':
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    try {
+      return format(new Date(dateString), 'MMM dd, HH:mm');
+    } catch {
+      return dateString;
+    }
+  };
+
+  const truncateText = (text, maxLength = 30) => {
+    if (!text) return '-';
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
 
   // Fetch exchange statistics
   useEffect(() => {
@@ -43,6 +129,11 @@ export default function DashboardDefault() {
   useEffect(() => {
     fetchUserDetails();
   }, [fetchUserDetails]);
+
+  // Fetch recent event logs
+  useEffect(() => {
+    fetchRecentEventLogs();
+  }, [fetchRecentEventLogs]);
 
   // Debug logging
   useEffect(() => {
@@ -246,11 +337,107 @@ export default function DashboardDefault() {
         </MainCard>
       </Grid>
 
-      {/* Filters Section */}
+      {/* Recent Event Logs Section */}
       <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-        <MainCard sx={{ mt: 1 }} content={false}>
-          <Box sx={{ p: 3 }}></Box>
+        <MainCard sx={{ mt: 1 }}>
+          <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">Recent Message Logs</Typography>
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => navigate('logs/messages')}
+                sx={{ textDecoration: 'none', cursor: 'pointer' }}
+              >
+                View All →
+              </Link>
+            </Box>
+
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Queue</TableCell>
+                    <TableCell>Carrier</TableCell>
+                    <TableCell>Recipient</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell align="center">More</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {eventLogsLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">
+                        <CircularProgress size={24} />
+                      </TableCell>
+                    </TableRow>
+                  ) : eventLogsError ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">
+                        <Alert severity="error" sx={{ border: 'none' }}>
+                          {eventLogsError}
+                        </Alert>
+                      </TableCell>
+                    </TableRow>
+                  ) : eventLogs.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">
+                        <Box sx={{ py: 3, textAlign: 'center' }}>
+                          <EventIcon sx={{ fontSize: 32, color: 'text.disabled', mb: 1 }} />
+                          <Typography variant="body2" color="text.secondary">
+                            No recent messages found
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    eventLogs.map((log) => (
+                      <TableRow key={log.eid} hover>
+                        <TableCell>
+                          <Chip label={log.status} color={getStatusColor(log.status)} size="small" />
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip title={log.queue_id}>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                              {truncateText(log.queue_name || log.queue_id, 15)}
+                            </Typography>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">{log.carrier || '-'}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">{log.to || '-'}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">{formatDate(log.created_at)}</Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Tooltip title="View in Event Logs">
+                            <IconButton size="small" onClick={() => navigate('logs/messages')}>
+                              <OpenInNewIcon sx={{ color: 'grey' }} fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
         </MainCard>
+      </Grid>
+
+      {/* Event Logs Chart Section */}
+      <Grid size={{ xs: 12, md: 8, lg: 8 }}>
+        <EventLogsChart />
+      </Grid>
+
+      {/* Event Logs Pie Chart Section */}
+      <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+        <EventLogsPieChart />
       </Grid>
 
       {/* row 2 */}

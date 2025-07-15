@@ -9,7 +9,10 @@ import {
   ApiOutlined,
   CreditCardOutlined,
   SettingOutlined,
-  TableOutlined
+  TableOutlined,
+  FileTextOutlined,
+  DollarOutlined,
+  SafetyCertificateOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -23,7 +26,10 @@ const icons = {
   CreditCardOutlined,
   SettingOutlined,
   CommentOutlined,
-  TableOutlined
+  TableOutlined,
+  FileTextOutlined,
+  DollarOutlined,
+  SafetyCertificateOutlined
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -73,14 +79,6 @@ const dashboard = {
     //   icon: icons.CommentOutlined,
     //   breadcrumbs: false
     // },
-    {
-      id: 'queues',
-      title: 'Queues',
-      type: 'item',
-      url: '/dashboard/queues',
-      icon: icons.TableOutlined,
-      breadcrumbs: false
-    },
     // {
     //   id: 'subscription',
     //   title: 'Subscription & Billing',
