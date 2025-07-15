@@ -26,30 +26,23 @@ import {
   IconButton,
   Snackbar
 } from '@mui/material';
-import {
-  Refresh as RefreshIcon,
-  FilterList as FilterIcon,
-  Event as EventIcon,
-  OpenInNew as OpenInNewIcon,
-  Info
-} from '@mui/icons-material';
+import { Refresh as RefreshIcon, FilterList as FilterIcon, Event as EventIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import MainCard from 'components/MainCard';
 import { eventLogsAPI } from '../../utils/api';
 import { format } from 'date-fns';
 
-const MessageLogs = () => {
+const AuthLogs = () => {
   const [eventLogs, setEventLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-  const [status, setStatus] = useState('');
   const [summary, setSummary] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Fixed category for message logs
-  const category = 'MESSAGE';
+  // Fixed category for auth logs
+  const category = 'AUTH';
 
   // Fetch event logs
   const fetchEventLogs = useCallback(async () => {
@@ -57,7 +50,7 @@ const MessageLogs = () => {
       setLoading(true);
       setError('');
 
-      const response = await eventLogsAPI.getAll(page + 1, pageSize, category, status || null);
+      const response = await eventLogsAPI.getAll(page + 1, pageSize, category, null);
 
       // Handle response format
       let data;
@@ -67,19 +60,19 @@ const MessageLogs = () => {
         data = response;
       }
 
-      console.log('Message logs API response:', data);
+      console.log('Auth logs API response:', data);
 
       setEventLogs(data.data || []);
       setTotalCount(data.pagination?.total || 0);
     } catch (err) {
-      console.error('Error fetching message logs:', err);
-      setError('Failed to load message logs. Please try again.');
+      console.error('Error fetching auth logs:', err);
+      setError('Failed to load auth logs. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, status]);
+  }, [page, pageSize]);
 
-  // Fetch summary for message category
+  // Fetch summary for auth category
   const fetchSummary = useCallback(async () => {
     try {
       const response = await eventLogsAPI.getSummary(category);
@@ -91,7 +84,7 @@ const MessageLogs = () => {
       }
       setSummary(data.data);
     } catch (err) {
-      console.error('Error fetching message summary:', err);
+      console.error('Error fetching auth summary:', err);
       showSnackbar('Failed to load summary statistics', 'error');
     }
   }, []);
@@ -114,45 +107,9 @@ const MessageLogs = () => {
     setPage(0);
   };
 
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
-    setPage(0);
-  };
-
-  const clearFilters = () => {
-    setStatus('');
-    setPage(0);
-  };
-
   const refreshData = () => {
     fetchEventLogs();
     fetchSummary();
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'QUEUED':
-        return 'success';
-      case 'PENDING':
-        return 'warning';
-      case 'FAILED':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case 'MESSAGE':
-        return 'primary';
-      case 'PAYMENT':
-        return 'secondary';
-      case 'AUTH':
-        return 'info';
-      default:
-        return 'default';
-    }
   };
 
   const formatDate = (dateString) => {
@@ -174,91 +131,15 @@ const MessageLogs = () => {
         <CardContent>
           <Box sx={{ mb: 3 }}>
             <Typography variant="h4" gutterBottom>
-              Message Logs
+              Auth Logs
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Monitor all message-related events and their statuses
+              Monitor all authentication-related events and their statuses
             </Typography>
           </Box>
 
-          {/* Summary Cards */}
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>
-                    Total Events
-                  </Typography>
-                  <Typography variant="h4">{summary?.total_count || 0}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Message events
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>
-                    Queued
-                  </Typography>
-                  <Typography variant="h4" color="success.main">
-                    {summary?.total_queued || 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Successfully queued
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>
-                    Pending
-                  </Typography>
-                  <Typography variant="h4" color="warning.main">
-                    {summary?.total_pending || 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Awaiting processing
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>
-                    Failed
-                  </Typography>
-                  <Typography variant="h4" color="error.main">
-                    {summary?.total_failed || 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Processing failed
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
           {/* Filters */}
           <Stack direction="row" spacing={2} sx={{ mb: 3 }} alignItems="center">
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Status</InputLabel>
-              <Select value={status} onChange={handleStatusChange} label="Status">
-                <MenuItem value="">All Statuses</MenuItem>
-                <MenuItem value="PENDING">PENDING</MenuItem>
-                <MenuItem value="QUEUED">QUEUED</MenuItem>
-                <MenuItem value="FAILED">FAILED</MenuItem>
-              </Select>
-            </FormControl>
-
-            <Button variant="outlined" size="small" onClick={clearFilters} disabled={!status}>
-              Clear Filters
-            </Button>
-
             <Button variant="outlined" size="small" onClick={refreshData} startIcon={<RefreshIcon />}>
               Refresh
             </Button>
@@ -270,38 +151,34 @@ const MessageLogs = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Event ID</TableCell>
-                  <TableCell>Status</TableCell>
                   <TableCell>Description</TableCell>
-                  <TableCell>Queue</TableCell>
-                  <TableCell>Carrier</TableCell>
-                  <TableCell>Recipient</TableCell>
-                  <TableCell>Created</TableCell>
+                  <TableCell>Date</TableCell>
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={7} align="center">
                       <CircularProgress />
                     </TableCell>
                   </TableRow>
                 ) : error ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={7} align="center">
                       <Alert severity="error">{error}</Alert>
                     </TableCell>
                   </TableRow>
                 ) : eventLogs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={7} align="center">
                       <Box sx={{ py: 4, textAlign: 'center' }}>
                         <EventIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
                         <Typography variant="h6" color="text.secondary" gutterBottom>
-                          No message logs found
+                          No auth logs found
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {status ? 'Try adjusting your filters' : 'Message logs will appear here once you start sending messages'}
+                          Auth logs will appear here once you start processing authentication events
                         </Typography>
                       </Box>
                     </TableCell>
@@ -317,9 +194,6 @@ const MessageLogs = () => {
                         </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <Chip label={log.status} color={getStatusColor(log.status)} size="small" />
-                      </TableCell>
-                      <TableCell>
                         <Tooltip title={log.description}>
                           <Typography variant="body2" noWrap>
                             {truncateText(log.description, 40)}
@@ -327,21 +201,12 @@ const MessageLogs = () => {
                         </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <Tooltip title={log.queue_id}>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                            {truncateText(log.queue_name || log.queue_id, 20)}
-                          </Typography>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>{log.carrier || '-'}</TableCell>
-                      <TableCell>{log.to || '-'}</TableCell>
-                      <TableCell>
                         <Typography variant="body2">{formatDate(log.created_at)}</Typography>
                       </TableCell>
                       <TableCell align="center">
                         <Tooltip title="View Details">
                           <IconButton size="small" onClick={() => showSnackbar(`Event ID: ${log.eid}`, 'info')}>
-                            <Info sx={{ color: 'grey' }} fontSize="small" />
+                            <OpenInNew as OpenInNewIcon sx={{ color: 'grey' }} fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -380,4 +245,4 @@ const MessageLogs = () => {
   );
 };
 
-export default MessageLogs;
+export default AuthLogs;
