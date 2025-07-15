@@ -17,9 +17,15 @@ import {
   Tooltip,
   Alert
 } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon, Delete as DeleteIcon, Info as InfoIcon, ExpandLess } from '@mui/icons-material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  Delete as DeleteIcon,
+  Info as InfoIcon,
+  ExpandLess,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
 
-const QueueDisplay = ({ queues = [] }) => {
+const QueueDisplay = ({ queues = [], onRefresh }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleAccordionChange = (event, isExpanded) => {
@@ -60,12 +66,23 @@ const QueueDisplay = ({ queues = [] }) => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-            <Chip label={`${queues.length} Queue${queues.length !== 1 ? 's' : ''} (Read-only)`} size="small" color="info" />
+            <Chip label={`${queues.length} Queue${queues.length !== 1 ? 's' : ''} (Read-only)`} size="small" color="primary" />
             <Typography variant="caption" color="text.secondary">
               Queues are managed automatically
             </Typography>
             <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              {expanded ? <ExpandLess fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+              {onRefresh && (
+                <Tooltip title="Refresh Queues">
+                  <IconButton size="small" onClick={onRefresh} sx={{ p: 0.5 }}>
+                    <RefreshIcon sx={{ color: 'grey' }} fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {expanded ? (
+                <ExpandLess sx={{ color: 'grey' }} fontSize="small" />
+              ) : (
+                <ExpandMoreIcon sx={{ color: 'grey' }} fontSize="small" />
+              )}
             </Box>
           </Box>
         </AccordionSummary>
@@ -76,50 +93,39 @@ const QueueDisplay = ({ queues = [] }) => {
               <TableHead>
                 <TableRow>
                   <TableCell>
-                    <strong>Queue ID</strong>
+                    <strong>Queue Name</strong>
                   </TableCell>
                   <TableCell>
-                    <strong>Country</strong>
+                    <strong>State</strong>
                   </TableCell>
                   <TableCell>
-                    <strong>MCC</strong>
+                    <strong>Messages</strong>
                   </TableCell>
                   <TableCell>
-                    <strong>MNC</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Routing Key</strong>
+                    <strong>Consumers</strong>
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {queues.map((queue, index) => (
-                  <TableRow key={queue.id || queue.queue || index}>
+                  <TableRow key={queue.name || index}>
                     <TableCell>
                       <Typography variant="body2" fontFamily="monospace">
-                        {queue.id || queue.queue || 'N/A'}
+                        {queue.name || 'N/A'}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Typography variant="body2">+{queue.country_code || 'N/A'}</Typography>
-                        {queue.country_name && (
-                          <Typography variant="caption" color="text.secondary">
-                            ({queue.country_name})
-                          </Typography>
-                        )}
-                      </Box>
+                      <Chip
+                        label={queue.state || 'N/A'}
+                        size="small"
+                        color={queue.state === 'running' ? 'success' : queue.state === 'idle' ? 'default' : 'warning'}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Chip label={queue.mcc || 'N/A'} size="small" variant="outlined" />
+                      <Typography variant="body2">{queue.messages !== undefined ? queue.messages : 'N/A'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Chip label={queue.mnc || 'N/A'} size="small" variant="outlined" />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontFamily="monospace" color="text.secondary">
-                        {queue.routing_key || 'N/A'}
-                      </Typography>
+                      <Typography variant="body2">{queue.consumers !== undefined ? queue.consumers : 'N/A'}</Typography>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -130,8 +136,8 @@ const QueueDisplay = ({ queues = [] }) => {
           {queues.length > 0 && (
             <Alert severity="info" sx={{ mt: 2 }}>
               <Typography variant="body2">
-                <strong>Queue Structure:</strong> Each queue is bound to this exchange and routes messages based on country code (+
-                {queues[0]?.country_code}) and network operators (MCC/MNC codes).
+                <strong>Queue Information:</strong> Each queue is bound to this exchange and handles message routing. The state shows the
+                current operational status, while messages and consumers indicate queue activity.
               </Typography>
             </Alert>
           )}

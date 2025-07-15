@@ -19,8 +19,9 @@ const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
 
 // render - other pages
 const Exchange = Loadable(lazy(() => import('pages/exchange/index')));
-const Message = Loadable(lazy(() => import('pages/messages/index')));
-const EventLogs = Loadable(lazy(() => import('pages/event-logs/index')));
+const MessageLogs = Loadable(lazy(() => import('pages/event-logs/index')));
+const PaymentLogs = Loadable(lazy(() => import('pages/event-logs/payment-logs')));
+const AuthLogs = Loadable(lazy(() => import('pages/event-logs/auth-logs')));
 const Subscription = Loadable(lazy(() => import('pages/subscription/index')));
 const Settings = Loadable(lazy(() => import('pages/settings/index')));
 const Documentation = Loadable(lazy(() => import('pages/extra-pages/documentation')));
@@ -54,8 +55,9 @@ const MainRoutes = {
             </RequireAuth>
           )
         },
-        { path: 'messages', element: <Message /> },
-        { path: 'queues', element: <EventLogs /> },
+        { path: 'logs/messages', element: <MessageLogs /> },
+        { path: 'logs/payments', element: <PaymentLogs /> },
+        { path: 'logs/auth', element: <AuthLogs /> },
         { path: 'exchange', element: <Exchange /> },
         { path: 'subscription', element: <Subscription /> },
         { path: 'settings', element: <Settings /> },

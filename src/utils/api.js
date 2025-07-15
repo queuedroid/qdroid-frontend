@@ -198,7 +198,10 @@ export const exchangeAPI = {
   deleteQueue: (exchangeId, queueId) =>
     apiRequest(`/exchanges/${exchangeId}/queues/${queueId}`, {
       method: 'DELETE'
-    })
+    }),
+
+  // Get queues for an exchange (paginated)
+  getQueues: (exchangeId, page = 1, pageSize = 10) => apiRequest(`/exchanges/${exchangeId}/queues?page=${page}&page_size=${pageSize}`)
 };
 
 /**
