@@ -176,7 +176,7 @@ export default function DashboardDefault() {
       </Grid>
 
       {/* Statistics Cards */}
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
           title="Total Exchanges"
           count={loading ? '...' : exchangeStats.totalExchanges.toString()}
@@ -184,7 +184,7 @@ export default function DashboardDefault() {
           isLoss={false}
         />
       </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
           title="Active Queues"
           count={loading ? '...' : exchangeStats.activeQueues.toString()}
@@ -192,7 +192,7 @@ export default function DashboardDefault() {
           isLoss={false}
         />
       </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
           title="Total Events"
           count={loading ? '...' : exchangeStats.messagesSent.toLocaleString()}
@@ -200,7 +200,7 @@ export default function DashboardDefault() {
           isLoss={false}
         />
       </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
           title="Messages Queued"
           count={loading ? '...' : exchangeStats.messagesQueued.toLocaleString()}
@@ -208,8 +208,6 @@ export default function DashboardDefault() {
           isLoss={false}
         />
       </Grid>
-
-      <Grid sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} size={{ md: 8 }} />
 
       {/* User Information Section */}
       <Grid size={{ xs: 12, md: 12, lg: 12 }}>
@@ -340,7 +338,7 @@ export default function DashboardDefault() {
       {/* Recent Event Logs Section */}
       <Grid size={{ xs: 12, md: 12, lg: 12 }}>
         <MainCard sx={{ mt: 1 }}>
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ p: { md: 3, xs: 0 } }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">Recent Message Logs</Typography>
               <Link
@@ -439,22 +437,6 @@ export default function DashboardDefault() {
       <Grid size={{ xs: 12, md: 4, lg: 4 }}>
         <EventLogsPieChart />
       </Grid>
-
-      {/* row 2 */}
-      {/* <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-        <UniqueVisitorCard filters={filtersApplied} />
-      </Grid>
-      <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-        <CountryTable filters={filtersApplied} />
-      </Grid>
-      
-      <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-        <UserTable filters={filtersApplied} />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-        <ReportCard />
-      </Grid> */}
     </Grid>
   );
 }

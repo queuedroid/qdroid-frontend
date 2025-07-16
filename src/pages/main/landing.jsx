@@ -1,25 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Card, CardContent, Paper, TextField, CardMedia, Avatar, Divider, IconButton } from '@mui/material';
-import { Tabs, Tab } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, Avatar, Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { motion } from 'framer-motion';
 import {
   ApiOutlined,
   DashboardOutlined,
-  DashOutlined,
-  GithubOutlined,
   LineChartOutlined,
   MessageOutlined,
-  MoonOutlined,
   SecurityScanOutlined,
-  SunOutlined,
   UsergroupAddOutlined
 } from '@ant-design/icons';
-import BannerImage from '../../components/BannerImage';
 import AnimateButton from 'components/@extended/AnimateButton';
-import ReactFlow, { Background, Controls } from 'reactflow';
-import 'reactflow/dist/style.css';
-import { useThemeCustomization } from '../../themes';
 import Nav from '../../components/Nav';
 import { Link } from 'react-router';
 
@@ -51,7 +42,7 @@ const Landing = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           sx={{
-            height: '100vh',
+            py: { md: 0, xs: 0 },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -61,7 +52,7 @@ const Landing = () => {
           }}
         >
           {/* Main content */}
-          <Grid container spacing={4} sx={{ alignItems: 'center', zIndex: 1, px: { xs: 2, md: 25 } }}>
+          <Grid container spacing={4} sx={{ alignItems: 'center', zIndex: 1, px: { xs: 2, md: 25 }, justifyContent: 'center', my: 'auto' }}>
             {/* Text Content - Left Side */}
             <Grid size={{ xs: 12, md: 6 }} sx={{ mt: 10 }}>
               <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
@@ -74,8 +65,8 @@ const Landing = () => {
                   sx={{
                     fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem', lg: '6rem' },
                     fontWeight: 800,
-                    mb: { md: 5, xs: 3 },
-                    mt: { xs: 30, md: 0 }
+                    mb: { md: 2, xs: 3 },
+                    mt: { xs: 5, md: 0 }
                   }}
                 >
                   QueueDriod
@@ -238,47 +229,128 @@ const Landing = () => {
                 <Box
                   sx={{
                     position: 'absolute',
-                    width: { xs: '240px', sm: '320px', md: '500px' },
-                    height: { xs: '240px', sm: '320px', md: '500px' },
+                    width: { xs: '370px', sm: '520px', md: '600px' },
+                    height: { xs: '380px', sm: '520px', md: '600px' },
                     background: 'linear-gradient(135deg, rgba(245, 57, 57, 0.94) 0%, rgba(151, 66, 1, 0.97) 100%)',
                     borderRadius: '20px',
-                    transform: { xs: 'rotate(6deg)', md: 'rotate(8deg)' },
+                    transform: { xs: 'rotate(6deg)', md: 'rotate(2deg)' },
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
                     zIndex: 0,
-                    mt: { xs: 15, md: 35 }
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    width: { xs: '240px', sm: '320px', md: '500px' },
-                    height: { xs: '240px', sm: '320px', md: '500px' },
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 245, 240, 0.97) 100%)',
-                    borderRadius: '20px',
-                    transform: { xs: 'rotate(-6deg)', md: 'rotate(-8deg)' },
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
-                    zIndex: 0,
-                    mt: { xs: 15, md: 35 }
+                    mt: { xs: 22, sm: 30, md: 35 }
                   }}
                 />
 
                 <Box
                   component="img"
-                  src="/3d.png"
+                  src="/black-boy-posing.png"
                   alt="QueueDriod System Illustration"
                   sx={{
-                    width: { xs: '80%', sm: '75%', md: '65%' },
-                    maxWidth: '400px',
+                    width: { xs: '100%', sm: '75%', md: '85%' },
                     height: 'auto',
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2))',
                     position: 'relative',
                     zIndex: 1
                   }}
                 />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    width: { xs: '400px', sm: '620px', md: '680px' },
+                    height: { xs: '150px', sm: '200px', md: '200px' },
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 245, 240, 0.97) 100%)',
+                    borderRadius: '20px',
+                    transform: { xs: 'rotate(-6deg)', md: 'rotate(-5deg)' },
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
+                    mt: { xs: 57, sm: 70, md: 95 },
+                    zIndex: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    px: { xs: 1, md: 4 },
+                    py: { xs: 1, md: 3 }
+                  }}
+                >
+                  {/* Connected Avatars */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      mb: { xs: 1, md: 2 },
+                      position: 'relative'
+                    }}
+                  >
+                    <Avatar
+                      src="/african-man.png"
+                      sx={{
+                        width: { xs: 32, md: 45 },
+                        height: { xs: 32, md: 45 },
+                        border: '3px solid #fff',
+                        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                        zIndex: 3
+                      }}
+                    />
+                    <Avatar
+                      src="/front-view-man-Photoroom.png"
+                      sx={{
+                        width: { xs: 32, md: 45 },
+                        height: { xs: 32, md: 45 },
+                        border: '3px solid #fff',
+                        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                        ml: { xs: -1, md: -1.5 },
+                        zIndex: 2
+                      }}
+                    />
+                    <Avatar
+                      sx={{
+                        width: { xs: 32, md: 45 },
+                        height: { xs: 32, md: 45 },
+                        border: '3px solid #fff',
+                        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                        ml: { xs: -1, md: -1.5 },
+                        zIndex: 1,
+                        bgcolor: '#ee5a52'
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ color: '#fff', fontWeight: 'bold', fontSize: { xs: '0.7rem', md: '0.9rem' } }}>
+                        +5K
+                      </Typography>
+                    </Avatar>
+                  </Box>
+
+                  {/* Text Content */}
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontSize: { xs: '0.8rem', md: '1rem' },
+                      fontWeight: 600,
+                      textAlign: 'center',
+                      color: '#333',
+                      mb: { xs: 0.5, md: 1 },
+                      lineHeight: 1.2
+                    }}
+                  >
+                    Queue over 5,000+ messages
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontSize: { xs: '0.7rem', md: '0.85rem' },
+                      textAlign: 'center',
+                      color: '#666',
+                      opacity: 0.8,
+                      lineHeight: 1.3
+                    }}
+                  >
+                    QueueDriod uses advanced queuing with automatic retry mechanisms ensuring your business-critical messages are delivered
+                    reliably.
+                  </Typography>
+                </Box>
               </Box>
             </Grid>
           </Grid>
@@ -302,7 +374,7 @@ const Landing = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           sx={{
-            py: 15,
+            pt: 20,
             px: { xs: 2, md: 4 }
           }}
         >
@@ -317,8 +389,8 @@ const Landing = () => {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 viewport={{ once: true }}
                 sx={{
-                  fontSize: { xs: '1.8rem', sm: '2.5rem', md: '2.8rem' },
-                  fontWeight: 'bold',
+                  fontSize: { xs: '1.8rem', sm: '2.3rem', md: '2.5rem' },
+                  fontWeight: 700,
                   mb: 2
                 }}
               >
@@ -530,7 +602,6 @@ const Landing = () => {
                 </Grid>
               </Grid>
             </Box>
-
             {/* Management Section */}
             <Box
               component={motion.div}
@@ -539,17 +610,13 @@ const Landing = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               viewport={{ once: true }}
               sx={{
-                my: { xs: 10, md: 20 },
-                borderRadius: 4,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: { xs: '10px solid rgba(15, 15, 13, 0.47)', md: '30px solid rgba(15, 15, 13, 0.47)' },
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
+                mt: { xs: 10, md: 25 },
+                mb: 6
               }}
             >
               <Grid container spacing={0} sx={{ alignItems: 'center' }}>
                 {/* Image Section */}
-                <Grid size={{ xs: 12, md: 5 }}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Box
                     component={motion.div}
                     initial={{ opacity: 0, x: -50 }}
@@ -564,19 +631,21 @@ const Landing = () => {
                   >
                     <Box
                       component="img"
-                      src="/manage.jpg"
+                      src="/man-using-tablet.jpg"
                       alt="QueueDriod Management Dashboard"
                       sx={{
                         width: '100%',
                         height: '100%',
-                        filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1))'
+                        filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1))',
+                        borderRadius: 4,
+                        border: '3px solid rgb(15, 15, 13)'
                       }}
                     />
                   </Box>
                 </Grid>
 
                 {/* Text and Button Section */}
-                <Grid size={{ xs: 12, md: 7 }}>
+                <Grid size={{ xs: 12, md: 8 }}>
                   <Box
                     component={motion.div}
                     initial={{ opacity: 0, x: 50 }}
@@ -594,8 +663,8 @@ const Landing = () => {
                     <Typography
                       variant="h2"
                       sx={{
-                        fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' },
-                        fontWeight: 'bold',
+                        fontSize: { xs: '1.4rem', sm: '1.5rem', md: '1.8rem' },
+                        fontWeight: 700,
                         mb: 3
                       }}
                     >
