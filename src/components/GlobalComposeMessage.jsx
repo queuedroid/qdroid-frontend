@@ -144,7 +144,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
       onClose();
 
       // Navigate to messages page to see the queued message
-      navigate('queues');
+      navigate('logs/messages');
     } catch (error) {
       console.error('Error sending message:', error);
       setError(error.response?.data?.message || 'Failed to send message');
@@ -331,6 +331,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
                 sx={{
                   '& .PhoneInput': {
                     border: '1px solid #d3d4d5',
+                    bgcolor: 'white',
                     borderRadius: '8px',
                     padding: '12px',
                     '&:focus-within': {
@@ -371,8 +372,9 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
                         flex: 1,
                         '& .PhoneInput': {
                           border: '1px solid #d3d4d5',
+                          bgcolor: 'white',
                           borderRadius: '8px',
-                          padding: '8px',
+                          padding: '12px',
                           '&:focus-within': {
                             borderColor: '#1976d2',
                             borderWidth: '2px'

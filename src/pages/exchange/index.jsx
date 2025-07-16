@@ -52,6 +52,8 @@ export default function Exchange() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalExchanges, setTotalExchanges] = useState(0);
+  const [queuePages, setQueuePages] = useState({}); // Track current page for each exchange
+  const [queuePageSize] = useState(5); // Smaller page size for queues
 
   // Validate form data
   const validateForm = () => {
@@ -112,18 +114,23 @@ export default function Exchange() {
           exchangeData.map(async (exchange) => {
             try {
               const exchangeId = exchange.exchange_id || exchange.id;
-              console.log(`Fetching queues for exchange ${exchangeId}...`);
-              const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100); // Fetch up to 100 queues
+              const queuePage = queuePages[exchangeId] || 1;
+              console.log(`Fetching queues for exchange ${exchangeId}, page ${queuePage}...`);
+              const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, queuePage, queuePageSize);
 
               return {
                 ...exchange,
-                queues: queuesResponse.data || []
+                queues: queuesResponse.data || [],
+                totalQueues: queuesResponse.pagination?.total || queuesResponse.total || 0,
+                queuePage: queuePage
               };
             } catch (error) {
               console.error(`Error fetching queues for exchange ${exchange.exchange_id || exchange.id}:`, error);
               return {
                 ...exchange,
-                queues: [] // Return empty array if queue fetching fails
+                queues: [], // Return empty array if queue fetching fails
+                totalQueues: 0,
+                queuePage: 1
               };
             }
           })
@@ -147,18 +154,23 @@ export default function Exchange() {
           exchangeData.map(async (exchange) => {
             try {
               const exchangeId = exchange.exchange_id || exchange.id;
-              console.log(`Fetching queues for exchange ${exchangeId}...`);
-              const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100); // Fetch up to 100 queues
+              const queuePage = queuePages[exchangeId] || 1;
+              console.log(`Fetching queues for exchange ${exchangeId}, page ${queuePage}...`);
+              const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, queuePage, queuePageSize);
 
               return {
                 ...exchange,
-                queues: queuesResponse.data || []
+                queues: queuesResponse.data || [],
+                totalQueues: queuesResponse.pagination?.total || queuesResponse.total || 0,
+                queuePage: queuePage
               };
             } catch (error) {
               console.error(`Error fetching queues for exchange ${exchange.exchange_id || exchange.id}:`, error);
               return {
                 ...exchange,
-                queues: [] // Return empty array if queue fetching fails
+                queues: [], // Return empty array if queue fetching fails
+                totalQueues: 0,
+                queuePage: 1
               };
             }
           })
@@ -232,13 +244,20 @@ export default function Exchange() {
   // Refresh queues for a specific exchange
   const refreshQueuesForExchange = async (exchangeId) => {
     try {
-      console.log(`Refreshing queues for exchange ${exchangeId}...`);
-      const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100);
+      const currentPage = queuePages[exchangeId] || 1;
+      console.log(`Refreshing queues for exchange ${exchangeId}, page ${currentPage}...`);
+      const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, currentPage, queuePageSize);
 
       // Update the specific exchange with new queue data
       setExchanges((prevExchanges) =>
         prevExchanges.map((exchange) =>
-          exchange.exchange_id === exchangeId || exchange.id === exchangeId ? { ...exchange, queues: queuesResponse.data || [] } : exchange
+          exchange.exchange_id === exchangeId || exchange.id === exchangeId
+            ? {
+                ...exchange,
+                queues: queuesResponse.data || [],
+                totalQueues: queuesResponse.pagination?.total || queuesResponse.total || 0
+              }
+            : exchange
         )
       );
 
@@ -246,6 +265,33 @@ export default function Exchange() {
     } catch (error) {
       console.error(`Error refreshing queues for exchange ${exchangeId}:`, error);
       showSnackbar('Error refreshing queues', 'error');
+    }
+  };
+
+  // Handle queue page change for a specific exchange
+  const handleQueuePageChange = async (exchangeId, newPage) => {
+    try {
+      // Update the queue page for this exchange
+      setQueuePages((prev) => ({ ...prev, [exchangeId]: newPage }));
+
+      console.log(`Changing queue page for exchange ${exchangeId} to page ${newPage}...`);
+      const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, newPage, queuePageSize);
+
+      // Update the specific exchange with new queue data
+      setExchanges((prevExchanges) =>
+        prevExchanges.map((exchange) =>
+          exchange.exchange_id === exchangeId || exchange.id === exchangeId
+            ? {
+                ...exchange,
+                queues: queuesResponse.data || [],
+                queuePage: newPage
+              }
+            : exchange
+        )
+      );
+    } catch (error) {
+      console.error(`Error changing queue page for exchange ${exchangeId}:`, error);
+      showSnackbar('Error loading queue page', 'error');
     }
   };
 
@@ -295,18 +341,18 @@ export default function Exchange() {
 
   useEffect(() => {
     fetchExchanges();
-  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, queuePages]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       <Grid size={12}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', aligns: 'center', mb: 3 }}>
           <Typography variant="h4">Exchange Management</Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button variant="outlined" startIcon={<UndoOutlined />} onClick={fetchExchanges}>
+          <Box sx={{ display: 'flex', gap: { md: 2, xs: 1 } }}>
+            <Button size="small" variant="outlined" startIcon={<UndoOutlined />} onClick={fetchExchanges}>
               Refresh
             </Button>
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => handleDialogOpen('create')}>
+            <Button size="small" variant="contained" startIcon={<PlusOutlined />} onClick={() => handleDialogOpen('create')}>
               Create Exchange
             </Button>
           </Box>
@@ -339,18 +385,15 @@ export default function Exchange() {
               <Grid size={{ xs: 12, sm: 6, md: 12 }} key={exchange.exchange_id || exchange.id}>
                 <MainCard sx={{ height: '100%' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Typography variant="h5" component="h2">
-                      Exhange Label: {exchange.label || exchange.exchange_id}
+                    <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+                      {exchange.label || exchange.exchange_id}
                     </Typography>
-                    {/* <IconButton sx={{ p: 0.5, color: '#000' }} size="small" onClick={(e) => handleMenuClick(e, exchange)}>
-                      <MoreVertIcon />
-                    </IconButton> */}
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {exchange.description || 'No description'}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    ID: <Chip sx={{ bgcolor: '#F1E8B8' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
+                    ID: <Chip sx={{ bgcolor: '#E0AC9Dccc' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
                     <Tooltip title="Copy Exchange ID">
                       <IconButton
                         size="small"
@@ -368,8 +411,12 @@ export default function Exchange() {
                   {/* Queue Display - Read Only */}
                   <QueueDisplay
                     queues={exchange.queues || []}
+                    totalQueues={exchange.totalQueues || 0}
+                    currentPage={exchange.queuePage || 1}
+                    pageSize={queuePageSize}
                     exchangeId={exchange.exchange_id || exchange.id}
                     onRefresh={() => refreshQueuesForExchange(exchange.exchange_id || exchange.id)}
+                    onPageChange={(newPage) => handleQueuePageChange(exchange.exchange_id || exchange.id, newPage)}
                   />
 
                   <Box sx={{ display: 'flex', gap: 1, pt: 1 }}>

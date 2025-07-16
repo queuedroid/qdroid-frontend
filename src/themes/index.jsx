@@ -40,7 +40,7 @@ export default function ThemeCustomization({ children }) {
   };
 
   const theme = Palette(mode, 'light');
-  const themeTypography = Typography('Space Grotesk', 'sans-serif');
+  const themeTypography = Typography('"Wix Madefor Display", sans-serif');
   const themeCustomShadows = useMemo(() => CustomShadows(theme), [theme]);
 
   const themeOptions = useMemo(
