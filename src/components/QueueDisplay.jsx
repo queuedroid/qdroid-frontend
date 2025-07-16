@@ -15,7 +15,9 @@ import {
   Paper,
   IconButton,
   Tooltip,
-  Alert
+  Alert,
+  Pagination,
+  Stack
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -25,7 +27,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 
-const QueueDisplay = ({ queues = [], onRefresh }) => {
+const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleAccordionChange = (event, isExpanded) => {
@@ -66,7 +68,7 @@ const QueueDisplay = ({ queues = [], onRefresh }) => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-            <Chip label={`${queues.length} Queue${queues.length !== 1 ? 's' : ''} (Read-only)`} size="small" color="primary" />
+            <Chip label={`${totalQueues} Queue${totalQueues !== 1 ? 's' : ''} (Read-only)`} size="small" color="primary" />
             <Typography variant="caption" color="text.secondary">
               Queues are managed automatically
             </Typography>
@@ -93,16 +95,36 @@ const QueueDisplay = ({ queues = [], onRefresh }) => {
               <TableHead>
                 <TableRow>
                   <TableCell>
-                    <strong>Queue Name</strong>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <strong>Queue Name</strong>
+                      <Tooltip title="Name of the queue">
+                        <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell>
-                    <strong>State</strong>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <strong>State</strong>
+                      <Tooltip title="Current state of the queue. This indicates whether the queue is running, idle, or in an error state. It can be used to monitor the health of the queue. Example values: 'running', 'idle', 'error'">
+                        <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell>
-                    <strong>Messages</strong>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <strong>Messages</strong>
+                      <Tooltip title="Number of messages in the queue. This is the number of messages that are currently in the queue waiting to be consumed. It can be used to monitor the load on the queue.">
+                        <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell>
-                    <strong>Consumers</strong>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <strong>Consumers</strong>
+                      <Tooltip title="Number of devices connected to the queue. This is the number of consumers that are currently consuming messages from this queue. It can be used to monitor the load on the queue.">
+                        <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -132,6 +154,19 @@ const QueueDisplay = ({ queues = [], onRefresh }) => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          {/* Pagination */}
+          {totalQueues > pageSize && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Pagination
+                count={Math.ceil(totalQueues / pageSize)}
+                page={currentPage}
+                onChange={(event, value) => onPageChange && onPageChange(value)}
+                color="primary"
+                size="small"
+              />
+            </Box>
+          )}
 
           {queues.length > 0 && (
             <Alert severity="info" sx={{ mt: 2 }}>

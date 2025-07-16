@@ -168,7 +168,7 @@ const MessageLogs = () => {
 
           {/* Summary Cards */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>
@@ -181,7 +181,7 @@ const MessageLogs = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>
@@ -196,7 +196,7 @@ const MessageLogs = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>
@@ -211,7 +211,7 @@ const MessageLogs = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>
