@@ -7,7 +7,6 @@ import RequireAuth from '../components/RequireAuth';
 import RequireOnboarding from '../components/RequireOnboarding';
 import Landing from '../pages/main/landing';
 import NotFound from '../pages/extra-pages/notfound';
-import Home from '../pages/main/home';
 
 // render- Dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
