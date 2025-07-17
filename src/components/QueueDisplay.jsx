@@ -17,7 +17,8 @@ import {
   Tooltip,
   Alert,
   Pagination,
-  Stack
+  Stack,
+  Button
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -26,8 +27,9 @@ import {
   ExpandLess,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { LinkOutlined } from '@ant-design/icons';
 
-const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
+const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1, pageSize = 10, onPageChange, onQueueLinkDevice }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleAccordionChange = (event, isExpanded) => {
@@ -126,6 +128,9 @@ const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1
                       </Tooltip>
                     </Box>
                   </TableCell>
+                  <TableCell>
+                    <strong>Actions</strong>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -148,6 +153,18 @@ const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">{queue.consumers !== undefined ? queue.consumers : 'N/A'}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      {onQueueLinkDevice && (
+                        <Button
+                          size="small"
+                          startIcon={<LinkOutlined />}
+                          onClick={() => onQueueLinkDevice(queue)}
+                          sx={{ fontSize: '0.75rem' }}
+                        >
+                          Link Device
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
