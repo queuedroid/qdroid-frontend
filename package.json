@@ -48,6 +48,7 @@
     "lodash-es": "4.17.21",
     "mcc-mnc-list": "^1.1.11",
     "motion-dom": "^12.9.1",
+    "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "18.3.1",
     "react-device-detect": "2.2.3",

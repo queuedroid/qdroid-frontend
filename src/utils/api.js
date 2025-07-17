@@ -201,7 +201,13 @@ export const exchangeAPI = {
     }),
 
   // Get queues for an exchange (paginated)
-  getQueues: (exchangeId, page = 1, pageSize = 10) => apiRequest(`/exchanges/${exchangeId}/queues?page=${page}&page_size=${pageSize}`)
+  getQueues: (exchangeId, page = 1, pageSize = 10) => apiRequest(`/exchanges/${exchangeId}/queues?page=${page}&page_size=${pageSize}`),
+
+  // Get exchange connection details
+  getConnectionDetails: (exchangeId) => apiRequest(`/exchanges/${exchangeId}/connection`),
+
+  // Get queue connection details
+  getQueueConnectionDetails: (exchangeId, queueId) => apiRequest(`/exchanges/${exchangeId}/queues/${queueId}/connection`)
 };
 
 /**
