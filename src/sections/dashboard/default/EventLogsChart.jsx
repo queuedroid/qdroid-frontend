@@ -150,7 +150,7 @@ export default function EventLogsChart() {
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Box>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              Event Logs (Last 7 Days)
+              Message Logs (Last 7 Days)
             </Typography>
             <Typography variant="h4">Message Status Overview</Typography>
           </Box>

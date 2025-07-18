@@ -20,7 +20,7 @@ import SettingOutlined from '@ant-design/icons/SettingOutlined';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
-export default function ProfileTab() {
+export default function ProfileTab({ onClose }) {
   const navigate = useNavigate();
 
   // Logout handler
@@ -30,10 +30,22 @@ export default function ProfileTab() {
 
   // Navigate to settings page
   const handleEditProfile = () => {
+    // Close dropdown immediately
+    if (onClose) {
+      onClose();
+    }
+
+    // Navigate
     navigate('/dashboard/settings');
   };
 
   const handleSettings = () => {
+    // Close dropdown immediately
+    if (onClose) {
+      onClose();
+    }
+
+    // Navigate
     navigate('/dashboard/settings');
   };
 
@@ -63,4 +75,7 @@ export default function ProfileTab() {
   );
 }
 
-ProfileTab.propTypes = { handleLogout: PropTypes.func };
+ProfileTab.propTypes = {
+  handleLogout: PropTypes.func,
+  onClose: PropTypes.func
+};

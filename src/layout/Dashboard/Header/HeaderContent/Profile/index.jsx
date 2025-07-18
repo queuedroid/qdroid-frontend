@@ -15,20 +15,18 @@ import Tabs from '@mui/material/Tabs';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 
 // project imports
 import ProfileTab from './ProfileTab';
-import SettingTab from './SettingTab';
 import Avatar from 'components/@extended/Avatar';
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
-import IconButton from 'components/@extended/IconButton';
 import { handleLogout as centralizedLogout } from 'utils/api';
 import { useUserDetails } from 'hooks/useUserDetails';
 
 // assets
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
-import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/user-1.jpg';
 import avatar2 from 'assets/images/users/user-2.jpg';
@@ -66,30 +64,12 @@ export default function Profile() {
     fetchUserDetails();
   }, [fetchUserDetails]);
 
-  // Add event listener to close dropdown when clicking anywhere on the page
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (open && anchorRef.current && !anchorRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, [open]);
-
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
   const handleClose = (event) => {
+    // Don't close if clicking inside the dropdown content
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
@@ -199,7 +179,16 @@ export default function Profile() {
                     </Grid>
                   </CardContent>
 
-                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <Box
+                    sx={{
+                      borderBottom: 1,
+                      borderColor: 'divider',
+                      width: '80%',
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      mx: 'auto'
+                    }}
+                  >
                     <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
                       <Tab
                         sx={{
@@ -217,29 +206,10 @@ export default function Profile() {
                         label="Profile"
                         {...a11yProps(0)}
                       />
-                      <Tab
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          textTransform: 'capitalize',
-                          gap: 1.25,
-                          '& .MuiTab-icon': {
-                            marginBottom: 0
-                          }
-                        }}
-                        icon={<SettingOutlined />}
-                        label="Setting"
-                        {...a11yProps(1)}
-                      />
                     </Tabs>
                   </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
-                    <ProfileTab />
-                  </TabPanel>
-                  <TabPanel value={value} index={1} dir={theme.direction}>
-                    <SettingTab />
+                    <ProfileTab onClose={() => setOpen(false)} />
                   </TabPanel>
                 </MainCard>
               </ClickAwayListener>

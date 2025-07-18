@@ -5,7 +5,6 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 
 // project imports
-import Search from './Search';
 import Profile from './Profile';
 import Notification from './Notification';
 import MobileSection from './MobileSection';
@@ -20,11 +19,10 @@ export default function HeaderContent() {
 
   return (
     <>
-      {!downLG && <Search />}
-      {downLG && <Box sx={{ width: '100%', ml: 1 }} />}
+      <Box sx={{ width: '100%', ml: 1 }} />
       <IconButton
         component={Link}
-        href="https://github.com/QueueDriod"
+        href="https://github.com/QueueDroid"
         target="_blank"
         disableRipple
         color="secondary"
