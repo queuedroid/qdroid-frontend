@@ -37,7 +37,10 @@ export default function MobileSection() {
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
+      // Check if anchorRef.current exists before calling focus
+      if (anchorRef.current) {
+        anchorRef.current.focus();
+      }
     }
 
     prevOpen.current = open;
