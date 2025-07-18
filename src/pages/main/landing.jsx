@@ -69,7 +69,7 @@ const Landing = () => {
                     mt: { xs: 5, md: 0 }
                   }}
                 >
-                  QueueDriod
+                  QueueDroid
                 </Typography>
 
                 <Typography
@@ -183,7 +183,9 @@ const Landing = () => {
                   <AnimateButton>
                     <Button
                       component={Link}
-                      to="/dashboard"
+                      to="https://github.com/queuedroid/qdroid-server?tab=readme-ov-file"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       variant="outlined"
                       size="large"
                       startIcon={<ApiOutlined />}
@@ -245,7 +247,7 @@ const Landing = () => {
                 <Box
                   component="img"
                   src="/black-boy-posing.png"
-                  alt="QueueDriod System Illustration"
+                  alt="QueueDroid System Illustration"
                   sx={{
                     width: { xs: '100%', sm: '75%', md: '85%' },
                     height: 'auto',
@@ -347,7 +349,7 @@ const Landing = () => {
                       lineHeight: 1.3
                     }}
                   >
-                    QueueDriod uses advanced queuing with automatic retry mechanisms ensuring your business-critical messages are delivered
+                    QueueDroid uses advanced queuing with automatic retry mechanisms ensuring your business-critical messages are delivered
                     reliably.
                   </Typography>
                 </Box>
@@ -366,7 +368,7 @@ const Landing = () => {
           `}
         </style>
 
-        {/* Why Use QueueDriod Section */}
+        {/* Why Use QueueDroid Section */}
         <Box
           component={motion.div}
           initial={{ opacity: 0, y: 50 }}
@@ -394,7 +396,7 @@ const Landing = () => {
                   mb: 2
                 }}
               >
-                Why Choose QueueDriod?
+                Why Choose QueueDroid?
               </Typography>
             </Box>
 
@@ -632,7 +634,7 @@ const Landing = () => {
                     <Box
                       component="img"
                       src="/man-using-tablet.jpg"
-                      alt="QueueDriod Management Dashboard"
+                      alt="QueueDroid Management Dashboard"
                       sx={{
                         width: '100%',
                         height: '100%',

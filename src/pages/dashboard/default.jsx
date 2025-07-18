@@ -194,9 +194,9 @@ export default function DashboardDefault() {
       </Grid>
       <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
-          title="Total Events"
+          title="Total Messages"
           count={loading ? '...' : exchangeStats.messagesSent.toLocaleString()}
-          extra="From event logs"
+          extra="All message logs"
           isLoss={false}
         />
       </Grid>

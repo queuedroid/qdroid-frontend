@@ -18,7 +18,7 @@ const logs = {
   children: [
     {
       id: 'message-logs',
-      title: 'Message Logs',
+      title: 'Message',
       type: 'item',
       url: '/dashboard/logs/messages',
       icon: icons.MessageOutlined,
