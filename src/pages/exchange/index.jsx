@@ -35,7 +35,8 @@ import {
 import { useState, useEffect } from 'react';
 import MainCard from 'components/MainCard';
 import QueueDisplay from 'components/QueueDisplay';
-import { EditOutlined, PlusOutlined, UndoOutlined } from '@ant-design/icons';
+import DeviceLinkDialog from 'components/DeviceLinkDialog';
+import { EditOutlined, PlusOutlined, UndoOutlined, LinkOutlined } from '@ant-design/icons';
 import { apiConfig } from '../../config/apiConfig';
 import { CopyOutlined } from '@ant-design/icons/lib';
 
@@ -54,6 +55,11 @@ export default function Exchange() {
   const [totalExchanges, setTotalExchanges] = useState(0);
   const [queuePages, setQueuePages] = useState({}); // Track current page for each exchange
   const [queuePageSize] = useState(5); // Smaller page size for queues
+
+  // Device Link Dialog state
+  const [deviceLinkOpen, setDeviceLinkOpen] = useState(false);
+  const [deviceLinkExchange, setDeviceLinkExchange] = useState(null);
+  const [deviceLinkQueue, setDeviceLinkQueue] = useState(null);
 
   // Validate form data
   const validateForm = () => {
@@ -241,6 +247,19 @@ export default function Exchange() {
     }
   };
 
+  // Handle device link dialog
+  const handleDeviceLinkOpen = (exchange, queue = null) => {
+    setDeviceLinkExchange(exchange);
+    setDeviceLinkQueue(queue);
+    setDeviceLinkOpen(true);
+  };
+
+  const handleDeviceLinkClose = () => {
+    setDeviceLinkOpen(false);
+    setDeviceLinkExchange(null);
+    setDeviceLinkQueue(null);
+  };
+
   // Refresh queues for a specific exchange
   const refreshQueuesForExchange = async (exchangeId) => {
     try {
@@ -388,12 +407,30 @@ export default function Exchange() {
                     <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
                       {exchange.label || exchange.exchange_id}
                     </Typography>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<LinkOutlined />}
+                      onClick={() => handleDeviceLinkOpen(exchange)}
+                      sx={{
+                        ml: 2,
+                        flexShrink: 0,
+                        borderColor: '#ee5a52',
+                        color: '#ee5a52',
+                        '&:hover': {
+                          borderColor: '#d84b43',
+                          backgroundColor: 'rgba(238, 85, 82, 0.04)'
+                        }
+                      }}
+                    >
+                      Link Device
+                    </Button>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {exchange.description || 'No description'}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    ID: <Chip sx={{ bgcolor: '#E0AC9Dccc' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
+                    ID: <Chip sx={{ bgcolor: '#f7e8e4' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
                     <Tooltip title="Copy Exchange ID">
                       <IconButton
                         size="small"
@@ -417,6 +454,7 @@ export default function Exchange() {
                     exchangeId={exchange.exchange_id || exchange.id}
                     onRefresh={() => refreshQueuesForExchange(exchange.exchange_id || exchange.id)}
                     onPageChange={(newPage) => handleQueuePageChange(exchange.exchange_id || exchange.id, newPage)}
+                    onQueueLinkDevice={(queue) => handleDeviceLinkOpen(exchange, queue)}
                   />
 
                   <Box sx={{ display: 'flex', gap: 1, pt: 1 }}>
@@ -527,6 +565,9 @@ export default function Exchange() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Device Link Dialog */}
+      <DeviceLinkDialog open={deviceLinkOpen} onClose={handleDeviceLinkClose} exchange={deviceLinkExchange} queue={deviceLinkQueue} />
     </Grid>
   );
 }
