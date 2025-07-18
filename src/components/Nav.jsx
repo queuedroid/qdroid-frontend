@@ -44,7 +44,7 @@ const Nav = () => {
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Box component="img" src="/logo.png" alt="Logo" sx={{ width: { md: 30, xs: 20 }, mr: 1 }} />
         <Typography variant="h6" className="header" sx={{ fontWeight: 'bold', fontSize: { xs: 12, md: 20 } }}>
-          QueueDriod
+          QueueDroid
         </Typography>
       </Box>
 
@@ -60,7 +60,7 @@ const Nav = () => {
         >
           Login
         </Button>
-        <a href="https://github.com/QueueDriod" target="_blank">
+        <a href="https://github.com/QueueDroid" target="_blank">
           {' '}
           <GithubOutlined style={{ fontSize: 27, color: 'black' }} />{' '}
         </a>

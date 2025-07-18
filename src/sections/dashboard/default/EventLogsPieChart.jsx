@@ -100,9 +100,9 @@ export default function EventLogsPieChart() {
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              Event Status Distribution
+              Message Status Distribution
             </Typography>
-            <Typography variant="h4">{totalCount.toLocaleString()} Total Events</Typography>
+            <Typography variant="h4">{totalCount.toLocaleString()} Total Message Log(s)</Typography>
           </Box>
         </Stack>
 

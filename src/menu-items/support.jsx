@@ -21,12 +21,11 @@ const support = {
       title: 'Documentation',
       type: 'item',
       url: '/dashboard/documentation',
-      icon: icons.FileSearchOutlined,
-      breadcrumbs: false
+      icon: icons.FileSearchOutlined
     },
     {
       id: 'help',
-      title: 'help',
+      title: 'Help',
       type: 'item',
       url: '/dashboard/help',
       icon: icons.QuestionOutlined

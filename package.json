@@ -1,11 +1,11 @@
 {
-  "name": "QueueDriod-dashboard",
+  "name": "QueueDroid-dashboard",
   "version": "1.5.0",
-  "homepage": "https://QueueDriod.com/",
+  "homepage": "https://QueueDroid.com/",
   "author": {
-    "name": "QueueDriod",
+    "name": "QueueDroid",
     "email": "developers@smswithoutborders.com",
-    "url": "https://QueueDriod.com/"
+    "url": "https://QueueDroid.com/"
   },
   "scripts": {
     "start": "vite",

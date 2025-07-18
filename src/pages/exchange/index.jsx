@@ -22,7 +22,9 @@ import {
   ListItemIcon,
   ListItemText,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -60,6 +62,10 @@ export default function Exchange() {
   const [deviceLinkOpen, setDeviceLinkOpen] = useState(false);
   const [deviceLinkExchange, setDeviceLinkExchange] = useState(null);
   const [deviceLinkQueue, setDeviceLinkQueue] = useState(null);
+
+  // Auto-refresh state
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(null);
 
   // Validate form data
   const validateForm = () => {
@@ -362,18 +368,109 @@ export default function Exchange() {
     fetchExchanges();
   }, [page, queuePages]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-refresh effect
+  useEffect(() => {
+    if (autoRefreshEnabled) {
+      const interval = setInterval(() => {
+        console.log('Auto-refreshing exchanges and queues...');
+        fetchExchanges();
+      }, 10000); // 10 seconds
+
+      setRefreshInterval(interval);
+
+      return () => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      };
+    } else if (refreshInterval) {
+      clearInterval(refreshInterval);
+      setRefreshInterval(null);
+    }
+  }, [autoRefreshEnabled]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [refreshInterval]);
+
   return (
-    <Grid container rowSpacing={4.5} columnSpacing={2.75}>
+    <Grid container rowSpacing={4.5} columnSpacing={2.75} sx={{ px: { xs: 1, sm: 2, md: 0 } }}>
       <Grid size={12}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', aligns: 'center', mb: 3 }}>
-          <Typography variant="h4">Exchange Management</Typography>
-          <Box sx={{ display: 'flex', gap: { md: 2, xs: 1 } }}>
-            <Button size="small" variant="outlined" startIcon={<UndoOutlined />} onClick={fetchExchanges}>
-              Refresh
-            </Button>
-            <Button size="small" variant="contained" startIcon={<PlusOutlined />} onClick={() => handleDialogOpen('create')}>
-              Create Exchange
-            </Button>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'stretch', md: 'center' },
+            mb: 3,
+            gap: { xs: 2, md: 0 }
+          }}
+        >
+          <Typography variant={{ xs: 'h5', md: 'h4' }} sx={{ fontWeight: 600 }}>
+            Exchange Management
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: { xs: 1, md: 2 },
+              alignItems: { xs: 'stretch', sm: 'center' }
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={autoRefreshEnabled}
+                  onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
+                  size="small"
+                  sx={{
+                    '& .MuiSwitch-track': {
+                      backgroundColor: autoRefreshEnabled ? undefined : 'rgba(0, 0, 0, 0.12)'
+                    }
+                  }}
+                />
+              }
+              label="Auto-refresh (10s)"
+              sx={{
+                mr: { xs: 0, sm: 1 },
+                justifyContent: { xs: 'center', sm: 'flex-start' },
+                '& .MuiFormControlLabel-label': {
+                  color: autoRefreshEnabled ? 'text.primary' : 'text.secondary',
+                  fontWeight: autoRefreshEnabled ? 500 : 400
+                }
+              }}
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}
+            >
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<UndoOutlined />}
+                onClick={fetchExchanges}
+                fullWidth={{ xs: true, sm: false }}
+              >
+                Refresh
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                onClick={() => handleDialogOpen('create')}
+                fullWidth={{ xs: true, sm: false }}
+              >
+                Create Exchange
+              </Button>
+            </Box>
           </Box>
         </Box>
       </Grid>
@@ -386,14 +483,20 @@ export default function Exchange() {
           </Box>
         ) : exchanges.length === 0 ? (
           <MainCard>
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="h6" color="text.secondary">
+            <Box sx={{ textAlign: 'center', py: { xs: 3, sm: 4 }, px: { xs: 2, sm: 3 } }}>
+              <Typography variant={{ xs: 'h6', sm: 'h6' }} color="text.secondary">
                 No exchanges found
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: { xs: 2, sm: 2 } }}>
                 Create your first exchange to get started
               </Typography>
-              <Button variant="contained" startIcon={<PlusOutlined />} sx={{ mt: 2 }} onClick={() => handleDialogOpen('create')}>
+              <Button
+                variant="contained"
+                startIcon={<PlusOutlined />}
+                sx={{ mt: 1 }}
+                onClick={() => handleDialogOpen('create')}
+                fullWidth={{ xs: true, sm: false }}
+              >
                 Create Exchange
               </Button>
             </Box>
@@ -401,10 +504,19 @@ export default function Exchange() {
         ) : (
           <Grid container spacing={3}>
             {exchanges.map((exchange) => (
-              <Grid size={{ xs: 12, sm: 6, md: 12 }} key={exchange.exchange_id || exchange.id}>
+              <Grid size={{ xs: 12 }} key={exchange.exchange_id || exchange.id}>
                 <MainCard sx={{ height: '100%' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      justifyContent: 'space-between',
+                      alignItems: { xs: 'stretch', sm: 'flex-start' },
+                      mb: 2,
+                      gap: { xs: 1, sm: 0 }
+                    }}
+                  >
+                    <Typography variant={{ xs: 'h6', sm: 'h5' }} component="h2" sx={{ fontWeight: 700, mb: { xs: 1, sm: 0 } }}>
                       {exchange.label || exchange.exchange_id}
                     </Typography>
                     <Button
@@ -412,8 +524,9 @@ export default function Exchange() {
                       variant="outlined"
                       startIcon={<LinkOutlined />}
                       onClick={() => handleDeviceLinkOpen(exchange)}
+                      fullWidth={{ xs: true, sm: false }}
                       sx={{
-                        ml: 2,
+                        ml: { xs: 0, sm: 2 },
                         flexShrink: 0,
                         borderColor: '#ee5a52',
                         color: '#ee5a52',
@@ -429,19 +542,32 @@ export default function Exchange() {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {exchange.description || 'No description'}
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    ID: <Chip sx={{ bgcolor: '#f7e8e4' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
-                    <Tooltip title="Copy Exchange ID">
-                      <IconButton
-                        size="small"
-                        onClick={() => copyToClipboard(exchange.exchange_id || exchange.id)}
-                        sx={{ p: 0.5, color: '#000' }}
-                      >
-                        <CopyOutlined fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      gap: 1,
+                      mb: 2
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        ID:
+                      </Typography>
+                      <Chip sx={{ bgcolor: '#f7e8e4' }} label={`${exchange.exchange_id || exchange.id}`} size="small" />
+                      <Tooltip title="Copy Exchange ID">
+                        <IconButton
+                          size="small"
+                          onClick={() => copyToClipboard(exchange.exchange_id || exchange.id)}
+                          sx={{ p: 0.5, color: '#000' }}
+                        >
+                          <CopyOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
                     Created at: {new Date(exchange.created_at).toLocaleDateString()}
                   </Typography>
 
@@ -457,11 +583,31 @@ export default function Exchange() {
                     onQueueLinkDevice={(queue) => handleDeviceLinkOpen(exchange, queue)}
                   />
 
-                  <Box sx={{ display: 'flex', gap: 1, pt: 1 }}>
-                    <Button size="small" startIcon={<EditOutlined />} onClick={() => handleDialogOpen('edit', exchange)}>
+                  <Box
+                    sx={{
+                      //display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: { xs: 1, sm: 1 },
+                      pt: 1
+                    }}
+                  >
+                    <Button
+                      size="small"
+                      startIcon={<EditOutlined />}
+                      onClick={() => handleDialogOpen('edit', exchange)}
+                      fullWidth={{ xs: true, sm: false }}
+                      sx={{ flex: { sm: 1 } }}
+                    >
                       Edit
                     </Button>
-                    <Button size="small" startIcon={<DeleteIcon />} color="error" onClick={() => handleDialogOpen('delete', exchange)}>
+                    <Button
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      color="error"
+                      onClick={() => handleDialogOpen('delete', exchange)}
+                      fullWidth={{ xs: true, sm: false }}
+                      sx={{ flex: { sm: 1 } }}
+                    >
                       Delete
                     </Button>
                   </Box>
@@ -499,7 +645,19 @@ export default function Exchange() {
       </Menu>
 
       {/* Create/Edit/Delete Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={{ xs: true, sm: false }}
+        sx={{
+          '& .MuiDialog-paper': {
+            margin: { xs: 0, sm: 2 },
+            maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' }
+          }
+        }}
+      >
         <DialogTitle>
           {dialogType === 'create' && 'Create Exchange'}
           {dialogType === 'edit' && 'Edit Exchange'}
