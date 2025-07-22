@@ -650,11 +650,10 @@ export default function Exchange() {
         onClose={() => setOpenDialog(false)}
         maxWidth="sm"
         fullWidth
-        fullScreen={{ xs: true, sm: false }}
         sx={{
           '& .MuiDialog-paper': {
-            margin: { xs: 0, sm: 2 },
-            maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' }
+            margin: 2,
+            maxHeight: 'calc(100% - 64px)'
           }
         }}
       >
