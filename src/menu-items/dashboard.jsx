@@ -12,7 +12,8 @@ import {
   TableOutlined,
   FileTextOutlined,
   DollarOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
+  KeyOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -29,7 +30,8 @@ const icons = {
   TableOutlined,
   FileTextOutlined,
   DollarOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
+  KeyOutlined
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -87,6 +89,14 @@ const dashboard = {
     //   icon: icons.CreditCardOutlined,
     //   breadcrumbs: false
     // },
+    {
+      id: 'api-keys',
+      title: 'API Keys',
+      type: 'item',
+      url: '/dashboard/api-keys',
+      icon: icons.KeyOutlined,
+      breadcrumbs: false
+    },
     {
       id: 'settings',
       title: 'Settings',

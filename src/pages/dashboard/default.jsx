@@ -335,6 +335,16 @@ export default function DashboardDefault() {
         </MainCard>
       </Grid>
 
+      {/* Event Logs Chart Section */}
+      <Grid size={{ xs: 12, md: 8, lg: 8 }}>
+        <EventLogsChart />
+      </Grid>
+
+      {/* Event Logs Pie Chart Section */}
+      <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+        <EventLogsPieChart />
+      </Grid>
+
       {/* Recent Event Logs Section */}
       <Grid size={{ xs: 12, md: 12, lg: 12 }}>
         <MainCard sx={{ mt: 1 }}>
@@ -426,16 +436,6 @@ export default function DashboardDefault() {
             </TableContainer>
           </Box>
         </MainCard>
-      </Grid>
-
-      {/* Event Logs Chart Section */}
-      <Grid size={{ xs: 12, md: 8, lg: 8 }}>
-        <EventLogsChart />
-      </Grid>
-
-      {/* Event Logs Pie Chart Section */}
-      <Grid size={{ xs: 12, md: 4, lg: 4 }}>
-        <EventLogsPieChart />
       </Grid>
     </Grid>
   );
