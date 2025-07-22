@@ -24,7 +24,10 @@ import {
   CircularProgress,
   Tooltip,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -66,6 +69,7 @@ export default function Exchange() {
   // Auto-refresh state
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(null);
+  const [refreshIntervalDuration, setRefreshIntervalDuration] = useState(10); // Default to 10 seconds
 
   // Validate form data
   const validateForm = () => {
@@ -76,12 +80,6 @@ export default function Exchange() {
       errors.label = 'Label is required';
       isValid = false;
     }
-
-    if (!formData.description.trim()) {
-      errors.description = 'Description is required';
-      isValid = false;
-    }
-
     setFormErrors(errors);
     return isValid;
   };
@@ -372,9 +370,9 @@ export default function Exchange() {
   useEffect(() => {
     if (autoRefreshEnabled) {
       const interval = setInterval(() => {
-        console.log('Auto-refreshing exchanges and queues...');
+        console.log(`Auto-refreshing exchanges and queues every ${refreshIntervalDuration}s...`);
         fetchExchanges();
-      }, 10000); // 10 seconds
+      }, refreshIntervalDuration * 1000); // Convert seconds to milliseconds
 
       setRefreshInterval(interval);
 
@@ -387,7 +385,7 @@ export default function Exchange() {
       clearInterval(refreshInterval);
       setRefreshInterval(null);
     }
-  }, [autoRefreshEnabled]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoRefreshEnabled, refreshIntervalDuration]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cleanup interval on unmount
   useEffect(() => {
@@ -422,29 +420,60 @@ export default function Exchange() {
               alignItems: { xs: 'stretch', sm: 'center' }
             }}
           >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={autoRefreshEnabled}
-                  onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
-                  size="small"
-                  sx={{
-                    '& .MuiSwitch-track': {
-                      backgroundColor: autoRefreshEnabled ? undefined : 'rgba(0, 0, 0, 0.12)'
-                    }
-                  }}
-                />
-              }
-              label="Auto-refresh (10s)"
-              sx={{
-                mr: { xs: 0, sm: 1 },
-                justifyContent: { xs: 'center', sm: 'flex-start' },
-                '& .MuiFormControlLabel-label': {
-                  color: autoRefreshEnabled ? 'text.primary' : 'text.secondary',
-                  fontWeight: autoRefreshEnabled ? 500 : 400
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={autoRefreshEnabled}
+                    onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
+                    size="small"
+                    sx={{
+                      '& .MuiSwitch-track': {
+                        backgroundColor: autoRefreshEnabled ? undefined : 'rgba(0, 0, 0, 0.12)'
+                      }
+                    }}
+                  />
                 }
-              }}
-            />
+                label="Auto-refresh"
+                sx={{
+                  mr: 1,
+                  '& .MuiFormControlLabel-label': {
+                    color: autoRefreshEnabled ? 'text.primary' : 'text.secondary',
+                    fontWeight: autoRefreshEnabled ? 500 : 400
+                  }
+                }}
+              />
+              {autoRefreshEnabled && (
+                <FormControl size="small" sx={{ minWidth: 80 }}>
+                  <Select
+                    value={refreshIntervalDuration}
+                    onChange={(e) => setRefreshIntervalDuration(e.target.value)}
+                    displayEmpty
+                    sx={{
+                      '& .MuiSelect-select': {
+                        paddingY: 0.5,
+                        fontSize: '0.875rem',
+                        color: '#666',
+                        backgroundColor: '#f5f5f5'
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#ccc'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#999'
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#666'
+                      }
+                    }}
+                  >
+                    <MenuItem value={5}>5s</MenuItem>
+                    <MenuItem value={10}>10s</MenuItem>
+                    <MenuItem value={15}>15s</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+            </Box>
             <Box
               sx={{
                 display: 'flex',
@@ -689,9 +718,8 @@ export default function Exchange() {
                 margin="normal"
                 multiline
                 rows={3}
-                required
                 error={!!formErrors.description}
-                helperText={formErrors.description || 'Provide a detailed description for the exchange'}
+                helperText={formErrors.description || 'Provide a description for the exchange (optional)'}
               />
             </Box>
           )}
@@ -702,7 +730,7 @@ export default function Exchange() {
             onClick={handleSubmit}
             variant="contained"
             color={dialogType === 'delete' ? 'error' : 'primary'}
-            disabled={dialogType !== 'delete' && (!formData.label.trim() || !formData.description.trim())}
+            disabled={dialogType !== 'delete' && !formData.label.trim()}
           >
             {dialogType === 'create' && 'Create'}
             {dialogType === 'edit' && 'Update'}
