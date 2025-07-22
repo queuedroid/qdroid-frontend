@@ -30,7 +30,9 @@ import {
   UserOutlined,
   DatabaseOutlined,
   TagOutlined,
-  QrcodeOutlined
+  QrcodeOutlined,
+  GlobalOutlined,
+  NumberOutlined
 } from '@ant-design/icons';
 import QRCode from 'qrcode';
 import { exchangeAPI } from '../utils/api';
@@ -88,6 +90,9 @@ const DeviceLinkDialog = ({ open, onClose, exchange, queue = null }) => {
       const qrData = {
         type: isQueueConnection ? 'queue_connection' : 'exchange_connection',
         amqp_url: data.amqp_url,
+        host: data.host,
+        port: data.port,
+        protocol: data.protocol,
         username: data.username,
         password: data.password,
         virtual_host: data.virtual_host,
@@ -241,9 +246,12 @@ const DeviceLinkDialog = ({ open, onClose, exchange, queue = null }) => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <QuickConnectChip label="Host" value={connectionData.host} fieldName="host" />
+                      <QuickConnectChip label="Port" value={connectionData.port} fieldName="port" />
+                      <QuickConnectChip label="Protocol" value={connectionData.protocol} fieldName="protocol" />
                       <QuickConnectChip label="Username" value={connectionData.username} fieldName="username" />
                       <QuickConnectChip label="Password" value={connectionData.password} fieldName="password" />
-                      <QuickConnectChip label="Host" value={connectionData.virtual_host} fieldName="virtual_host" />
+                      <QuickConnectChip label="Virtual Host" value={connectionData.virtual_host} fieldName="virtual_host" />
                       <QuickConnectChip label="Exchange" value={connectionData.exchange} fieldName="exchange" />
                       {isQueueConnection && (
                         <QuickConnectChip label="Binding Key" value={connectionData.binding_key} fieldName="binding_key" />
@@ -271,15 +279,21 @@ const DeviceLinkDialog = ({ open, onClose, exchange, queue = null }) => {
 
                     <ConnectionField label="AMQP URL" value={connectionData.amqp_url} fieldName="amqp_url" icon={LinkOutlined} multiline />
 
-                    <ConnectionField label="Username" value={connectionData.username} fieldName="username" icon={UserOutlined} />
+                    <ConnectionField label="Host" value={connectionData.host} fieldName="host" icon={GlobalOutlined} />
 
-                    <ConnectionField label="Password" value={connectionData.password} fieldName="password" icon={KeyOutlined} />
+                    <ConnectionField label="Port" value={connectionData.port} fieldName="port" icon={NumberOutlined} />
+
+                    <ConnectionField label="Protocol" value={connectionData.protocol} fieldName="protocol" icon={CloudServerOutlined} />
                   </Grid>
 
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                      Server Details
+                      Authentication & Routing
                     </Typography>
+
+                    <ConnectionField label="Username" value={connectionData.username} fieldName="username" icon={UserOutlined} />
+
+                    <ConnectionField label="Password" value={connectionData.password} fieldName="password" icon={KeyOutlined} />
 
                     <ConnectionField
                       label="Virtual Host"
