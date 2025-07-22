@@ -69,7 +69,7 @@ const DeviceLinkDialog = ({ open, onClose, exchange, queue = null }) => {
     try {
       let response;
       if (isQueueConnection) {
-        response = await exchangeAPI.getQueueConnectionDetails(exchange.exchange_id || exchange.id, queue.queue_id || queue.id);
+        response = await exchangeAPI.getQueueConnectionDetails(exchange.exchange_id || exchange.id, queue.name);
       } else {
         response = await exchangeAPI.getConnectionDetails(exchange.exchange_id || exchange.id);
       }
@@ -203,7 +203,7 @@ const DeviceLinkDialog = ({ open, onClose, exchange, queue = null }) => {
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           {isQueueConnection
-            ? `Queue: ${queue?.label || queue?.queue_id || queue?.id}`
+            ? `Queue: ${queue?.name || queue?.label || 'Unknown Queue'}`
             : `Exchange: ${exchange?.label || exchange?.exchange_id || exchange?.id}`}
         </Typography>
       </DialogTitle>
