@@ -243,7 +243,7 @@ const APIKeys = () => {
 
       // Refresh the API keys list
       await fetchAPIKeys(pagination.page, pagination.page_size);
-      
+
       showSnackbar('API key deleted successfully', 'success');
       setOpenDeleteDialog(false);
       setKeyToDelete(null);
@@ -381,7 +381,6 @@ const APIKeys = () => {
                   <TableRow>
                     <TableCell>Name</TableCell>
                     <TableCell>Description</TableCell>
-                    <TableCell>Key ID</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Created</TableCell>
                     <TableCell>Last Used</TableCell>
@@ -414,38 +413,6 @@ const APIKeys = () => {
                           <Typography variant="body2" color="text.secondary">
                             {getFieldValue(key.description, 'Description', 'No description')}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          {key.key_id ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, maxWidth: 200 }}>
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  fontFamily: 'monospace',
-                                  fontSize: '0.75rem',
-                                  backgroundColor: 'grey.50',
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  flex: 1,
-                                  minWidth: 0,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis'
-                                }}
-                              >
-                                {key.key_id}
-                              </Typography>
-                              <Tooltip title="Copy Key ID">
-                                <IconButton size="small" onClick={() => copyToClipboard(key.key_id, 'Key ID')}>
-                                  <CopyIcon sx={{ color: 'grey', fontSize: 15 }} />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          ) : (
-                            <Typography variant="body2" color="error">
-                              Not available
-                            </Typography>
-                          )}
                         </TableCell>
                         <TableCell>
                           <Chip label={getStatusText(key.expires_at)} color={getStatusColor(key.expires_at)} size="small" />
@@ -547,16 +514,7 @@ const APIKeys = () => {
       </Dialog>
 
       {/* API Key Display Dialog - One Time Only */}
-      <Dialog open={openKeyDisplayDialog} onClose={handleKeyDisplayDialogClose} maxWidth="md" fullWidth disableEscapeKeyDown>
-        <DialogTitle sx={{ pb: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Alert severity="success" sx={{ flexGrow: 1, fontSize: '1rem' }}>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                🎉 API Key Created Successfully!
-              </Typography>
-            </Alert>
-          </Box>
-        </DialogTitle>
+      <Dialog open={openKeyDisplayDialog} onClose={() => {}} maxWidth="md" fullWidth disableEscapeKeyDown>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 3 }}>
             <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
@@ -624,12 +582,6 @@ const APIKeys = () => {
                   </IconButton>
                 </Tooltip>
               </Box>
-
-              <Alert severity="info">
-                <Typography variant="body2">
-                  💡 <strong>Tip:</strong> You can click on the API key field above to select all text for easy copying.
-                </Typography>
-              </Alert>
             </Box>
           )}
         </DialogContent>
@@ -650,15 +602,13 @@ const APIKeys = () => {
                 <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
                   <strong>Warning:</strong> This action cannot be undone.
                 </Typography>
-                <Typography variant="body2">
-                  Once deleted, this API key will immediately stop working and cannot be recovered.
-                </Typography>
+                <Typography variant="body2">Once deleted, this API key will immediately stop working and cannot be recovered.</Typography>
               </Alert>
-              
+
               <Typography variant="body1" sx={{ mb: 2 }}>
                 Are you sure you want to delete the following API key?
               </Typography>
-              
+
               <Box sx={{ backgroundColor: 'grey.50', p: 2, borderRadius: 1, mb: 2 }}>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   Name: <strong>{keyToDelete.name}</strong>
