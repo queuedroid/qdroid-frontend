@@ -25,11 +25,22 @@ import {
   Delete as DeleteIcon,
   Info as InfoIcon,
   ExpandLess,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  Clear as ClearIcon
 } from '@mui/icons-material';
 import { LinkOutlined } from '@ant-design/icons';
 
-const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1, pageSize = 10, onPageChange, onQueueLinkDevice }) => {
+const QueueDisplay = ({
+  queues = [],
+  onRefresh,
+  totalQueues = 0,
+  currentPage = 1,
+  pageSize = 10,
+  onPageChange,
+  onQueueLinkDevice,
+  onQueueDelete,
+  onQueuePurge
+}) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleAccordionChange = (event, isExpanded) => {
@@ -70,7 +81,7 @@ const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-            <Chip label={`${totalQueues} Queue${totalQueues !== 1 ? 's' : ''} (Read-only)`} size="small" color="primary" />
+            <Chip label={`${totalQueues} Queue${totalQueues !== 1 ? 's' : ''}`} size="small" color="primary" />
             <Typography variant="caption" color="text.secondary">
               Queues are managed automatically
             </Typography>
@@ -155,16 +166,32 @@ const QueueDisplay = ({ queues = [], onRefresh, totalQueues = 0, currentPage = 1
                       <Typography variant="body2">{queue.consumers !== undefined ? queue.consumers : 'N/A'}</Typography>
                     </TableCell>
                     <TableCell>
-                      {onQueueLinkDevice && (
-                        <Button
-                          size="small"
-                          startIcon={<LinkOutlined />}
-                          onClick={() => onQueueLinkDevice(queue)}
-                          sx={{ fontSize: '0.75rem' }}
-                        >
-                          Link Device
-                        </Button>
-                      )}
+                      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                        {onQueueLinkDevice && (
+                          <Button
+                            size="small"
+                            startIcon={<LinkOutlined />}
+                            onClick={() => onQueueLinkDevice(queue)}
+                            sx={{ fontSize: '0.75rem', minWidth: 'auto' }}
+                          >
+                            Link
+                          </Button>
+                        )}
+                        {onQueuePurge && (
+                          <Tooltip title="Purge all messages from queue">
+                            <IconButton size="small" onClick={() => onQueuePurge(queue)} sx={{ color: 'warning.main' }}>
+                              <ClearIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {onQueueDelete && (
+                          <Tooltip title="Delete queue permanently">
+                            <IconButton size="small" onClick={() => onQueueDelete(queue)} sx={{ color: 'error.main' }}>
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
