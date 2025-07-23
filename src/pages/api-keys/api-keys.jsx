@@ -30,12 +30,13 @@ import {
   Add as AddIcon,
   ContentCopy as CopyIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  VisibilityOff as VisibilityOffIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 import { PlusOutlined, KeyOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { format } from 'date-fns';
-import { apiRequest } from '../../utils/api';
+import { apiKeysAPI } from '../../utils/api';
 
 const APIKeys = () => {
   const [apiKeys, setApiKeys] = useState([]);
@@ -49,6 +50,9 @@ const APIKeys = () => {
   });
   const [openDialog, setOpenDialog] = useState(false);
   const [openKeyDisplayDialog, setOpenKeyDisplayDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [keyToDelete, setKeyToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [newApiKey, setNewApiKey] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', expires_at: '' });
   const [formErrors, setFormErrors] = useState({ name: '', description: '', expires_at: '' });
@@ -58,7 +62,7 @@ const APIKeys = () => {
   const fetchAPIKeys = useCallback(async (page = 1, pageSize = 10) => {
     try {
       setFetchLoading(true);
-      const response = await apiRequest(`/auth/api-keys?page=${page}&page_size=${pageSize}`);
+      const response = await apiKeysAPI.getAll(page, pageSize);
 
       // Handle the new API structure
       if (response.data) {
@@ -126,13 +130,10 @@ const APIKeys = () => {
 
     try {
       setLoading(true);
-      const response = await apiRequest('/auth/api-keys', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description || undefined,
-          expires_at: formData.expires_at || undefined
-        })
+      const response = await apiKeysAPI.create({
+        name: formData.name,
+        description: formData.description || undefined,
+        expires_at: formData.expires_at || undefined
       });
 
       // Store the new API key and show it in a special dialog
@@ -230,6 +231,40 @@ const APIKeys = () => {
   // Show snackbar
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
+  };
+
+  // Delete API key
+  const deleteAPIKey = async () => {
+    if (!keyToDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      await apiKeysAPI.delete(keyToDelete.key_id);
+
+      // Refresh the API keys list
+      await fetchAPIKeys(pagination.page, pagination.page_size);
+      
+      showSnackbar('API key deleted successfully', 'success');
+      setOpenDeleteDialog(false);
+      setKeyToDelete(null);
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+      const errorMessage = error.message || 'Failed to delete API key';
+      showSnackbar(errorMessage, 'error');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Handle delete confirmation dialog
+  const handleDeleteClick = (key) => {
+    setKeyToDelete(key);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDeleteDialogClose = () => {
+    setOpenDeleteDialog(false);
+    setKeyToDelete(null);
   };
 
   // Helper function to safely get field values with fallback messages
@@ -425,12 +460,10 @@ const APIKeys = () => {
                           <Typography variant="body2">{key.expires_at ? formatDate(key.expires_at) : 'Never'}</Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Tooltip title="More actions coming soon">
-                            <span>
-                              <Button size="small" disabled variant="outlined">
-                                Manage
-                              </Button>
-                            </span>
+                          <Tooltip title="Delete API Key">
+                            <IconButton size="small" color="error" onClick={() => handleDeleteClick(key)} disabled={deleteLoading}>
+                              <DeleteIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
                           </Tooltip>
                         </TableCell>
                       </TableRow>
@@ -603,6 +636,57 @@ const APIKeys = () => {
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={handleKeyDisplayDialogClose} variant="contained" size="large" fullWidth>
             I've Saved My API Key
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={openDeleteDialog} onClose={handleDeleteDialogClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Delete API Key</DialogTitle>
+        <DialogContent>
+          {keyToDelete && (
+            <Box sx={{ mt: 2 }}>
+              <Alert severity="warning" sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+                  <strong>Warning:</strong> This action cannot be undone.
+                </Typography>
+                <Typography variant="body2">
+                  Once deleted, this API key will immediately stop working and cannot be recovered.
+                </Typography>
+              </Alert>
+              
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Are you sure you want to delete the following API key?
+              </Typography>
+              
+              <Box sx={{ backgroundColor: 'grey.50', p: 2, borderRadius: 1, mb: 2 }}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  Name: <strong>{keyToDelete.name}</strong>
+                </Typography>
+                {keyToDelete.description && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    Description: {keyToDelete.description}
+                  </Typography>
+                )}
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  Key ID: <code>{keyToDelete.key_id}</code>
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={deleteAPIKey}
+            variant="contained"
+            color="error"
+            disabled={deleteLoading}
+            startIcon={deleteLoading ? <CircularProgress size={16} /> : <DeleteIcon />}
+          >
+            {deleteLoading ? 'Deleting...' : 'Delete API Key'}
           </Button>
         </DialogActions>
       </Dialog>
