@@ -67,6 +67,14 @@ export default function Exchange() {
   const [deviceLinkExchange, setDeviceLinkExchange] = useState(null);
   const [deviceLinkQueue, setDeviceLinkQueue] = useState(null);
 
+  // Queue action dialog state
+  const [queueActionDialog, setQueueActionDialog] = useState({
+    open: false,
+    type: '', // 'delete' or 'purge'
+    queue: null,
+    exchange: null
+  });
+
   // Auto-refresh state
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(null);
@@ -271,6 +279,64 @@ export default function Exchange() {
     setDeviceLinkOpen(false);
     setDeviceLinkExchange(null);
     setDeviceLinkQueue(null);
+  };
+
+  // Handle queue delete
+  const handleQueueDelete = (exchange, queue) => {
+    setQueueActionDialog({
+      open: true,
+      type: 'delete',
+      queue,
+      exchange
+    });
+  };
+
+  // Handle queue purge
+  const handleQueuePurge = (exchange, queue) => {
+    setQueueActionDialog({
+      open: true,
+      type: 'purge',
+      queue,
+      exchange
+    });
+  };
+
+  // Execute queue action
+  const executeQueueAction = async () => {
+    const { type, queue, exchange } = queueActionDialog;
+
+    try {
+      if (type === 'delete') {
+        await apiConfig.exchanges.deleteQueue(exchange.exchange_id || exchange.id, queue.name || queue.id);
+        showSnackbar('Queue deleted successfully', 'success');
+      } else if (type === 'purge') {
+        await apiConfig.exchanges.purgeQueue(exchange.exchange_id || exchange.id, queue.name || queue.id);
+        showSnackbar('Queue purged successfully', 'success');
+      }
+
+      // Refresh the queues for this exchange
+      await refreshQueuesForExchange(exchange.exchange_id || exchange.id);
+    } catch (error) {
+      console.error(`Error ${type}ing queue:`, error);
+      
+      // Handle specific errors
+      if (error.message && error.message.includes('405')) {
+        if (type === 'purge') {
+          showSnackbar('Queue purge feature is not yet available on the server', 'warning');
+        } else {
+          showSnackbar(`Queue ${type} feature is not available`, 'warning');
+        }
+      } else {
+        showSnackbar(`Error ${type}ing queue: ${error.message || 'Unknown error'}`, 'error');
+      }
+    } finally {
+      setQueueActionDialog({ open: false, type: '', queue: null, exchange: null });
+    }
+  };
+
+  // Close queue action dialog
+  const closeQueueActionDialog = () => {
+    setQueueActionDialog({ open: false, type: '', queue: null, exchange: null });
   };
 
   // Refresh queues for a specific exchange
@@ -635,6 +701,8 @@ export default function Exchange() {
                     onRefresh={() => refreshQueuesForExchange(exchange.exchange_id || exchange.id)}
                     onPageChange={(newPage) => handleQueuePageChange(exchange.exchange_id || exchange.id, newPage)}
                     onQueueLinkDevice={(queue) => handleDeviceLinkOpen(exchange, queue)}
+                    onQueueDelete={(queue) => handleQueueDelete(exchange, queue)}
+                    onQueuePurge={(queue) => handleQueuePurge(exchange, queue)}
                   />
 
                   <Box
@@ -775,6 +843,46 @@ export default function Exchange() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Queue Action Confirmation Dialog */}
+      <Dialog
+        open={queueActionDialog.open}
+        onClose={closeQueueActionDialog}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            margin: 2,
+            maxHeight: 'calc(100% - 64px)'
+          }
+        }}
+      >
+        <DialogTitle>
+          {queueActionDialog.type === 'delete' && 'Delete Queue'}
+          {queueActionDialog.type === 'purge' && 'Purge Queue'}
+        </DialogTitle>
+        <DialogContent>
+          {queueActionDialog.type === 'delete' && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              Are you sure you want to permanently delete the queue "<strong>{queueActionDialog.queue?.name}</strong>"? This will remove the
+              queue and all its messages. This action cannot be undone.
+            </Alert>
+          )}
+          {queueActionDialog.type === 'purge' && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              Are you sure you want to purge all messages from the queue "<strong>{queueActionDialog.queue?.name}</strong>"? This will
+              remove all messages but keep the queue. This action cannot be undone.
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeQueueActionDialog}>Cancel</Button>
+          <Button onClick={executeQueueAction} variant="contained" color={queueActionDialog.type === 'delete' ? 'error' : 'warning'}>
+            {queueActionDialog.type === 'delete' && 'Delete Queue'}
+            {queueActionDialog.type === 'purge' && 'Purge Messages'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Device Link Dialog */}
       <DeviceLinkDialog open={deviceLinkOpen} onClose={handleDeviceLinkClose} exchange={deviceLinkExchange} queue={deviceLinkQueue} />

@@ -200,6 +200,13 @@ export const exchangeAPI = {
       method: 'DELETE'
     }),
 
+  // Purge queue (remove all messages)
+  // Note: If this returns 405, the endpoint might not be implemented yet
+  purgeQueue: (exchangeId, queueId) =>
+    apiRequest(`/exchanges/${exchangeId}/queues/${queueId}/purge`, {
+      method: 'DELETE'
+    }),
+
   // Get queues for an exchange (paginated)
   getQueues: (exchangeId, page = 1, pageSize = 10) => apiRequest(`/exchanges/${exchangeId}/queues?page=${page}&page_size=${pageSize}`),
 
