@@ -245,4 +245,25 @@ export const eventLogsAPI = {
   }
 };
 
+/**
+ * API methods for API keys
+ */
+export const apiKeysAPI = {
+  // Get all API keys (paginated)
+  getAll: (page = 1, pageSize = 10) => apiRequest(`/auth/api-keys?page=${page}&page_size=${pageSize}`),
+
+  // Create new API key
+  create: (apiKeyData) =>
+    apiRequest('/auth/api-keys', {
+      method: 'POST',
+      body: JSON.stringify(apiKeyData)
+    }),
+
+  // Delete API key
+  delete: (keyId) =>
+    apiRequest(`/auth/api-keys/${keyId}`, {
+      method: 'DELETE'
+    })
+};
+
 export { API_BASE_URL, getAuthToken, createHeaders, apiRequest, handleLogout };

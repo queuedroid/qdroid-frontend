@@ -48,6 +48,7 @@ import { CopyOutlined } from '@ant-design/icons/lib';
 export default function Exchange() {
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [backgroundRefreshing, setBackgroundRefreshing] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState(null);
   const [dialogType, setDialogType] = useState('create'); // create, edit, delete
@@ -96,9 +97,13 @@ export default function Exchange() {
   };
 
   // Fetch exchanges and their queues
-  const fetchExchanges = async () => {
+  const fetchExchanges = async (isBackgroundRefresh = false) => {
     try {
-      setLoading(true);
+      if (isBackgroundRefresh) {
+        setBackgroundRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       console.log('Fetching exchanges from API...');
       const response = await apiConfig.exchanges.getAll(page, pageSize);
       console.log('API Response:', response);
@@ -192,7 +197,11 @@ export default function Exchange() {
       console.error('Error fetching exchanges:', error);
       showSnackbar('Error fetching exchanges', 'error');
     } finally {
-      setLoading(false);
+      if (isBackgroundRefresh) {
+        setBackgroundRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -265,7 +274,7 @@ export default function Exchange() {
   };
 
   // Refresh queues for a specific exchange
-  const refreshQueuesForExchange = async (exchangeId) => {
+  const refreshQueuesForExchange = async (exchangeId, isBackgroundRefresh = false) => {
     try {
       const currentPage = queuePages[exchangeId] || 1;
       console.log(`Refreshing queues for exchange ${exchangeId}, page ${currentPage}...`);
@@ -284,10 +293,14 @@ export default function Exchange() {
         )
       );
 
-      showSnackbar('Queues refreshed successfully', 'success');
+      if (!isBackgroundRefresh) {
+        showSnackbar('Queues refreshed successfully', 'success');
+      }
     } catch (error) {
       console.error(`Error refreshing queues for exchange ${exchangeId}:`, error);
-      showSnackbar('Error refreshing queues', 'error');
+      if (!isBackgroundRefresh) {
+        showSnackbar('Error refreshing queues', 'error');
+      }
     }
   };
 
@@ -371,7 +384,7 @@ export default function Exchange() {
     if (autoRefreshEnabled) {
       const interval = setInterval(() => {
         console.log(`Auto-refreshing exchanges and queues every ${refreshIntervalDuration}s...`);
-        fetchExchanges();
+        fetchExchanges(true); // Pass true for background refresh
       }, refreshIntervalDuration * 1000); // Convert seconds to milliseconds
 
       setRefreshInterval(interval);
@@ -411,6 +424,17 @@ export default function Exchange() {
         >
           <Typography variant={{ xs: 'h5', md: 'h4' }} sx={{ fontWeight: 600 }}>
             Exchange Management
+            {backgroundRefreshing && (
+              <CircularProgress
+                size={16}
+                sx={{
+                  ml: 1,
+                  color: 'text.secondary',
+                  opacity: 0.6
+                }}
+                thickness={3}
+              />
+            )}
           </Typography>
           <Box
             sx={{
@@ -485,10 +509,11 @@ export default function Exchange() {
                 size="small"
                 variant="outlined"
                 startIcon={<UndoOutlined />}
-                onClick={fetchExchanges}
+                onClick={() => fetchExchanges(true)}
+                disabled={backgroundRefreshing}
                 fullWidth={{ xs: true, sm: false }}
               >
-                Refresh
+                {backgroundRefreshing ? 'Refreshing...' : 'Refresh'}
               </Button>
               <Button
                 size="small"
