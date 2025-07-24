@@ -579,30 +579,15 @@ const APIKeys = () => {
         <DialogContent>
           {keyToDelete && (
             <Box sx={{ mt: 2 }}>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Are you sure you want to delete the API key?
+              </Typography>
               <Alert severity="warning" sx={{ mb: 2 }}>
                 <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
                   <strong>Warning:</strong> This action cannot be undone.
                 </Typography>
                 <Typography variant="body2">Once deleted, this API key will immediately stop working and cannot be recovered.</Typography>
               </Alert>
-
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                Are you sure you want to delete the following API key?
-              </Typography>
-
-              <Box sx={{ backgroundColor: 'grey.50', p: 2, borderRadius: 1, mb: 2 }}>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  Name: <strong>{keyToDelete.name}</strong>
-                </Typography>
-                {keyToDelete.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                    Description: {keyToDelete.description}
-                  </Typography>
-                )}
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  Key ID: <code>{keyToDelete.key_id}</code>
-                </Typography>
-              </Box>
             </Box>
           )}
         </DialogContent>
