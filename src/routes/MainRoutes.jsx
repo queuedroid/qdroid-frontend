@@ -16,6 +16,11 @@ const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
 const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
 
+// render - error pages
+const ServerError = Loadable(lazy(() => import('pages/extra-pages/error-pages/ServerError')));
+const NetworkError = Loadable(lazy(() => import('pages/extra-pages/error-pages/NetworkError')));
+const ForbiddenError = Loadable(lazy(() => import('pages/extra-pages/error-pages/ForbiddenError')));
+
 // render - other pages
 const Exchange = Loadable(lazy(() => import('pages/exchange/index')));
 const MessageLogs = Loadable(lazy(() => import('pages/event-logs/index')));
@@ -36,6 +41,22 @@ const MainRoutes = {
     {
       path: '/',
       element: <Landing />
+    },
+    {
+      path: '/404',
+      element: <NotFound />
+    },
+    {
+      path: '/403',
+      element: <ForbiddenError />
+    },
+    {
+      path: '/server-error',
+      element: <ServerError />
+    },
+    {
+      path: '/network-error',
+      element: <NetworkError />
     },
     {
       path: '*',

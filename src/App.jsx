@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import router from 'routes';
 import ThemeCustomization from 'themes';
 import { setupAxiosInterceptors } from 'utils/axiosInterceptors';
+import ErrorBoundary from 'components/ErrorBoundary';
 
 import ScrollTop from 'components/ScrollTop';
 
@@ -19,10 +20,12 @@ export default function App() {
   }, []);
 
   return (
-    <ThemeCustomization>
-      <ScrollTop>
-        <RouterProvider router={router} />
-      </ScrollTop>
-    </ThemeCustomization>
+    <ErrorBoundary>
+      <ThemeCustomization>
+        <ScrollTop>
+          <RouterProvider router={router} />
+        </ScrollTop>
+      </ThemeCustomization>
+    </ErrorBoundary>
   );
 }
