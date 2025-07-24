@@ -2,7 +2,6 @@
 import { useState, useCallback } from 'react';
 import { apiConfig } from '../config/apiConfig';
 import { calculateDashboardStats, getDefaultStats, normalizeStatsResponse } from '../utils/dashboardStats';
-import { mergeStoredQueues } from '../utils/queuePersistence';
 
 export const useDashboardStats = () => {
   const [exchangeStats, setExchangeStats] = useState(getDefaultStats());
@@ -27,8 +26,27 @@ export const useDashboardStats = () => {
       // Normalize and calculate basic stats
       const { exchanges, pagination } = normalizeStatsResponse(exchangesData);
 
-      // Merge stored queues with exchange data for accurate queue counts
-      const exchangesWithQueues = mergeStoredQueues(exchanges);
+      // Fetch queues for each exchange to get accurate consumer counts
+      const exchangesWithQueues = await Promise.all(
+        exchanges.map(async (exchange) => {
+          try {
+            const exchangeId = exchange.exchange_id || exchange.id;
+            console.log(`Fetching queues for exchange ${exchangeId} for dashboard stats...`);
+            const queuesResponse = await apiConfig.exchanges.getQueues(exchangeId, 1, 100); // Get up to 100 queues
+
+            return {
+              ...exchange,
+              queues: queuesResponse.data || []
+            };
+          } catch (error) {
+            console.error(`Error fetching queues for exchange ${exchange.exchange_id || exchange.id}:`, error);
+            return {
+              ...exchange,
+              queues: [] // Return empty array if queue fetching fails
+            };
+          }
+        })
+      );
 
       const baseStats = calculateDashboardStats(exchangesWithQueues, pagination);
 

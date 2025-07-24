@@ -35,8 +35,12 @@ import {
 } from '@mui/icons-material';
 import { PlusOutlined, KeyOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
+import ErrorDisplay from 'components/ErrorDisplay';
 import { format } from 'date-fns';
 import { apiKeysAPI } from '../../utils/api';
+
+// ...other imports...
+import { useErrorHandler } from '../../hooks/useErrorHandler';
 
 const APIKeys = () => {
   const [apiKeys, setApiKeys] = useState([]);
@@ -58,32 +62,42 @@ const APIKeys = () => {
   const [formErrors, setFormErrors] = useState({ name: '', description: '', expires_at: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Fetch existing API keys
-  const fetchAPIKeys = useCallback(async (page = 1, pageSize = 10) => {
-    try {
-      setFetchLoading(true);
-      const response = await apiKeysAPI.getAll(page, pageSize);
+  // Use the error handler hook
+  const { error, handleError, clearError, withErrorHandling, showUserFriendlyError } = useErrorHandler();
 
-      // Handle the new API structure
-      if (response.data) {
-        setApiKeys(response.data);
-        setPagination({
-          page: response.pagination?.page || page,
-          page_size: response.pagination?.page_size || pageSize,
-          total: response.pagination?.total || response.data.length,
-          total_pages: response.pagination?.total_pages || Math.ceil((response.pagination?.total || response.data.length) / pageSize)
-        });
-      } else {
-        // Fallback for older API format
-        setApiKeys(response.api_keys || response || []);
-      }
-    } catch (error) {
-      console.error('Error fetching API keys:', error);
-      showSnackbar('Failed to load API keys', 'error');
-    } finally {
-      setFetchLoading(false);
-    }
-  }, []);
+  // Fetch existing API keys with enhanced error handling
+  const fetchAPIKeys = useCallback(
+    async (page = 1, pageSize = 10) => {
+      const wrappedFetch = withErrorHandling(
+        async () => {
+          setFetchLoading(true);
+          const response = await apiKeysAPI.getAll(page, pageSize);
+
+          // Handle the new API structure
+          if (response.data) {
+            setApiKeys(response.data);
+            setPagination({
+              page: response.pagination?.page || page,
+              page_size: response.pagination?.page_size || pageSize,
+              total: response.pagination?.total || response.data.length,
+              total_pages: response.pagination?.total_pages || Math.ceil((response.pagination?.total || response.data.length) / pageSize)
+            });
+          } else {
+            // Fallback for older API format
+            setApiKeys(response.api_keys || response || []);
+          }
+          setFetchLoading(false);
+        },
+        {
+          customMessage: 'Failed to load API keys',
+          rethrow: false
+        }
+      );
+
+      await wrappedFetch();
+    },
+    [withErrorHandling]
+  );
 
   // Fetch API keys on component mount
   useEffect(() => {
@@ -121,7 +135,7 @@ const APIKeys = () => {
     return isValid;
   };
 
-  // Create new API key
+  // Create new API key with enhanced error handling
   const createAPIKey = async () => {
     if (!validateForm()) {
       showSnackbar('Please fill in all required fields', 'error');
@@ -149,47 +163,22 @@ const APIKeys = () => {
     } catch (error) {
       console.error('Error creating API key:', error);
 
-      // Extract error message based on HTTP status code
-      let errorMessage = 'Error creating API key';
+      // Use the enhanced error handler for better user experience
+      const userMessage = showUserFriendlyError(error, 'Failed to create API key');
 
-      if (error.message) {
-        // Extract HTTP status code from error message
-        const statusMatch = error.message.match(/HTTP (\d+):/);
-        if (statusMatch) {
-          const statusCode = parseInt(statusMatch[1]);
-
-          // Provide user-friendly messages based on status code
-          switch (statusCode) {
-            case 400:
-              errorMessage = 'Bad request. Please check your input and try again.';
-              break;
-            case 401:
-              errorMessage = 'Your session has expired. Please log in again.';
-              break;
-            case 409:
-              errorMessage = 'This API key name is already registered. Please try another one.';
-              break;
-            case 500:
-              errorMessage = 'Server error. Please try again later.';
-              break;
-            default:
-              // Try to extract the actual API message as fallback
-              try {
-                const errorMatch = error.message.match(/HTTP \d+: (.+)/);
-                if (errorMatch) {
-                  const jsonString = errorMatch[1];
-                  const errorData = JSON.parse(jsonString);
-                  errorMessage = errorData.message || errorMessage;
-                }
-              } catch {
-                // Keep the default status-based message
-              }
-              break;
-          }
-        }
+      // Handle specific error types
+      if (error?.response?.status === 409) {
+        showSnackbar('This API key name already exists. Please choose a different name.', 'error');
+      } else if (error?.response?.status === 401) {
+        handleError(error); // This will redirect to login
+      } else if (error?.response?.status >= 500) {
+        handleError(error); // This will show server error
+      } else if (error?.code === 'NETWORK_ERROR' || !error?.response) {
+        handleError(error); // This will show network error
+      } else {
+        // For other errors, show a user-friendly message
+        showSnackbar(userMessage, 'error');
       }
-
-      showSnackbar(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -340,6 +329,20 @@ const APIKeys = () => {
           </Button>
         </Box>
       </Grid>
+
+      {/* Error Display */}
+      {error && (
+        <Grid size={12}>
+          <ErrorDisplay
+            error={error}
+            onRetry={() => {
+              clearError();
+              fetchAPIKeys(pagination.page, pagination.page_size);
+            }}
+            onDismiss={clearError}
+          />
+        </Grid>
+      )}
 
       {/* API Keys Display */}
       <Grid size={12}>
@@ -514,38 +517,16 @@ const APIKeys = () => {
       </Dialog>
 
       {/* API Key Display Dialog - One Time Only */}
-      <Dialog open={openKeyDisplayDialog} onClose={() => {}} maxWidth="md" fullWidth disableEscapeKeyDown>
+      <Dialog open={openKeyDisplayDialog} onClose={() => {}} maxWidth="sm" fullWidth disableEscapeKeyDown>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 3 }}>
-            <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+            <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
               <strong>Important:</strong> This is the only time you will see this API key. Please copy it and store it in a safe place.
             </Typography>
-            <Typography variant="body2">For security reasons, we do not store the key and cannot retrieve it later.</Typography>
           </Alert>
 
           {newApiKey && (
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-                API Key Details
-              </Typography>
-
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  Name: <strong>{newApiKey.name}</strong>
-                </Typography>
-                {newApiKey.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Description: {newApiKey.description}
-                  </Typography>
-                )}
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  Key ID: <strong>{newApiKey.key_id}</strong>
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Expires: <strong>{newApiKey.expires_at ? formatDate(newApiKey.expires_at) : 'Never'}</strong>
-                </Typography>
-              </Box>
-
               <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
                 Your API Key:
               </Typography>

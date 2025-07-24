@@ -188,7 +188,7 @@ export default function DashboardDefault() {
         <AnalyticEcommerce
           title="Active Queues"
           count={loading ? '...' : exchangeStats.activeQueues.toString()}
-          extra="SMS queues"
+          extra="Queues with consumers"
           isLoss={false}
         />
       </Grid>

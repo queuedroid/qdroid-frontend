@@ -8,14 +8,25 @@ export const calculateDashboardStats = (exchanges = [], pagination = {}) => {
   const total = pagination?.total || pagination?.totalCount || exchanges.length;
 
   // Calculate accurate queue statistics
-  let totalQueues = 0;
+  let totalQueues = 0; // Count of active queues (queues with consumers > 0)
   let totalMessagesSent = 0;
   let totalMessagesQueued = 0;
 
   exchanges.forEach((exchange) => {
-    // Count queues for this exchange
-    const queueCount = exchange.queues?.length || 0;
-    totalQueues += queueCount;
+    // Count active queues for this exchange (queues with consumers > 0)
+    if (exchange.queues && Array.isArray(exchange.queues)) {
+      exchange.queues.forEach((queue) => {
+        // A queue is considered active if it has consumers
+        const consumerCount = parseInt(queue.consumers) || 0;
+        const queueState = queue.state;
+
+        // Count as active if it has consumers, regardless of state
+        // (consumers indicate actual usage/activity)
+        if (consumerCount > 0) {
+          totalQueues += 1;
+        }
+      });
+    }
 
     // If exchange has message statistics, add them
     if (exchange.stats) {
