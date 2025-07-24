@@ -318,7 +318,7 @@ export default function Exchange() {
       await refreshQueuesForExchange(exchange.exchange_id || exchange.id);
     } catch (error) {
       console.error(`Error ${type}ing queue:`, error);
-      
+
       // Handle specific errors
       if (error.message && error.message.includes('405')) {
         if (type === 'purge') {
