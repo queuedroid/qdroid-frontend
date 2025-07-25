@@ -20,14 +20,16 @@ import {
   Stack,
   Chip,
   Alert,
-  Snackbar
+  Snackbar,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
 import MainCard from 'components/MainCard';
 import { useUserDetails } from 'hooks/useUserDetails';
-import { handleLogout as centralizedLogout } from 'utils/api';
+import { handleLogout as centralizedLogout, userAPI } from 'utils/api';
 
 // assets
 import avatar1 from 'assets/images/users/user-1.jpg';
@@ -35,7 +37,8 @@ import avatar2 from 'assets/images/users/user-2.jpg';
 import avatar3 from 'assets/images/users/user-3.jpg';
 import avatar4 from 'assets/images/users/user-4.jpg';
 import avatar5 from 'assets/images/users/user-5.jpg';
-import { EditOutlined, SaveOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { EditOutlined, SaveOutlined, UserOutlined, LogoutOutlined, LockOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const avatarOptions = [
   { id: 'user-1', src: avatar1, name: 'Avatar 1' },
@@ -57,6 +60,28 @@ export default function Settings() {
   const [profilePhone, setProfilePhone] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [saving, setSaving] = useState(false);
+
+  // Change password state management
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+
+  // Delete account state management
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
 
   // Load user details on component mount
   useEffect(() => {
@@ -104,6 +129,153 @@ export default function Settings() {
     }
   };
 
+  // Password change functions
+  const validatePasswordForm = () => {
+    const errors = {};
+    let isValid = true;
+
+    if (!passwordForm.currentPassword) {
+      errors.currentPassword = 'Current password is required';
+      isValid = false;
+    }
+
+    if (!passwordForm.newPassword) {
+      errors.newPassword = 'New password is required';
+      isValid = false;
+    } else if (passwordForm.newPassword.length < 8) {
+      errors.newPassword = 'Password must be at least 8 characters long';
+      isValid = false;
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(passwordForm.newPassword)) {
+      errors.newPassword =
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+      isValid = false;
+    }
+
+    if (!passwordForm.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your new password';
+      isValid = false;
+    } else if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+      isValid = false;
+    }
+
+    if (passwordForm.currentPassword === passwordForm.newPassword) {
+      errors.newPassword = 'New password must be different from current password';
+      isValid = false;
+    }
+
+    setPasswordErrors(errors);
+    return isValid;
+  };
+
+  const handlePasswordChange = async () => {
+    if (!validatePasswordForm()) {
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      await userAPI.changePassword({
+        current_password: passwordForm.currentPassword,
+        new_password: passwordForm.newPassword
+      });
+
+      showSnackbar('Password changed successfully!', 'success');
+      setOpenPasswordDialog(false);
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setPasswordErrors({});
+    } catch (error) {
+      console.error('Error changing password:', error);
+
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        showSnackbar('Current password is incorrect', 'error');
+      } else if (error.message.includes('400')) {
+        showSnackbar('Invalid password format', 'error');
+      } else {
+        showSnackbar('Failed to change password. Please try again.', 'error');
+      }
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handlePasswordDialogClose = () => {
+    setOpenPasswordDialog(false);
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setPasswordErrors({});
+    setShowPasswords({
+      current: false,
+      new: false,
+      confirm: false
+    });
+  };
+
+  const handlePasswordInputChange = (field, value) => {
+    setPasswordForm((prev) => ({ ...prev, [field]: value }));
+    if (passwordErrors[field]) {
+      setPasswordErrors((prev) => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  // Delete account functions
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      setDeleteError('Password is required to delete your account');
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      await userAPI.deleteAccount({
+        password: deletePassword
+      });
+
+      showSnackbar('Account deleted successfully. You will be logged out shortly.', 'success');
+
+      // Give user time to see the message, then logout
+      setTimeout(() => {
+        centralizedLogout();
+      }, 3000);
+
+      setOpenDeleteDialog(false);
+    } catch (error) {
+      console.error('Error deleting account:', error);
+
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        setDeleteError('Incorrect password');
+      } else if (error.message.includes('400')) {
+        setDeleteError('Invalid request');
+      } else {
+        setDeleteError('Failed to delete account. Please try again.');
+      }
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDeleteDialogClose = () => {
+    setOpenDeleteDialog(false);
+    setDeletePassword('');
+    setDeleteError('');
+    setShowDeletePassword(false);
+  };
+
+  const handleDeleteDialogOpen = () => {
+    setOpenDeleteDialog(true);
+  };
+
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* Header */}
@@ -116,9 +288,9 @@ export default function Settings() {
         </Typography>
       </Grid>
 
-      {/* Profile Settings Card */}
+      {/* Profile Information Card */}
       <Grid size={{ xs: 12, lg: 8 }}>
-        <MainCard title="Profile Settings">
+        <MainCard title="Profile Information">
           <CardContent>
             <Grid container spacing={3}>
               {/* Profile Picture Section */}
@@ -136,6 +308,9 @@ export default function Settings() {
                     }}
                   />
                   <Box>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {profileName || 'User'}
+                    </Typography>
                     <Button variant="outlined" startIcon={<EditOutlined />} onClick={handleAvatarChange} sx={{ mb: 1 }}>
                       Change Picture
                     </Button>
@@ -199,60 +374,69 @@ export default function Settings() {
               </Grid>
             </Grid>
           </CardContent>
-          {/* <CardActions sx={{ px: 3, pb: 3 }}>
-            <Button variant="contained" startIcon={<SaveOutlined />} onClick={handleProfileSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </CardActions> */}
         </MainCard>
       </Grid>
 
-      {/* Account Information Card */}
+      {/* Security & Account Management Card */}
       <Grid size={{ xs: 12, lg: 4 }}>
-        <MainCard title="Account Information">
+        <MainCard title="Security & Account Management">
           <CardContent>
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Current Avatar
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
-                  <Avatar src={getCurrentAvatarSrc()} sx={{ width: 40, height: 40 }} />
-                  <Typography variant="body2">{profileName || 'User'}</Typography>
+            <Grid container spacing={4}>
+              {/* Password Section */}
+              <Grid size={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                      Change Password
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Update your password to keep your account secure
+                    </Typography>
+                    <Button variant="outlined" startIcon={<LockOutlined />} onClick={() => setOpenPasswordDialog(true)}>
+                      Change Password
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
+              </Grid>
 
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Profile Status
-                </Typography>
-                <Chip
-                  label={profileName ? 'Complete' : 'Incomplete'}
-                  color={profileName ? 'success' : 'warning'}
-                  size="small"
-                  sx={{ mt: 1 }}
-                />
-              </Box>
+              {/* Session Management */}
+              <Grid size={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                      Logout
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Sign out of your account on this device
+                    </Typography>
+                    <Button variant="outlined" color="warning" startIcon={<LogoutOutlined />} onClick={handleLogout}>
+                      Logout
+                    </Button>
+                  </Box>
+                </Box>
+              </Grid>
 
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Last Updated
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  Today
-                </Typography>
-              </Box>
+              {/* Account Deletion */}
+              <Grid size={12}>
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, color: 'error.main' }}>
+                        Delete Account
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Permanently delete your account. This action cannot be undone.
+                      </Typography>
+                      <Button variant="outlined" color="error" startIcon={<DeleteOutlined />} onClick={handleDeleteDialogOpen}>
+                        Delete Account
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Grid>
 
-              {/* Logout Section */}
-              <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Button variant="outlined" color="error" startIcon={<LogoutOutlined />} onClick={handleLogout} fullWidth sx={{ mb: 1 }}>
-                  Logout
-                </Button>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
-                  Sign out of your account
-                </Typography>
-              </Box>
-            </Stack>
+              {/* Security Recommendations */}
+            </Grid>
           </CardContent>
         </MainCard>
       </Grid>
@@ -312,6 +496,162 @@ export default function Settings() {
           <Button onClick={() => setOpenAvatarDialog(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleAvatarSave}>
             Save Picture
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={openPasswordDialog} onClose={handlePasswordDialogClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <LockOutlined />
+            Change Password
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Enter your current password and choose a new secure password
+          </Typography>
+
+          <Stack spacing={3}>
+            <TextField
+              fullWidth
+              label="Current Password"
+              type={showPasswords.current ? 'text' : 'password'}
+              value={passwordForm.currentPassword}
+              onChange={(e) => handlePasswordInputChange('currentPassword', e.target.value)}
+              error={!!passwordErrors.currentPassword}
+              helperText={passwordErrors.currentPassword}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton aria-label="toggle password visibility" onClick={() => togglePasswordVisibility('current')} edge="end">
+                      {showPasswords.current ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="New Password"
+              type={showPasswords.new ? 'text' : 'password'}
+              value={passwordForm.newPassword}
+              onChange={(e) => handlePasswordInputChange('newPassword', e.target.value)}
+              error={!!passwordErrors.newPassword}
+              helperText={passwordErrors.newPassword || 'Minimum 8 characters with uppercase, lowercase, number, and special character'}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton aria-label="toggle password visibility" onClick={() => togglePasswordVisibility('new')} edge="end">
+                      {showPasswords.new ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Confirm New Password"
+              type={showPasswords.confirm ? 'text' : 'password'}
+              value={passwordForm.confirmPassword}
+              onChange={(e) => handlePasswordInputChange('confirmPassword', e.target.value)}
+              error={!!passwordErrors.confirmPassword}
+              helperText={passwordErrors.confirmPassword}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton aria-label="toggle password visibility" onClick={() => togglePasswordVisibility('confirm')} edge="end">
+                      {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePasswordDialogClose} disabled={passwordLoading}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handlePasswordChange}
+            disabled={passwordLoading || !passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
+          >
+            {passwordLoading ? 'Changing...' : 'Change Password'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={handleDeleteDialogClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <DeleteOutlined style={{ color: theme.palette.error.main }} />
+            Delete Account
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+              <strong>Warning:</strong> This action is irreversible!
+            </Typography>
+            <Typography variant="body2">Deleting your account will permanently remove all your data including:</Typography>
+            <Typography variant="body2" component="div" sx={{ mt: 1, ml: 2 }}>
+              • All exchanges and queues
+              <br />
+              • Message history and logs
+              <br />
+              • API keys and configurations
+              <br />• Profile information
+            </Typography>
+          </Alert>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Please enter your password to confirm account deletion:
+          </Typography>
+
+          <TextField
+            fullWidth
+            label="Password"
+            type={showDeletePassword ? 'text' : 'password'}
+            value={deletePassword}
+            onChange={(e) => {
+              setDeletePassword(e.target.value);
+              if (deleteError) setDeleteError('');
+            }}
+            error={!!deleteError}
+            helperText={deleteError}
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton aria-label="toggle password visibility" onClick={() => setShowDeletePassword(!showDeletePassword)} edge="end">
+                    {showDeletePassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteAccount}
+            disabled={deleteLoading || !deletePassword}
+            startIcon={deleteLoading ? null : <DeleteOutlined />}
+          >
+            {deleteLoading ? 'Deleting Account...' : 'Delete My Account'}
           </Button>
         </DialogActions>
       </Dialog>
