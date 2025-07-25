@@ -273,4 +273,23 @@ export const apiKeysAPI = {
     })
 };
 
+/**
+ * API methods for user authentication and account management
+ */
+export const userAPI = {
+  // Change user password
+  changePassword: (passwordData) =>
+    apiRequest('/users/change-password', {
+      method: 'POST',
+      body: JSON.stringify(passwordData)
+    }),
+
+  // Delete user account
+  deleteAccount: (passwordData) =>
+    apiRequest('/users/delete-account', {
+      method: 'DELETE',
+      body: JSON.stringify(passwordData)
+    })
+};
+
 export { API_BASE_URL, getAuthToken, createHeaders, apiRequest, handleLogout };
