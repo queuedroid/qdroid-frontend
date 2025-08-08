@@ -32,7 +32,7 @@ export default function DashboardLayout() {
   const handleMessageSent = (response, messageData) => {
     setSnackbar({
       open: true,
-      message: `Message sent successfully to ${messageData.phone_number}`,
+      message: `Message sent successfully`,
       severity: 'success'
     });
   };

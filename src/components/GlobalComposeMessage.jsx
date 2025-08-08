@@ -18,7 +18,18 @@ import {
   Paper,
   Chip,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -29,7 +40,10 @@ import {
   Person as PersonIcon,
   Group as GroupIcon,
   Add as AddIcon,
-  Remove as RemoveIcon
+  Remove as RemoveIcon,
+  CloudUpload as CloudUploadIcon,
+  Description as DescriptionIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -51,6 +65,10 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
   const [error, setError] = useState('');
   const [minimized, setMinimized] = useState(false);
   const [messageMode, setMessageMode] = useState('single'); // 'single' or 'bulk'
+  const [bulkInputMethod, setBulkInputMethod] = useState('manual'); // 'manual' or 'csv'
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvPreview, setCsvPreview] = useState([]);
+  const [csvError, setCsvError] = useState('');
   const navigate = useNavigate();
 
   // Fetch exchanges when dialog opens
@@ -83,6 +101,78 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     }
   };
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setCsvError('');
+
+    // Validate file type
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      setCsvError('Please select a valid CSV file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setCsvError('File size must be less than 5MB');
+      return;
+    }
+
+    setCsvFile(file);
+
+    // Preview CSV content
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const lines = text.split('\n');
+        const previewLines = lines.slice(0, 6); // Show first 5 rows + header
+
+        const preview = previewLines
+          .filter((line) => line.trim())
+          .map((line) => {
+            // Simple CSV parsing - split by comma and handle basic quotes
+            const cells = line.split(',').map((cell) => cell.trim().replace(/^"(.*)"$/, '$1'));
+            return cells;
+          });
+
+        if (preview.length === 0) {
+          setCsvError('CSV file appears to be empty');
+          return;
+        }
+
+        // Validate CSV structure - should have at least phone_number column
+        const header = preview[0];
+        const phoneColumnIndex = header.findIndex(
+          (col) => col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')
+        );
+
+        if (phoneColumnIndex === -1) {
+          setCsvError('CSV must contain a column with phone numbers (e.g., "phone_number", "phone", "mobile")');
+          return;
+        }
+
+        setCsvPreview(preview);
+      } catch (error) {
+        setCsvError('Error reading CSV file: ' + error.message);
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  const removeCSVFile = () => {
+    setCsvFile(null);
+    setCsvPreview([]);
+    setCsvError('');
+    // Reset file input
+    const fileInput = document.getElementById('csv-file-input');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleSend = async () => {
     if (!selectedExchange || !messageContent.trim()) {
       setError('Please fill in all required fields');
@@ -95,10 +185,21 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     }
 
     if (messageMode === 'bulk') {
-      const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
-      if (validPhoneNumbers.length === 0) {
-        setError('Please enter at least one phone number');
-        return;
+      if (bulkInputMethod === 'manual') {
+        const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
+        if (validPhoneNumbers.length === 0) {
+          setError('Please enter at least one phone number');
+          return;
+        }
+      } else if (bulkInputMethod === 'csv') {
+        if (!csvFile) {
+          setError('Please select a CSV file');
+          return;
+        }
+        if (csvError) {
+          setError('Please fix CSV file errors before sending');
+          return;
+        }
       }
     }
 
@@ -116,7 +217,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
           phone_number: phoneNumber
         };
         response = await messageAPI.sendSingle(messageData);
-      } else {
+      } else if (messageMode === 'bulk' && bulkInputMethod === 'manual') {
         const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
         const messages = validPhoneNumbers.map((phone) => ({
           content: messageContent,
@@ -126,6 +227,14 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
 
         messageData = { messages };
         response = await messageAPI.sendBulk(messageData);
+      } else if (messageMode === 'bulk' && bulkInputMethod === 'csv') {
+        // CSV file upload
+        response = await messageAPI.sendBulkCSV(csvFile, selectedExchange.exchange_id, messageContent);
+        messageData = {
+          file: csvFile.name,
+          exchange_id: selectedExchange.exchange_id,
+          content: messageContent
+        };
       }
 
       // Call the onSend callback if provided
@@ -139,6 +248,8 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
       setMessageContent('');
       setSelectedExchange(null);
       setMessageMode('single');
+      setBulkInputMethod('manual');
+      removeCSVFile();
 
       // Close dialog
       onClose();
@@ -147,7 +258,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
       navigate('logs/messages');
     } catch (error) {
       console.error('Error sending message:', error);
-      setError(error.response?.data?.message || 'Failed to send message');
+      setError(error.message || 'Failed to send message');
     } finally {
       setLoading(false);
     }
@@ -161,6 +272,8 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     setError('');
     setMinimized(false);
     setMessageMode('single');
+    setBulkInputMethod('manual');
+    removeCSVFile();
     onClose();
   };
 
@@ -168,6 +281,20 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     if (newMode !== null) {
       setMessageMode(newMode);
       setError('');
+      // Reset bulk input method when switching modes
+      if (newMode === 'single') {
+        setBulkInputMethod('manual');
+        removeCSVFile();
+      }
+    }
+  };
+
+  const handleBulkInputMethodChange = (event) => {
+    const newMethod = event.target.value;
+    setBulkInputMethod(newMethod);
+    setError('');
+    if (newMethod === 'manual') {
+      removeCSVFile();
     }
   };
 
@@ -217,10 +344,17 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
           </Box>
         </Box>
         <Typography variant="body2" sx={{ opacity: 0.9, mt: 1 }}>
-          To: {messageMode === 'single' ? phoneNumber || 'Not set' : `${phoneNumbers.filter((p) => p.trim()).length} recipients`}
+          To:{' '}
+          {messageMode === 'single'
+            ? phoneNumber || 'Not set'
+            : bulkInputMethod === 'csv'
+              ? csvFile
+                ? `CSV: ${csvFile.name}`
+                : 'No CSV file'
+              : `${phoneNumbers.filter((p) => p.trim()).length} recipients`}
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.9 }}>
-          Mode: {messageMode === 'single' ? 'Single' : 'Bulk'}
+          Mode: {messageMode === 'single' ? 'Single' : `Bulk (${bulkInputMethod})`}
         </Typography>
       </Paper>
     );
@@ -331,16 +465,19 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
                 sx={{
                   '& .PhoneInput': {
                     border: '1px solid #d3d4d5',
-                    bgcolor: 'white',
+                    bgcolor: '#fff',
                     borderRadius: '8px',
                     padding: '12px',
                     '&:focus-within': {
                       borderColor: '#1976d2',
-                      borderWidth: '2px'
+                      borderWidth: '2px',
+                      bgcolor: 'white'
                     }
                   },
                   '& .PhoneInputInput': {
                     border: 'none',
+                    bgcolor: '#fff',
+                    color: '#333',
                     outline: 'none',
                     fontSize: '14px',
                     marginLeft: '8px'
@@ -358,60 +495,161 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
             </Box>
           ) : (
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="subtitle2">Phone Numbers * ({phoneNumbers.filter((p) => p.trim()).length})</Typography>
-                <Button size="small" startIcon={<AddIcon />} onClick={addPhoneNumber} variant="outlined">
-                  Add Number
-                </Button>
-              </Box>
-              <Stack spacing={1}>
-                {phoneNumbers.map((phone, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <Box
-                      sx={{
-                        flex: 1,
-                        '& .PhoneInput': {
-                          border: '1px solid #d3d4d5',
-                          bgcolor: 'white',
-                          borderRadius: '8px',
-                          padding: '12px',
-                          '&:focus-within': {
-                            borderColor: '#1976d2',
-                            borderWidth: '2px'
-                          }
-                        },
-                        '& .PhoneInputInput': {
-                          border: 'none',
-                          outline: 'none',
-                          fontSize: '14px',
-                          marginLeft: '8px'
-                        }
-                      }}
-                    >
-                      <PhoneInput
-                        placeholder={`Phone number ${index + 1}`}
-                        value={phone}
-                        onChange={(value) => updatePhoneNumber(index, value)}
-                        defaultCountry="CM"
-                        international
-                      />
-                    </Box>
-                    {phoneNumbers.length > 1 && (
-                      <IconButton onClick={() => removePhoneNumber(index)} color="error" size="small">
-                        <RemoveIcon />
-                      </IconButton>
+              {/* Bulk Input Method Selection */}
+              <FormControl component="fieldset" sx={{ mb: 2 }}>
+                <FormLabel component="legend" sx={{ fontSize: '0.875rem', fontWeight: 600, mb: 1 }}>
+                  How would you like to add recipients? *
+                </FormLabel>
+                <RadioGroup value={bulkInputMethod} onChange={handleBulkInputMethodChange} row>
+                  <FormControlLabel value="manual" control={<Radio size="small" />} label="Manual Input" />
+                  <FormControlLabel value="csv" control={<Radio size="small" />} label="CSV Upload" />
+                </RadioGroup>
+              </FormControl>
+
+              {bulkInputMethod === 'manual' ? (
+                <>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="subtitle2">Phone Numbers * ({phoneNumbers.filter((p) => p.trim()).length})</Typography>
+                    <Button size="small" startIcon={<AddIcon />} onClick={addPhoneNumber} variant="outlined">
+                      Add Number
+                    </Button>
+                  </Box>
+                  <Stack spacing={1}>
+                    {phoneNumbers.map((phone, index) => (
+                      <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            '& .PhoneInput': {
+                              border: '1px solid #d3d4d5',
+                              bgcolor: 'white',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              '&:focus-within': {
+                                borderColor: '#1976d2',
+                                borderWidth: '2px'
+                              }
+                            },
+                            '& .PhoneInputInput': {
+                              border: 'none',
+                              bgcolor: '#fff',
+                              color: '#333',
+                              outline: 'none',
+                              fontSize: '14px',
+                              marginLeft: '8px'
+                            }
+                          }}
+                        >
+                          <PhoneInput
+                            placeholder={`Phone number ${index + 1}`}
+                            value={phone}
+                            onChange={(value) => updatePhoneNumber(index, value)}
+                            defaultCountry="CM"
+                            international
+                          />
+                        </Box>
+                        {phoneNumbers.length > 1 && (
+                          <IconButton onClick={() => removePhoneNumber(index)} color="error" size="small">
+                            <RemoveIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                  {phoneNumbers.filter((p) => p.trim()).length > 0 && (
+                    <Chip
+                      label={`${phoneNumbers.filter((p) => p.trim()).length} recipients selected`}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      sx={{ mt: 1 }}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* CSV File Upload */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Upload CSV File *
+                    </Typography>
+
+                    {!csvFile ? (
+                      <Box>
+                        <input accept=".csv" style={{ display: 'none' }} id="csv-file-input" type="file" onChange={handleFileUpload} />
+                        <label htmlFor="csv-file-input">
+                          <Button variant="outlined" component="span" startIcon={<CloudUploadIcon />} sx={{ mb: 1 }} fullWidth>
+                            Choose CSV File
+                          </Button>
+                        </label>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                          CSV should contain a column with phone numbers (e.g., "phone_number", "phone", "mobile"). The exchange ID and
+                          message content will be automatically added to each row.
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Box>
+                        <Paper variant="outlined" sx={{ p: 2, mb: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <DescriptionIcon color="primary" />
+                              <Box>
+                                <Typography variant="body2" fontWeight="bold">
+                                  {csvFile.name}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {(csvFile.size / 1024).toFixed(1)} KB
+                                </Typography>
+                              </Box>
+                            </Box>
+                            <IconButton onClick={removeCSVFile} color="error" size="small">
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </Paper>
+
+                        {csvError && (
+                          <Alert severity="error" sx={{ mb: 1 }}>
+                            {csvError}
+                          </Alert>
+                        )}
+
+                        {csvPreview.length > 0 && !csvError && (
+                          <Box>
+                            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                              Preview ({csvPreview.length - 1} rows)
+                            </Typography>
+                            <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 200 }}>
+                              <Table size="small">
+                                <TableHead>
+                                  <TableRow>
+                                    {csvPreview[0]?.map((header, index) => (
+                                      <TableCell key={index} sx={{ fontWeight: 'bold', bgcolor: 'grey.50' }}>
+                                        {header}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {csvPreview.slice(1).map((row, rowIndex) => (
+                                    <TableRow key={rowIndex}>
+                                      {row.map((cell, cellIndex) => (
+                                        <TableCell key={cellIndex}>{cell}</TableCell>
+                                      ))}
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              Showing first 5 rows. Total recipients will be processed from the full file.
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
                     )}
                   </Box>
-                ))}
-              </Stack>
-              {phoneNumbers.filter((p) => p.trim()).length > 0 && (
-                <Chip
-                  label={`${phoneNumbers.filter((p) => p.trim()).length} recipients selected`}
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                  sx={{ mt: 1 }}
-                />
+                </>
               )}
             </Box>
           )}
@@ -442,10 +680,15 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
             !selectedExchange ||
             !messageContent.trim() ||
             (messageMode === 'single' && !phoneNumber) ||
-            (messageMode === 'bulk' && phoneNumbers.filter((p) => p.trim()).length === 0)
+            (messageMode === 'bulk' && bulkInputMethod === 'manual' && phoneNumbers.filter((p) => p.trim()).length === 0) ||
+            (messageMode === 'bulk' && bulkInputMethod === 'csv' && (!csvFile || csvError))
           }
         >
-          {messageMode === 'single' ? 'Send' : `Send to ${phoneNumbers.filter((p) => p.trim()).length} recipients`}
+          {messageMode === 'single'
+            ? 'Send'
+            : bulkInputMethod === 'csv'
+              ? `Send to CSV Recipients`
+              : `Send to ${phoneNumbers.filter((p) => p.trim()).length} recipients`}
         </Button>
       </DialogActions>
     </Dialog>

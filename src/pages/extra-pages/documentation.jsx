@@ -40,7 +40,7 @@ export default function Documentation() {
     { method: 'DELETE', endpoint: '/exchanges/{id}/queues/{queueId}', description: 'Delete a queue' },
     { method: 'GET', endpoint: '/exchanges/{id}/connection', description: 'Get exchange connection details' },
     { method: 'POST', endpoint: '/messages/send', description: 'Send a single SMS message' },
-    { method: 'POST', endpoint: '/messages/bulk-send', description: 'Send multiple SMS messages' },
+    { method: 'POST', endpoint: '/messages/bulk-send', description: 'Send multiple SMS messages (JSON or CSV upload)' },
     { method: 'GET', endpoint: '/event-logs', description: 'Get message logs with filtering' },
     { method: 'POST', endpoint: '/auth/login', description: 'User authentication' },
     { method: 'POST', endpoint: '/auth/signup', description: 'User registration' },
@@ -278,6 +278,82 @@ export default function Documentation() {
                 View Complete API Documentation
               </Button>
             </Box>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* CSV Format */}
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMore sx={{ color: 'grey' }} />}>
+            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+              📄 CSV Upload Format
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Bulk Message CSV Format
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  When uploading CSV files for bulk messaging, your CSV file only needs to contain phone numbers. The system automatically
+                  adds the exchange ID and message content to each row before processing.
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Required Column
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Your CSV must contain at least one column with phone numbers. The column name can be any of the following:
+                </Typography>
+                <Box component="ul" sx={{ pl: 2 }}>
+                  <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                    <code>phone_number</code>, <code>phone</code>, <code>mobile</code>
+                  </Typography>
+                  <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                    Any column name containing the words "phone", "number", or "mobile"
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Example CSV Format
+                </Typography>
+                <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', whiteSpace: 'pre' }}>
+                    {`phone_number,name
++237123456789,John Doe
++237987654321,Jane Smith
++237555444333,Bob Johnson`}
+                  </Typography>
+                </Paper>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  The system will automatically convert this to include exchange_id and content columns for processing.
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  File Requirements
+                </Typography>
+                <Box component="ul" sx={{ pl: 2 }}>
+                  <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                    File extension must be .csv
+                  </Typography>
+                  <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                    Maximum file size: 5MB
+                  </Typography>
+                  <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                    CSV should include headers in the first row
+                  </Typography>
+                  <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                    Phone numbers should include country code (e.g., +237123456789)
+                  </Typography>
+                </Box>
+              </Box>
+            </Stack>
           </AccordionDetails>
         </Accordion>
 
