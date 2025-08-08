@@ -218,6 +218,67 @@ export const exchangeAPI = {
 };
 
 /**
+ * Helper function to create a modified CSV file with exchange_id and content columns
+ */
+const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const lines = text.split('\n').filter((line) => line.trim());
+        
+        if (lines.length === 0) {
+          reject(new Error('CSV file is empty'));
+          return;
+        }
+
+        // Parse header and find phone number column
+        const header = lines[0].split(',').map((col) => col.trim().replace(/^"(.*)"$/, '$1'));
+        const phoneColumnIndex = header.findIndex(
+          (col) => col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')
+        );
+
+        if (phoneColumnIndex === -1) {
+          reject(new Error('CSV must contain a column with phone numbers'));
+          return;
+        }
+
+        // Create new CSV with required columns
+        const newHeader = ['phone_number', 'exchange_id', 'content'];
+        const newLines = [newHeader.join(',')];
+
+        // Process data rows
+        for (let i = 1; i < lines.length; i++) {
+          const cells = lines[i].split(',').map((cell) => cell.trim().replace(/^"(.*)"$/, '$1'));
+          const phoneNumber = cells[phoneColumnIndex];
+          
+          if (phoneNumber && phoneNumber.trim()) {
+            newLines.push(`"${phoneNumber}","${exchangeId}","${messageContent}"`);
+          }
+        }
+
+        // Create new file
+        const csvContent = newLines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const modifiedFile = new File([blob], `modified_${originalFile.name}`, { type: 'text/csv' });
+        
+        resolve(modifiedFile);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read CSV file'));
+    };
+
+    reader.readAsText(originalFile);
+  });
+};
+
+/**
  * API methods for messages
  */
 export const messageAPI = {
@@ -228,12 +289,80 @@ export const messageAPI = {
       body: JSON.stringify(messageData)
     }),
 
-  // Send multiple messages in bulk
+  // Send multiple messages in bulk (JSON payload)
   sendBulk: (bulkMessageData) =>
     apiRequest('/messages/bulk-send', {
       method: 'POST',
       body: JSON.stringify(bulkMessageData)
-    })
+    }),
+
+  // Send multiple messages in bulk (CSV file upload)
+  sendBulkCSV: async (csvFile, exchangeId, messageContent) => {
+    const url = `${API_BASE_URL}/messages/bulk-send`;
+    
+    try {
+      // Create a modified CSV file that includes exchange_id and content columns
+      const modifiedCsvFile = await createModifiedCSV(csvFile, exchangeId, messageContent);
+      
+      const formData = new FormData();
+      formData.append('file', modifiedCsvFile);
+
+      const token = getAuthToken();
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      // Note: Don't set Content-Type for FormData, let the browser set it with boundary
+
+      console.log('Making CSV upload request:', {
+        url,
+        file: modifiedCsvFile.name,
+        exchangeId,
+        messageContent
+      });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+
+      console.log('CSV upload response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
+      // Check for 401 Unauthorized error
+      if (response.status === 401) {
+        console.error('401 Unauthorized - Session expired. Logging out user.');
+        handleLogout().catch((logoutError) => {
+          console.error('Error during logout:', logoutError);
+        });
+        return;
+      }
+
+      // Check if response is ok
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      // Parse JSON response
+      const data = await response.json();
+      console.log('Parsed CSV upload data:', data);
+      return data;
+    } catch (error) {
+      console.error('CSV upload failed:', error);
+      
+      // Handle CSV modification errors
+      if (error.message && error.message.includes('CSV')) {
+        throw new Error(`CSV processing error: ${error.message}`);
+      }
+      
+      throw error;
+    }
+  }
 };
 
 /**
