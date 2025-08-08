@@ -42,19 +42,32 @@ const Landing = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           sx={{
-            py: { md: 0, xs: 0 },
+            py: { xs: 4, sm: 6, md: 0 },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             background: 'linear-gradient(135deg,rgb(247, 232, 228) 0%,rgb(214, 214, 214) 100%)',
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            minHeight: { xs: 'auto', md: '100vh' }
           }}
         >
           {/* Main content */}
-          <Grid container spacing={4} sx={{ alignItems: 'center', zIndex: 1, px: { xs: 2, md: 25 }, justifyContent: 'center', my: 'auto' }}>
+          <Grid
+            container
+            columnSpacing={4}
+            rowSpacing={0}
+            sx={{
+              alignItems: 'center',
+              zIndex: 1,
+              px: { xs: 2, sm: 3, md: 15, lg: 15, xl: 25 },
+              justifyContent: 'center',
+              my: 'auto',
+              mx: 'auto'
+            }}
+          >
             {/* Text Content - Left Side */}
-            <Grid size={{ xs: 12, md: 6 }} sx={{ mt: 10 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 6, lg: 6 }} sx={{ mt: { xs: 5, sm: 8, md: 10 }, order: { xs: 1, md: 1 } }}>
               <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
                 <Typography
                   variant="h1"
@@ -63,10 +76,10 @@ const Landing = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                   sx={{
-                    fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem', lg: '6rem' },
+                    fontSize: { xs: '2rem', sm: '2.8rem', md: '4rem', lg: '5.5rem', xl: '6rem' },
                     fontWeight: 800,
-                    mb: { md: 2, xs: 3 },
-                    mt: { xs: 5, md: 0 }
+                    mb: { xs: 2, sm: 2, md: 2 },
+                    mt: { xs: 4, sm: 3, md: 0 }
                   }}
                 >
                   QueueDroid
@@ -79,7 +92,7 @@ const Landing = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                   sx={{
-                    fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.9rem' },
+                    fontSize: { xs: '1rem', sm: '1.3rem', md: '1.6rem', lg: '1.6rem', xl: '1.9rem' },
                     mb: 2,
                     fontWeight: 600,
                     opacity: 0.9,
@@ -131,8 +144,8 @@ const Landing = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
                   sx={{
-                    fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
-                    mb: { md: 10, xs: 4 },
+                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' },
+                    mb: { xs: 3, sm: 4, md: 10 },
                     opacity: 0.8,
                     lineHeight: 1.6
                   }}
@@ -148,10 +161,11 @@ const Landing = () => {
                   transition={{ duration: 0.8, delay: 0.8 }}
                   sx={{
                     display: 'flex',
-                    gap: { xs: 2, md: 3 },
+                    gap: { xs: 1.5, sm: 2, md: 3 },
                     justifyContent: { xs: 'center', md: 'flex-start' },
-                    flexWrap: 'nowrap',
-                    mb: { md: 4, xs: 0 }
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: 'center',
+                    mb: { xs: 3, sm: 4, md: 4 }
                   }}
                 >
                   <AnimateButton>
@@ -162,13 +176,14 @@ const Landing = () => {
                       size="large"
                       startIcon={<MessageOutlined />}
                       sx={{
-                        px: { xs: 2, md: 4 },
-                        py: { md: 2, xs: 1.4 },
-                        fontSize: { xs: '0.9rem', md: '1.1rem' },
+                        px: { xs: 2, sm: 3, md: 4 },
+                        py: { xs: 1.2, sm: 1.6, md: 2 },
+                        fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1.1rem' },
                         color: '#fff',
                         borderRadius: '50px',
                         background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)',
                         boxShadow: '0 8px 30px rgba(255, 107, 107, 0.3)',
+                        minWidth: { xs: '140px', sm: 'auto' },
                         '&:hover': {
                           background: 'linear-gradient(45deg,rgb(255, 122, 82) 30%,rgb(180, 58, 28) 90%)',
                           boxShadow: '0 12px 40px rgba(255, 107, 107, 0.4)',
@@ -190,12 +205,13 @@ const Landing = () => {
                       size="large"
                       startIcon={<ApiOutlined />}
                       sx={{
-                        px: { xs: 2, md: 4 },
-                        py: { md: 2, xs: 1.4 },
-                        fontSize: { xs: '0.9rem', md: '1.1rem' },
+                        px: { xs: 2, sm: 3, md: 4 },
+                        py: { xs: 1.2, sm: 1.6, md: 1.8, lg: 1.8, xl: 2 },
+                        fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1.1rem' },
                         borderRadius: '50px',
                         borderColor: 'black',
                         color: 'black',
+                        minWidth: { xs: '140px', sm: 'auto' },
                         '&:hover': {
                           borderColor: 'white',
                           background: 'rgba(26, 5, 5, 0.1)',
@@ -211,7 +227,7 @@ const Landing = () => {
             </Grid>
 
             {/* Image Content - Right Side */}
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 6, lg: 6 }} sx={{ order: { xs: 2, md: 2 } }}>
               <Box
                 component={motion.div}
                 initial={{ opacity: 0, x: 50 }}
@@ -223,24 +239,25 @@ const Landing = () => {
                   alignItems: 'center',
                   height: '100%',
                   position: 'relative',
-                  mb: { xs: 5, md: 15 },
-                  px: { xs: 2, md: 0 }
+                  mb: { xs: 5, sm: 8, md: 15 },
+                  mt: { xs: 0, sm: 0, md: 0 },
+                  px: { xs: 1, md: 0 }
                 }}
               >
                 {/* Tilted box behind the image */}
                 <Box
                   sx={{
                     position: 'absolute',
-                    width: { xs: '370px', sm: '520px', md: '600px' },
-                    height: { xs: '380px', sm: '520px', md: '600px' },
+                    width: { xs: '340px', sm: '490px', md: '490px', lg: '490px', xl: '600px' },
+                    height: { xs: '320px', sm: '490px', md: '490px', lg: '490px', xl: '600px' },
                     background: 'linear-gradient(135deg, rgba(245, 57, 57, 0.94) 0%, rgba(151, 66, 1, 0.97) 100%)',
                     borderRadius: '20px',
-                    transform: { xs: 'rotate(6deg)', md: 'rotate(2deg)' },
+                    transform: { xs: 'rotate(4deg)', sm: 'rotate(5deg)', md: 'rotate(2deg)' },
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
                     zIndex: 0,
-                    mt: { xs: 22, sm: 30, md: 35 }
+                    mt: { xs: 15, sm: 20, md: 35 }
                   }}
                 />
 
@@ -249,7 +266,7 @@ const Landing = () => {
                   src="/black-boy-posing.png"
                   alt="QueueDroid System Illustration"
                   sx={{
-                    width: { xs: '100%', sm: '75%', md: '85%' },
+                    width: { xs: '80%', sm: '70%', md: '70%', lg: '85%', xl: '85%' },
                     height: 'auto',
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2))',
                     position: 'relative',
@@ -259,22 +276,22 @@ const Landing = () => {
                 <Box
                   sx={{
                     position: 'absolute',
-                    width: { xs: '400px', sm: '620px', md: '680px' },
-                    height: { xs: '150px', sm: '200px', md: '200px' },
+                    width: { xs: '350px', sm: '450px', md: '680px', lg: '600px', xl: '680px' },
+                    height: { xs: '140px', sm: '160px', md: '160px', lg: '160px', xl: '190px' },
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 245, 240, 0.97) 100%)',
                     borderRadius: '20px',
-                    transform: { xs: 'rotate(-6deg)', md: 'rotate(-5deg)' },
+                    transform: { xs: 'rotate(-4deg)', sm: 'rotate(-5deg)', md: 'rotate(-5deg)' },
                     backdropFilter: 'blur(10px)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
-                    mt: { xs: 57, sm: 70, md: 95 },
+                    mt: { xs: 40, sm: 55, md: 85, lg: 85, xl: 95 },
                     zIndex: 2,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexDirection: 'column',
-                    px: { xs: 1, md: 4 },
-                    py: { xs: 1, md: 3 }
+                    px: { xs: 1, sm: 2, md: 4 },
+                    py: { xs: 1, sm: 2, md: 3 }
                   }}
                 >
                   {/* Connected Avatars */}
@@ -289,8 +306,8 @@ const Landing = () => {
                     <Avatar
                       src="/african-man.png"
                       sx={{
-                        width: { xs: 32, md: 45 },
-                        height: { xs: 32, md: 45 },
+                        width: { xs: 24, sm: 30, md: 45 },
+                        height: { xs: 24, sm: 30, md: 45 },
                         border: '3px solid #fff',
                         boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
                         zIndex: 3
@@ -299,26 +316,29 @@ const Landing = () => {
                     <Avatar
                       src="/front-view-man-Photoroom.png"
                       sx={{
-                        width: { xs: 32, md: 45 },
-                        height: { xs: 32, md: 45 },
+                        width: { xs: 24, sm: 30, md: 45 },
+                        height: { xs: 24, sm: 30, md: 45 },
                         border: '3px solid #fff',
                         boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                        ml: { xs: -1, md: -1.5 },
+                        ml: { xs: -0.5, sm: -1, md: -1.5 },
                         zIndex: 2
                       }}
                     />
                     <Avatar
                       sx={{
-                        width: { xs: 32, md: 45 },
-                        height: { xs: 32, md: 45 },
+                        width: { xs: 24, sm: 30, md: 45 },
+                        height: { xs: 24, sm: 30, md: 45 },
                         border: '3px solid #fff',
                         boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                        ml: { xs: -1, md: -1.5 },
+                        ml: { xs: -0.5, sm: -1, md: -1.5 },
                         zIndex: 1,
                         bgcolor: '#ee5a52'
                       }}
                     >
-                      <Typography variant="body2" sx={{ color: '#fff', fontWeight: 'bold', fontSize: { xs: '0.7rem', md: '0.9rem' } }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: '#fff', fontWeight: 'bold', fontSize: { xs: '0.5rem', sm: '0.6rem', md: '0.9rem' } }}
+                      >
                         +5K
                       </Typography>
                     </Avatar>
@@ -328,11 +348,11 @@ const Landing = () => {
                   <Typography
                     variant="h6"
                     sx={{
-                      fontSize: { xs: '0.8rem', md: '1rem' },
+                      fontSize: { xs: '0.6rem', sm: '0.75rem', md: '1rem' },
                       fontWeight: 600,
                       textAlign: 'center',
                       color: '#333',
-                      mb: { xs: 0.5, md: 1 },
+                      mb: { xs: 0.3, sm: 0.5, md: 1 },
                       lineHeight: 1.2
                     }}
                   >
@@ -342,7 +362,7 @@ const Landing = () => {
                   <Typography
                     variant="body2"
                     sx={{
-                      fontSize: { xs: '0.7rem', md: '0.85rem' },
+                      fontSize: { xs: '0.7rem', sm: '0.7rem', md: '0.85rem' },
                       textAlign: 'center',
                       color: '#666',
                       opacity: 0.8,
@@ -357,7 +377,6 @@ const Landing = () => {
             </Grid>
           </Grid>
         </Box>
-
         {/* Add keyframes for floating animation */}
         <style>
           {`
@@ -376,8 +395,8 @@ const Landing = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           sx={{
-            pt: 20,
-            px: { xs: 2, md: 4 }
+            pt: { xs: 10, sm: 15, md: 20 },
+            px: { xs: 2, sm: 3, md: 4 }
           }}
         >
           <Box sx={{ maxWidth: '1400px', mx: 'auto' }}>
@@ -391,9 +410,9 @@ const Landing = () => {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 viewport={{ once: true }}
                 sx={{
-                  fontSize: { xs: '1.8rem', sm: '2.3rem', md: '2.5rem' },
+                  fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
                   fontWeight: 700,
-                  mb: 2
+                  mb: { xs: 4, sm: 6, md: 8 }
                 }}
               >
                 Why Choose QueueDroid?
@@ -402,9 +421,9 @@ const Landing = () => {
 
             {/* Features Grid */}
             <Box sx={{ position: 'relative' }}>
-              <Grid container spacing={4} sx={{ position: 'relative', zIndex: 1 }}>
+              <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} sx={{ position: 'relative', zIndex: 1 }}>
                 {/* Feature 1 */}
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                   <Card
                     component={motion.div}
                     initial={{ opacity: 0, y: 30 }}
@@ -454,7 +473,7 @@ const Landing = () => {
                 </Grid>
 
                 {/* Feature 2 */}
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                   <Card
                     component={motion.div}
                     initial={{ opacity: 0, y: 30 }}
@@ -504,7 +523,7 @@ const Landing = () => {
                 </Grid>
 
                 {/* Feature 3 */}
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                   <Card
                     component={motion.div}
                     initial={{ opacity: 0, y: 30 }}
@@ -554,7 +573,7 @@ const Landing = () => {
                 </Grid>
 
                 {/* Feature 4 */}
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                   <Card
                     component={motion.div}
                     initial={{ opacity: 0, y: 30 }}
@@ -612,13 +631,13 @@ const Landing = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               viewport={{ once: true }}
               sx={{
-                mt: { xs: 10, md: 25 },
+                mt: { xs: 8, sm: 12, md: 16, lg: 16, xl: 25 },
                 mb: 6
               }}
             >
-              <Grid container spacing={0} sx={{ alignItems: 'center' }}>
+              <Grid container columnSpacing={2} sx={{ alignItems: 'center', mx: 'auto' }}>
                 {/* Image Section */}
-                <Grid size={{ xs: 12, md: 4 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 4 }} sx={{ order: { xs: 2, sm: 2, md: 1 } }}>
                   <Box
                     component={motion.div}
                     initial={{ opacity: 0, x: -50 }}
@@ -647,7 +666,7 @@ const Landing = () => {
                 </Grid>
 
                 {/* Text and Button Section */}
-                <Grid size={{ xs: 12, md: 8 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 8 }} sx={{ order: { xs: 1, sm: 1, md: 2 } }}>
                   <Box
                     component={motion.div}
                     initial={{ opacity: 0, x: 50 }}
@@ -659,15 +678,15 @@ const Landing = () => {
                     }}
                     justifyContent="center"
                     alignItems="center"
-                    px={{ xs: 3, md: 7 }}
-                    py={{ xs: 3, md: 0 }}
+                    px={{ xs: 2, sm: 4, md: 2, lg: 2, xl: 7 }}
+                    py={{ xs: 3, sm: 4, md: 0 }}
                   >
                     <Typography
                       variant="h2"
                       sx={{
-                        fontSize: { xs: '1.4rem', sm: '1.5rem', md: '1.8rem' },
+                        fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.8rem' },
                         fontWeight: 700,
-                        mb: 3
+                        mb: { xs: 2, sm: 3, md: 3 }
                       }}
                     >
                       Manage Your SMS Campaigns
@@ -675,7 +694,7 @@ const Landing = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
+                        fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' },
                         mb: 2,
                         opacity: 0.9,
                         lineHeight: 1.6
@@ -687,8 +706,8 @@ const Landing = () => {
                     <Typography
                       variant="body1"
                       sx={{
-                        fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
-                        mb: 3,
+                        fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' },
+                        mb: { xs: 3, sm: 4, md: 3 },
                         opacity: 0.8,
                         lineHeight: 1.6
                       }}
@@ -704,9 +723,9 @@ const Landing = () => {
                         size="large"
                         startIcon={<DashboardOutlined />}
                         sx={{
-                          px: { xs: 4, md: 6 },
-                          py: { xs: 1.4, md: 1.8 },
-                          fontSize: { xs: '1rem', md: '1.1rem' },
+                          px: { xs: 3, sm: 4, md: 6 },
+                          py: { xs: 1.2, sm: 1.5, md: 1.8 },
+                          fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                           borderRadius: '50px',
                           color: '#fff',
                           background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)',

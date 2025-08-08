@@ -280,13 +280,13 @@ export const userAPI = {
   // Change user password
   changePassword: (passwordData) =>
     apiRequest('/users/change-password', {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify(passwordData)
     }),
 
   // Delete user account
   deleteAccount: (passwordData) =>
-    apiRequest('/users/delete-account', {
+    apiRequest('/users/', {
       method: 'DELETE',
       body: JSON.stringify(passwordData)
     })
