@@ -1,8 +1,9 @@
-import React from 'react';
-import { Box, Typography, Button, Card, CardContent, Avatar, Divider } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Button, Card, CardContent, Avatar, Divider, Tabs, Tab } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import {
   ApiOutlined,
+  CopyOutlined,
   DashboardOutlined,
   LineChartOutlined,
   MessageOutlined,
@@ -24,6 +25,191 @@ const Footer = () => (
 );
 
 const Landing = () => {
+  const [selectedLanguage, setSelectedLanguage] = useState(0);
+
+  const codeExamples = [
+    {
+      language: 'JavaScript',
+      color: '#f7df1e',
+      textColor: '#000',
+      code: `const axios = require('axios');
+
+const sendSMS = async () => {
+  try {
+    const response = await axios.post(
+      'https://api.queuedroid.com/v1/sms/send',
+      {
+        to: '+1234567890',
+        message: 'Hello from QueueDroid!',
+        priority: 'normal'
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer YOUR_API_KEY',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    console.log('Message queued:', response.data);
+  } catch (error) {
+    console.error('Error:', error.response.data);
+  }
+};
+
+sendSMS();`
+    },
+    {
+      language: 'Python',
+      color: 'linear-gradient(135deg, #3776ab 0%, #ffd43b 100%)',
+      textColor: '#fff',
+      code: `import requests
+import json
+
+def send_sms():
+    url = "https://api.queuedroid.com/v1/sms/send"
+    
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "to": "+1234567890",
+        "message": "Hello from QueueDroid!",
+        "priority": "normal"
+    }
+    
+    try:
+        response = requests.post(url, 
+                               headers=headers, 
+                               json=data)
+        response.raise_for_status()
+        print("Message queued:", response.json())
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+
+send_sms()`
+    },
+    {
+      language: 'C',
+      color: 'linear-gradient(135deg, #659ad2 0%, #03599c 100%)',
+      textColor: '#fff',
+      code: `#include <stdio.h>
+#include <curl/curl.h>
+
+int send_sms() {
+    CURL *curl;
+    CURLcode res;
+    
+    curl = curl_easy_init();
+    if(curl) {
+        struct curl_slist *headers = NULL;
+        
+        // Set headers
+        headers = curl_slist_append(headers, 
+            "Authorization: Bearer YOUR_API_KEY");
+        headers = curl_slist_append(headers, 
+            "Content-Type: application/json");
+        
+        // JSON payload
+        const char *json_data = 
+            "{"
+            "\\"to\\": \\"+1234567890\\","
+            "\\"message\\": \\"Hello from QueueDroid!\\","
+            "\\"priority\\": \\"normal\\""
+            "}";
+        
+        curl_easy_setopt(curl, CURLOPT_URL, 
+            "https://api.queuedroid.com/v1/sms/send");
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        
+        res = curl_easy_perform(curl);
+        
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+        
+        return (res == CURLE_OK) ? 0 : 1;
+    }
+    return 1;
+}`
+    },
+    {
+      language: 'C++',
+      color: 'linear-gradient(135deg, #00599c 0%, #004482 100%)',
+      textColor: '#fff',
+      code: `#include <iostream>
+#include <curl/curl.h>
+#include <string>
+
+class QueueDroidClient {
+private:
+    std::string api_key;
+    std::string base_url;
+    
+public:
+    QueueDroidClient(const std::string& key) 
+        : api_key(key), 
+          base_url("https://api.queuedroid.com/v1") {}
+    
+    bool sendSMS(const std::string& to, 
+                 const std::string& message) {
+        CURL *curl;
+        CURLcode res;
+        bool success = false;
+        
+        curl = curl_easy_init();
+        if(curl) {
+            struct curl_slist *headers = NULL;
+            
+            std::string auth_header = 
+                "Authorization: Bearer " + api_key;
+            headers = curl_slist_append(headers, 
+                auth_header.c_str());
+            headers = curl_slist_append(headers, 
+                "Content-Type: application/json");
+            
+            std::string json_data = 
+                "{\\"to\\": \\"" + to + "\\", "
+                "\\"message\\": \\"" + message + "\\", "
+                "\\"priority\\": \\"normal\\"}";
+            
+            std::string url = base_url + "/sms/send";
+            
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, 
+                json_data.c_str());
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            
+            res = curl_easy_perform(curl);
+            success = (res == CURLE_OK);
+            
+            curl_slist_free_all(headers);
+            curl_easy_cleanup(curl);
+        }
+        return success;
+    }
+};
+
+int main() {
+    QueueDroidClient client("YOUR_API_KEY");
+    
+    if(client.sendSMS("+1234567890", 
+                      "Hello from QueueDroid!")) {
+        std::cout << "Message sent successfully!" << std::endl;
+    } else {
+        std::cout << "Failed to send message." << std::endl;
+    }
+    
+    return 0;
+}`
+    }
+  ];
+
+  const handleLanguageChange = (event, newValue) => {
+    setSelectedLanguage(newValue);
+  };
+
   return (
     <>
       <Nav />
@@ -212,9 +398,9 @@ const Landing = () => {
                     <AnimateButton type="slide" direction="up" offset={5}>
                       <Button
                         component={Link}
-                        to="https://github.com/queuedroid/qdroid-server?tab=readme-ov-file"
                         target="_blank"
                         rel="noopener noreferrer"
+                        to="/docs"
                         variant="outlined"
                         size="large"
                         startIcon={<ApiOutlined />}
@@ -233,7 +419,7 @@ const Landing = () => {
                           }
                         }}
                       >
-                        View API Docs
+                        View Documentation
                       </Button>
                     </AnimateButton>
                   </Box>
@@ -463,8 +649,8 @@ const Landing = () => {
                           Slash SMS Costs by 40%
                         </Typography>
                         <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.6 }}>
-                          Our intelligent routing system automatically selects the most cost-effective carriers for each message, dramatically
-                          reducing your SMS expenses without compromising delivery quality.
+                          Our intelligent routing system automatically selects the most cost-effective carriers for each message,
+                          dramatically reducing your SMS expenses without compromising delivery quality.
                         </Typography>
                       </CardContent>
                     </Card>
@@ -628,6 +814,7 @@ const Landing = () => {
                 </Grid>
               </Grid>
             </Box>
+
             {/* Management Section */}
             <Box
               sx={{
@@ -747,6 +934,147 @@ const Landing = () => {
                   </motion.div>
                 </Grid>
               </Grid>
+            </Box>
+
+            {/* How Easy It Is Section */}
+            <Box
+              sx={{
+                mt: { xs: 8, sm: 12, md: 16, xl: 22 },
+                mb: { xs: 8, sm: 12, md: 16 },
+                px: { xs: 2, sm: 3, md: 4 }
+              }}
+            >
+              <Box sx={{ maxWidth: '1400px', mx: 'auto' }}>
+                {/* Section Header */}
+                <Box sx={{ textAlign: 'center', mb: { xs: 6, sm: 8, md: 10 } }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                  >
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
+                        fontWeight: 700,
+                        mb: { xs: 2, sm: 3, md: 3 }
+                      }}
+                    >
+                      Simple Integration, Powerful Results
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontSize: { xs: '0.9rem', sm: '1rem', md: '1.2rem' },
+                        opacity: 0.8,
+                        maxWidth: '800px',
+                        mx: 'auto',
+                        lineHeight: 1.6
+                      }}
+                    >
+                      Get started with QueueDroid in minutes. Choose your favorite programming language and start sending SMS messages with
+                      just a few lines of code.
+                    </Typography>
+                  </motion.div>
+                </Box>
+
+                {/* Code Examples with Tabs */}
+                <Box sx={{ maxWidth: '1000px', mx: 'auto' }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                  >
+                    <Card
+                      sx={{
+                        borderRadius: 3,
+                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      {/* Language Tabs */}
+                      <Box
+                        sx={{
+                          background: '#bdbbbbff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          px: 2,
+                          py: 1
+                        }}
+                      >
+                        <Tabs
+                          value={selectedLanguage}
+                          onChange={handleLanguageChange}
+                          sx={{
+                            '& .MuiTab-root': {
+                              color: '#000',
+                              opacity: 0.7,
+                              minWidth: 'auto',
+                              px: 2,
+                              py: 1,
+                              fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
+                              fontWeight: 600,
+                              '&.Mui-selected': {
+                                color: '#000',
+                                opacity: 1
+                              }
+                            },
+                            '& .MuiTabs-indicator': {
+                              backgroundColor: codeExamples[selectedLanguage].textColor,
+                              height: 3
+                            }
+                          }}
+                        >
+                          {codeExamples.map((example, index) => (
+                            <Tab key={index} label={example.language} />
+                          ))}
+                        </Tabs>
+
+                        {/* Copy Button */}
+                        <Button
+                          size="small"
+                          sx={{
+                            minWidth: 'auto',
+                            p: 1,
+                            color: codeExamples[selectedLanguage].textColor,
+                            opacity: 0.8,
+                            '&:hover': {
+                              opacity: 1,
+                              bgcolor: 'rgba(255,255,255,0.1)'
+                            }
+                          }}
+                          onClick={() => navigator.clipboard.writeText(codeExamples[selectedLanguage].code)}
+                        >
+                          <CopyOutlined /> Copy
+                        </Button>
+                      </Box>
+
+                      {/* Code Display */}
+                      <CardContent sx={{ p: 0 }}>
+                        <Box
+                          sx={{
+                            background: '#1e1e1e',
+                            color: '#d4d4d4',
+                            p: 3,
+                            fontFamily: 'monospace',
+                            fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
+                            lineHeight: 1.5,
+                            overflow: 'auto',
+                            maxHeight: '500px'
+                          }}
+                        >
+                          <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{codeExamples[selectedLanguage].code}</pre>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </Box>
+              </Box>
             </Box>
           </Box>
         </Box>

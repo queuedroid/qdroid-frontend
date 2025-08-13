@@ -32,6 +32,7 @@ const APIKeys = Loadable(lazy(() => import('pages/api-keys/api-keys')));
 const Documentation = Loadable(lazy(() => import('pages/extra-pages/documentation')));
 const Help = Loadable(lazy(() => import('pages/extra-pages/help')));
 const OnboardingStepper = Loadable(lazy(() => import('pages/onboarding/first')));
+const DocsPage = Loadable(lazy(() => import('pages/docs/index')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -41,6 +42,10 @@ const MainRoutes = {
     {
       path: '/',
       element: <Landing />
+    },
+    {
+      path: '/docs',
+      element: <DocsPage />
     },
     {
       path: '/404',

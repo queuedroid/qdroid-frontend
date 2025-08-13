@@ -218,6 +218,44 @@ export const exchangeAPI = {
 };
 
 /**
+ * Helper function to properly parse CSV line with quoted values
+ */
+const parseCSVLine = (line) => {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < line.length) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        // Escaped quote
+        current += '"';
+        i += 2;
+      } else {
+        // Toggle quote state
+        inQuotes = !inQuotes;
+        i++;
+      }
+    } else if (char === ',' && !inQuotes) {
+      // End of field
+      result.push(current.trim());
+      current = '';
+      i++;
+    } else {
+      current += char;
+      i++;
+    }
+  }
+  
+  // Add the last field
+  result.push(current.trim());
+  return result;
+};
+
+/**
  * Helper function to create a modified CSV file with exchange_id and content columns
  */
 const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
@@ -234,10 +272,13 @@ const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
           return;
         }
 
-        // Parse header and find phone number column
-        const header = lines[0].split(',').map((col) => col.trim().replace(/^"(.*)"$/, '$1'));
+        // Parse header and find required columns
+        const header = parseCSVLine(lines[0]);
         const phoneColumnIndex = header.findIndex(
           (col) => col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')
+        );
+        const contentColumnIndex = header.findIndex(
+          (col) => col.toLowerCase().includes('content') || col.toLowerCase().includes('message')
         );
 
         if (phoneColumnIndex === -1) {
@@ -251,18 +292,40 @@ const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
 
         // Process data rows
         for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(',').map((cell) => cell.trim().replace(/^"(.*)"$/, '$1'));
+          const cells = parseCSVLine(lines[i]);
           const phoneNumber = cells[phoneColumnIndex];
           
           if (phoneNumber && phoneNumber.trim()) {
-            newLines.push(`"${phoneNumber}","${exchangeId}","${messageContent}"`);
+            // Use content from CSV if available, otherwise use provided messageContent
+            let contentToUse = messageContent;
+            if (contentColumnIndex !== -1 && cells[contentColumnIndex]) {
+              contentToUse = cells[contentColumnIndex];
+            }
+            
+            // Ensure we have content for this row
+            if (contentToUse && contentToUse.trim()) {
+              newLines.push(`"${phoneNumber}","${exchangeId}","${contentToUse.replace(/"/g, '""')}"`);
+            }
           }
+        }
+
+        // Check if we have any valid messages
+        if (newLines.length <= 1) {
+          reject(new Error('No valid messages found in CSV file - ensure phone numbers and content are present'));
+          return;
         }
 
         // Create new file
         const csvContent = newLines.join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv' });
         const modifiedFile = new File([blob], `modified_${originalFile.name}`, { type: 'text/csv' });
+        
+        console.log('Created modified CSV:', {
+          originalRows: lines.length - 1,
+          processedRows: newLines.length - 1,
+          hasContentColumn: contentColumnIndex !== -1,
+          sampleContent: csvContent.split('\n').slice(0, 3).join('\n')
+        });
         
         resolve(modifiedFile);
       } catch (error) {
@@ -297,7 +360,7 @@ export const messageAPI = {
     }),
 
   // Send multiple messages in bulk (CSV file upload)
-  sendBulkCSV: async (csvFile, exchangeId, messageContent) => {
+  sendBulkCSV: async (csvFile, exchangeId, messageContent = '') => {
     const url = `${API_BASE_URL}/messages/bulk-send`;
     
     try {
