@@ -1,24 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, IconButton, Typography } from '@mui/material';
-import { SunOutlined, MoonOutlined, GithubOutlined } from '@ant-design/icons';
-import { useThemeCustomization } from '../themes/index';
+import React from 'react';
+import { Box, Button, Typography } from '@mui/material';
+import { GithubOutlined } from '@ant-design/icons';
 
 const Nav = () => {
-  const { toggleColorMode } = useThemeCustomization();
-  const [mode, setMode] = useState(() => {
-    const storedMode = localStorage.getItem('themeMode');
-    return storedMode === 'dark' ? 'light' : 'dark';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('themeMode', mode);
-  }, [mode]);
-
-  const handleThemeToggle = () => {
-    setMode(mode === 'light' ? 'dark' : 'light');
-    toggleColorMode();
-  };
-
   return (
     <Box
       sx={{
@@ -35,9 +19,9 @@ const Nav = () => {
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 1000, // Ensure the nav is above other content
-        backdropFilter: 'blur(10px)', // Optional: adds a blur effect to the background
-        color: '#000' // Change text color to white for better contrast
+        zIndex: 1000,
+        backdropFilter: 'blur(10px)',
+        color: '#000'
       }}
     >
       {/* Logo + Name */}
@@ -53,18 +37,31 @@ const Nav = () => {
         <Button
           size="small"
           component="a"
-          href="/dashboard"
+          href="/register"
           target="_blank"
           variant="contained"
           sx={{ textTransform: 'none', borderRadius: 7, px: { md: 4, xs: 2 }, bgcolor: 'black', color: 'white' }}
         >
+          Signup
+        </Button>
+        <Button
+          variant="text"
+          size="small"
+          component="a"
+          href="/dashboard"
+          target="_blank"
+          sx={{
+            textTransform: 'none',
+            borderRadius: 7,
+            px: { md: 4, xs: 2 },
+            textDecoration: 'underline'
+          }}
+        >
           Login
         </Button>
-        <a href="https://github.com/QueueDroid" target="_blank">
-          {' '}
-          <GithubOutlined style={{ fontSize: 27, color: 'black' }} />{' '}
+        <a href="https://github.com/QueueDroid" target="_blank" rel="noopener noreferrer">
+          <GithubOutlined style={{ fontSize: 27, color: 'black' }} />
         </a>
-        {/* <IconButton onClick={handleThemeToggle}>{mode === 'light' ? <SunOutlined /> : <MoonOutlined />}</IconButton> */}
       </Box>
     </Box>
   );

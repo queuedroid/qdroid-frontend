@@ -186,14 +186,6 @@ export default function DashboardDefault() {
       </Grid>
       <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
-          title="Active Queues"
-          count={loading ? '...' : exchangeStats.activeQueues.toString()}
-          extra="Queues with consumers"
-          isLoss={false}
-        />
-      </Grid>
-      <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
-        <AnalyticEcommerce
           title="Total Messages"
           count={loading ? '...' : exchangeStats.messagesSent.toLocaleString()}
           extra="All message logs"
