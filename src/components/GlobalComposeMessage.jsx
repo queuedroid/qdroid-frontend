@@ -69,6 +69,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
   const [csvFile, setCsvFile] = useState(null);
   const [csvPreview, setCsvPreview] = useState([]);
   const [csvError, setCsvError] = useState('');
+  const [csvHasContentColumn, setCsvHasContentColumn] = useState(false);
   const navigate = useNavigate();
 
   // Fetch exchanges when dialog opens
@@ -99,6 +100,41 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     } finally {
       setExchangesLoading(false);
     }
+  };
+
+  const parseCSVLine = (line) => {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    let i = 0;
+
+    while (i < line.length) {
+      const char = line[i];
+
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          // Escaped quote
+          current += '"';
+          i += 2;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+          i++;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // End of field
+        result.push(current.trim());
+        current = '';
+        i++;
+      } else {
+        current += char;
+        i++;
+      }
+    }
+
+    // Add the last field
+    result.push(current.trim());
+    return result;
   };
 
   const handleFileUpload = (event) => {
@@ -132,9 +168,8 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
         const preview = previewLines
           .filter((line) => line.trim())
           .map((line) => {
-            // Simple CSV parsing - split by comma and handle basic quotes
-            const cells = line.split(',').map((cell) => cell.trim().replace(/^"(.*)"$/, '$1'));
-            return cells;
+            // Use improved CSV parsing to handle quoted values
+            return parseCSVLine(line);
           });
 
         if (preview.length === 0) {
@@ -148,10 +183,17 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
           (col) => col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')
         );
 
+        const contentColumnIndex = header.findIndex(
+          (col) => col.toLowerCase().includes('content') || col.toLowerCase().includes('message')
+        );
+
         if (phoneColumnIndex === -1) {
           setCsvError('CSV must contain a column with phone numbers (e.g., "phone_number", "phone", "mobile")');
           return;
         }
+
+        // Set whether CSV has content column
+        setCsvHasContentColumn(contentColumnIndex !== -1);
 
         setCsvPreview(preview);
       } catch (error) {
@@ -166,6 +208,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     setCsvFile(null);
     setCsvPreview([]);
     setCsvError('');
+    setCsvHasContentColumn(false);
     // Reset file input
     const fileInput = document.getElementById('csv-file-input');
     if (fileInput) {
@@ -174,8 +217,15 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
   };
 
   const handleSend = async () => {
-    if (!selectedExchange || !messageContent.trim()) {
-      setError('Please fill in all required fields');
+    if (!selectedExchange) {
+      setError('Please select an exchange');
+      return;
+    }
+
+    // Check message content requirement - skip if CSV has content column
+    const messageContentRequired = !(messageMode === 'bulk' && bulkInputMethod === 'csv' && csvHasContentColumn);
+    if (messageContentRequired && !messageContent.trim()) {
+      setError('Please enter a message');
       return;
     }
 
@@ -229,11 +279,11 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
         response = await messageAPI.sendBulk(messageData);
       } else if (messageMode === 'bulk' && bulkInputMethod === 'csv') {
         // CSV file upload
-        response = await messageAPI.sendBulkCSV(csvFile, selectedExchange.exchange_id, messageContent);
+        response = await messageAPI.sendBulkCSV(csvFile, selectedExchange.exchange_id, messageContent || '');
         messageData = {
           file: csvFile.name,
           exchange_id: selectedExchange.exchange_id,
-          content: messageContent
+          content: csvHasContentColumn ? 'Individual messages from CSV' : messageContent
         };
       }
 
@@ -616,6 +666,15 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
 
                         {csvPreview.length > 0 && !csvError && (
                           <Box>
+                            {csvHasContentColumn && (
+                              <Alert severity="success" sx={{ mb: 2 }}>
+                                <Typography variant="body2">
+                                  <strong>Individual messages detected!</strong> Your CSV contains a 'content' column with personalized
+                                  messages for each recipient. The message field above is now optional.
+                                </Typography>
+                              </Alert>
+                            )}
+
                             <Typography variant="subtitle2" sx={{ mb: 1 }}>
                               Preview ({csvPreview.length - 1} rows)
                             </Typography>
@@ -656,15 +715,19 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
 
           {/* Message Content */}
           <TextField
-            label="Message"
-            placeholder="Type your message here..."
+            label={`Message ${csvHasContentColumn ? '(Optional - CSV contains messages)' : ''}`}
+            placeholder={csvHasContentColumn ? 'Optional: Override messages from CSV' : 'Type your message here...'}
             value={messageContent}
             onChange={(e) => setMessageContent(e.target.value)}
             multiline
             rows={4}
-            required
+            required={!(messageMode === 'bulk' && bulkInputMethod === 'csv' && csvHasContentColumn)}
             inputProps={{ maxLength: 1000 }}
-            helperText={`${messageContent.length}/1000 characters`}
+            helperText={
+              csvHasContentColumn
+                ? `Optional field - CSV contains individual messages. ${messageContent.length}/1000 characters`
+                : `${messageContent.length}/1000 characters`
+            }
           />
         </Stack>
       </DialogContent>
@@ -678,7 +741,8 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
           disabled={
             loading ||
             !selectedExchange ||
-            !messageContent.trim() ||
+            // Message content validation: skip if CSV has content column
+            (!(messageMode === 'bulk' && bulkInputMethod === 'csv' && csvHasContentColumn) && !messageContent.trim()) ||
             (messageMode === 'single' && !phoneNumber) ||
             (messageMode === 'bulk' && bulkInputMethod === 'manual' && phoneNumbers.filter((p) => p.trim()).length === 0) ||
             (messageMode === 'bulk' && bulkInputMethod === 'csv' && (!csvFile || csvError))

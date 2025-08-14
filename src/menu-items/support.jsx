@@ -17,13 +17,6 @@ const support = {
   type: 'group',
   children: [
     {
-      id: 'documentation',
-      title: 'Documentation',
-      type: 'item',
-      url: '/dashboard/documentation',
-      icon: icons.FileSearchOutlined
-    },
-    {
       id: 'help',
       title: 'Help',
       type: 'item',
