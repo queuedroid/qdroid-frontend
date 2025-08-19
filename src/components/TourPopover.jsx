@@ -17,36 +17,49 @@ const TourPopover = () => {
 
   const currentStepData = getCurrentStep();
 
-  // Drag handlers for mobile
+  // Drag handlers for both mobile and desktop
   const handleMouseDown = (e) => {
-    if (isMobile && !anchorEl) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
-    }
+    // Enable dragging for all screen sizes
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+    e.preventDefault(); // Prevent text selection while dragging
   };
 
   const handleTouchStart = (e) => {
-    if (isMobile && !anchorEl) {
-      const touch = e.touches[0];
-      setIsDragging(true);
-      setDragStart({
-        x: touch.clientX - position.x,
-        y: touch.clientY - position.y
-      });
-    }
+    // Enable dragging for all screen sizes on touch devices
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({
+      x: touch.clientX - position.x,
+      y: touch.clientY - position.y
+    });
+    e.preventDefault(); // Prevent scrolling while dragging
   };
 
   // Add event listeners for dragging
   useEffect(() => {
     const handleDocMouseMove = (e) => {
-      if (isDragging && isMobile && !anchorEl) {
+      if (isDragging) {
+        const newX = e.clientX - dragStart.x;
+        const newY = e.clientY - dragStart.y;
+
+        // Boundary checking to keep dialog within viewport
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const dialogWidth = 400; // Approximate dialog width
+        const dialogHeight = 300; // Approximate dialog height
+
+        const boundedX = Math.max(0, Math.min(newX, viewportWidth - dialogWidth));
+        const boundedY = Math.max(0, Math.min(newY, viewportHeight - dialogHeight));
+
         setPosition({
-          x: e.clientX - dragStart.x,
-          y: e.clientY - dragStart.y
+          x: boundedX,
+          y: boundedY
         });
+        e.preventDefault();
       }
     };
 
@@ -55,12 +68,25 @@ const TourPopover = () => {
     };
 
     const handleDocTouchMove = (e) => {
-      if (isDragging && isMobile && !anchorEl) {
+      if (isDragging) {
         const touch = e.touches[0];
+        const newX = touch.clientX - dragStart.x;
+        const newY = touch.clientY - dragStart.y;
+
+        // Boundary checking to keep dialog within viewport
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const dialogWidth = 400; // Approximate dialog width
+        const dialogHeight = 300; // Approximate dialog height
+
+        const boundedX = Math.max(0, Math.min(newX, viewportWidth - dialogWidth));
+        const boundedY = Math.max(0, Math.min(newY, viewportHeight - dialogHeight));
+
         setPosition({
-          x: touch.clientX - dragStart.x,
-          y: touch.clientY - dragStart.y
+          x: boundedX,
+          y: boundedY
         });
+        e.preventDefault();
       }
     };
 
@@ -81,10 +107,15 @@ const TourPopover = () => {
       document.removeEventListener('touchmove', handleDocTouchMove);
       document.removeEventListener('touchend', handleDocTouchEnd);
     };
-  }, [isDragging, dragStart, isMobile, anchorEl]);
+  }, [isDragging, dragStart]);
 
   useEffect(() => {
     if (isActive && currentStepData) {
+      // Reset position when moving to a new step with a target
+      if (currentStepData.target) {
+        setPosition({ x: 0, y: 0 });
+      }
+
       // Small delay to ensure DOM is ready
       setTimeout(() => {
         if (currentStepData.target) {
@@ -260,17 +291,21 @@ const TourPopover = () => {
     skipTour();
   };
 
-  // Center positioning when no anchor
+  // Positioning logic for draggable tour dialog
+  const isDraggedAway = position.x !== 0 || position.y !== 0;
+
+  // Center positioning when no anchor or when dragged away
   const centerStyle = {
     position: 'fixed',
-    top: isMobile && (position.x !== 0 || position.y !== 0) ? `${position.y}px` : '50%',
-    left: isMobile && (position.x !== 0 || position.y !== 0) ? `${position.x}px` : '50%',
-    transform: isMobile && (position.x !== 0 || position.y !== 0) ? 'none' : 'translate(-50%, -50%)',
+    top: isDraggedAway ? `${position.y}px` : '50%',
+    left: isDraggedAway ? `${position.x}px` : '50%',
+    transform: isDraggedAway ? 'none' : 'translate(-50%, -50%)',
     zIndex: 1400,
-    cursor: isDragging ? 'grabbing' : isMobile && !anchorEl ? 'grab' : 'default'
+    cursor: isDragging ? 'grabbing' : 'grab'
   };
 
-  if (!anchorEl) {
+  // If dragged away from anchor, show as floating dialog
+  if (!anchorEl || isDraggedAway) {
     return (
       <Box sx={centerStyle}>
         <Paper
@@ -295,7 +330,7 @@ const TourPopover = () => {
             onPrev={handlePrev}
             onSkip={handleSkip}
             isMobile={isMobile}
-            showDragHandle={isMobile && !anchorEl}
+            showDragHandle={true}
           />
         </Paper>
       </Box>
@@ -325,13 +360,18 @@ const TourPopover = () => {
       ]}
     >
       <Paper
+        ref={dragRef}
         elevation={8}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         sx={{
           p: 3,
           maxWidth: 350,
           minWidth: 280,
           border: `2px solid ${theme.palette.primary.main}`,
-          borderRadius: 2
+          borderRadius: 2,
+          cursor: isDragging ? 'grabbing' : 'grab',
+          userSelect: isDragging ? 'none' : 'auto'
         }}
       >
         <TourContent
@@ -342,7 +382,7 @@ const TourPopover = () => {
           onPrev={handlePrev}
           onSkip={handleSkip}
           isMobile={isMobile}
-          showDragHandle={false}
+          showDragHandle={true}
         />
       </Paper>
     </Popper>
@@ -355,7 +395,7 @@ const TourContent = ({ currentStepData, currentStep, totalSteps, onNext, onPrev,
 
   return (
     <Box>
-      {/* Drag Handle for Mobile */}
+      {/* Drag Handle - Now visible on all screen sizes */}
       {showDragHandle && (
         <Box
           sx={{
@@ -363,10 +403,23 @@ const TourContent = ({ currentStepData, currentStep, totalSteps, onNext, onPrev,
             justifyContent: 'center',
             mb: 1,
             cursor: 'grab',
-            '&:active': { cursor: 'grabbing' }
+            '&:active': { cursor: 'grabbing' },
+            '&:hover': {
+              '& .drag-icon': {
+                color: 'primary.main',
+                transform: 'scale(1.1)'
+              }
+            }
           }}
         >
-          <DragOutlined style={{ color: 'text.secondary', fontSize: '1.2rem' }} />
+          {/* <DragOutlined
+            className="drag-icon"
+            style={{
+              color: '#696969ff',
+              fontSize: '1.2rem',
+              transition: 'all 0.2s ease'
+            }}
+          /> */}
         </Box>
       )}
 
@@ -379,7 +432,7 @@ const TourContent = ({ currentStepData, currentStep, totalSteps, onNext, onPrev,
           <Chip label={`${currentStep + 1} of ${totalSteps}`} size="small" color="primary" variant="outlined" />
         </Box>
         <IconButton size="small" onClick={onSkip} sx={{ ml: 1 }}>
-          <CloseOutlined />
+          <CloseOutlined sx={{ color: '#464646ff' }} />
         </IconButton>
       </Box>
 
