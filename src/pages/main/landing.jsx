@@ -34,175 +34,84 @@ const Landing = () => {
       textColor: '#000',
       code: `const axios = require('axios');
 
-const sendSMS = async () => {
-  try {
-    const response = await axios.post(
-      'https://api.queuedroid.com/v1/sms/send',
-      {
-        to: '+1234567890',
-        message: 'Hello from QueueDroid!',
-        priority: 'normal'
-      },
-      {
-        headers: {
-          'Authorization': 'Bearer YOUR_API_KEY',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    console.log('Message queued:', response.data);
-  } catch (error) {
-    console.error('Error:', error.response.data);
+// Send SMS with QueueDroid
+await axios.post('https://api.queuedroid.com/v1/sms/send', {
+  to: '+1234567890',
+  message: 'Hello from QueueDroid!',
+  priority: 'normal'
+}, {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
   }
-};
+});
 
-sendSMS();`
+console.log('✅ Message queued successfully!');`
     },
     {
       language: 'Python',
       color: 'linear-gradient(135deg, #3776ab 0%, #ffd43b 100%)',
       textColor: '#fff',
       code: `import requests
-import json
 
-def send_sms():
-    url = "https://api.queuedroid.com/v1/sms/send"
-    
-    headers = {
-        "Authorization": "Bearer YOUR_API_KEY",
-        "Content-Type": "application/json"
+# Send SMS with QueueDroid
+response = requests.post(
+    'https://api.queuedroid.com/v1/sms/send',
+    json={
+        'to': '+1234567890',
+        'message': 'Hello from QueueDroid!',
+        'priority': 'normal'
+    },
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
     }
-    
-    data = {
-        "to": "+1234567890",
-        "message": "Hello from QueueDroid!",
-        "priority": "normal"
-    }
-    
-    try:
-        response = requests.post(url, 
-                               headers=headers, 
-                               json=data)
-        response.raise_for_status()
-        print("Message queued:", response.json())
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+)
 
-send_sms()`
+print('✅ Message queued successfully!')`
     },
     {
-      language: 'C',
-      color: 'linear-gradient(135deg, #659ad2 0%, #03599c 100%)',
+      language: 'cURL',
+      color: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
       textColor: '#fff',
-      code: `#include <stdio.h>
-#include <curl/curl.h>
+      code: `# Send SMS with QueueDroid
+curl -X POST https://api.queuedroid.com/v1/sms/send \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "to": "+1234567890",
+    "message": "Hello from QueueDroid!",
+    "priority": "normal"
+  }'
 
-int send_sms() {
-    CURL *curl;
-    CURLcode res;
-    
-    curl = curl_easy_init();
-    if(curl) {
-        struct curl_slist *headers = NULL;
-        
-        // Set headers
-        headers = curl_slist_append(headers, 
-            "Authorization: Bearer YOUR_API_KEY");
-        headers = curl_slist_append(headers, 
-            "Content-Type: application/json");
-        
-        // JSON payload
-        const char *json_data = 
-            "{"
-            "\\"to\\": \\"+1234567890\\","
-            "\\"message\\": \\"Hello from QueueDroid!\\","
-            "\\"priority\\": \\"normal\\""
-            "}";
-        
-        curl_easy_setopt(curl, CURLOPT_URL, 
-            "https://api.queuedroid.com/v1/sms/send");
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data);
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        
-        res = curl_easy_perform(curl);
-        
-        curl_slist_free_all(headers);
-        curl_easy_cleanup(curl);
-        
-        return (res == CURLE_OK) ? 0 : 1;
-    }
-    return 1;
-}`
+# Response: {"status": "queued", "id": "msg_123"}`
     },
     {
-      language: 'C++',
-      color: 'linear-gradient(135deg, #00599c 0%, #004482 100%)',
+      language: 'PHP',
+      color: 'linear-gradient(135deg, #777bb4 0%, #4f5b93 100%)',
       textColor: '#fff',
-      code: `#include <iostream>
-#include <curl/curl.h>
-#include <string>
+      code: `<?php
+// Send SMS with QueueDroid
+$response = file_get_contents(
+    'https://api.queuedroid.com/v1/sms/send',
+    false,
+    stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => [
+                'Authorization: Bearer YOUR_API_KEY',
+                'Content-Type: application/json'
+            ],
+            'content' => json_encode([
+                'to' => '+1234567890',
+                'message' => 'Hello from QueueDroid!',
+                'priority' => 'normal'
+            ])
+        ]
+    ])
+);
 
-class QueueDroidClient {
-private:
-    std::string api_key;
-    std::string base_url;
-    
-public:
-    QueueDroidClient(const std::string& key) 
-        : api_key(key), 
-          base_url("https://api.queuedroid.com/v1") {}
-    
-    bool sendSMS(const std::string& to, 
-                 const std::string& message) {
-        CURL *curl;
-        CURLcode res;
-        bool success = false;
-        
-        curl = curl_easy_init();
-        if(curl) {
-            struct curl_slist *headers = NULL;
-            
-            std::string auth_header = 
-                "Authorization: Bearer " + api_key;
-            headers = curl_slist_append(headers, 
-                auth_header.c_str());
-            headers = curl_slist_append(headers, 
-                "Content-Type: application/json");
-            
-            std::string json_data = 
-                "{\\"to\\": \\"" + to + "\\", "
-                "\\"message\\": \\"" + message + "\\", "
-                "\\"priority\\": \\"normal\\"}";
-            
-            std::string url = base_url + "/sms/send";
-            
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, 
-                json_data.c_str());
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-            
-            res = curl_easy_perform(curl);
-            success = (res == CURLE_OK);
-            
-            curl_slist_free_all(headers);
-            curl_easy_cleanup(curl);
-        }
-        return success;
-    }
-};
-
-int main() {
-    QueueDroidClient client("YOUR_API_KEY");
-    
-    if(client.sendSMS("+1234567890", 
-                      "Hello from QueueDroid!")) {
-        std::cout << "Message sent successfully!" << std::endl;
-    } else {
-        std::cout << "Failed to send message." << std::endl;
-    }
-    
-    return 0;
-}`
+echo '✅ Message queued successfully!';`
     }
   ];
 
@@ -1648,8 +1557,8 @@ int main() {
                             >
                               {selectedLanguage === 0 && 'node send-sms.js'}
                               {selectedLanguage === 1 && 'python send-sms.py'}
-                              {selectedLanguage === 2 && 'gcc send-sms.c -lcurl && ./a.out'}
-                              {selectedLanguage === 3 && 'g++ send-sms.cpp -lcurl && ./a.out'}
+                              {selectedLanguage === 2 && 'bash'}
+                              {selectedLanguage === 3 && 'php send-sms.php'}
                             </Typography>
                           </Box>
                           <pre
