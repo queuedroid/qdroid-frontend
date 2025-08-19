@@ -778,6 +778,7 @@ export const GlobalComposeButton = ({ onMessageSent }) => {
         color="primary"
         aria-label="compose message"
         onClick={handleOpen}
+        data-tour="send-message"
         sx={{
           position: 'fixed',
           bottom: 50,

@@ -176,7 +176,7 @@ export default function DashboardDefault() {
       </Grid>
 
       {/* Statistics Cards */}
-      <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
+      {/* <Grid size={{ xs: 6, sm: 6, md: 3, lg: 3 }}>
         <AnalyticEcommerce
           title="Total Exchanges"
           count={loading ? '...' : exchangeStats.totalExchanges.toString()}
@@ -199,7 +199,7 @@ export default function DashboardDefault() {
           extra="Pending delivery"
           isLoss={false}
         />
-      </Grid>
+      </Grid> */}
 
       {/* User Information Section */}
       <Grid size={{ xs: 12, md: 12, lg: 12 }}>

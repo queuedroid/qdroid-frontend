@@ -29,7 +29,6 @@ const AuthLogs = Loadable(lazy(() => import('pages/event-logs/auth-logs')));
 const Subscription = Loadable(lazy(() => import('pages/subscription/index')));
 const Settings = Loadable(lazy(() => import('pages/settings/index')));
 const APIKeys = Loadable(lazy(() => import('pages/api-keys/api-keys')));
-const Documentation = Loadable(lazy(() => import('pages/extra-pages/documentation')));
 const Help = Loadable(lazy(() => import('pages/extra-pages/help')));
 const OnboardingStepper = Loadable(lazy(() => import('pages/onboarding/first')));
 const DocsPage = Loadable(lazy(() => import('pages/docs/index')));
@@ -88,7 +87,6 @@ const MainRoutes = {
         { path: 'subscription', element: <Subscription /> },
         { path: 'settings', element: <Settings /> },
         { path: 'api-keys', element: <APIKeys /> },
-        { path: 'documentation', element: <Documentation /> },
         { path: 'help', element: <Help /> },
         { path: 'onboarding', element: <OnboardingStepper /> }
       ]
