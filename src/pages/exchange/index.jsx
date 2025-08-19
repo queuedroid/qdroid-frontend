@@ -579,7 +579,7 @@ export default function Exchange() {
                 disabled={backgroundRefreshing}
                 fullWidth={{ xs: true, sm: false }}
               >
-                {backgroundRefreshing ? 'Refreshing...' : 'Refresh'}
+                {backgroundRefreshing ? 'Refresh' : 'Refresh'}
               </Button>
               <Button
                 size="small"
@@ -645,6 +645,7 @@ export default function Exchange() {
                       startIcon={<LinkOutlined />}
                       onClick={() => handleDeviceLinkOpen(exchange)}
                       fullWidth={{ xs: true, sm: false }}
+                      data-tour="add-device"
                       sx={{
                         ml: { xs: 0, sm: 2 },
                         flexShrink: 0,
