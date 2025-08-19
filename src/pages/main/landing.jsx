@@ -989,44 +989,90 @@ int main() {
                   >
                     <Card
                       sx={{
-                        borderRadius: 3,
-                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        overflow: 'hidden'
+                        borderRadius: 2,
+                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                        border: '1px solid #333',
+                        overflow: 'hidden',
+                        background: '#0d1117'
                       }}
                     >
-                      {/* Language Tabs */}
+                      {/* Terminal Header */}
                       <Box
                         sx={{
-                          background: '#bdbbbbff',
+                          background: 'linear-gradient(135deg, #21262d 0%, #161b22 100%)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          px: 2,
-                          py: 1
+                          px: 3,
+                          py: 2,
+                          borderBottom: '1px solid #30363d'
                         }}
                       >
+                        {/* Terminal Dots */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              background: '#ff5f56'
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              background: '#ffbd2e'
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              background: '#27ca3f'
+                            }}
+                          />
+                          <Typography
+                            sx={{
+                              ml: 2,
+                              color: '#8b949e',
+                              fontSize: '0.9rem',
+                              fontFamily: 'monospace'
+                            }}
+                          >
+                            @queuedroid: sending message...
+                          </Typography>
+                        </Box>
+
                         <Tabs
                           value={selectedLanguage}
                           onChange={handleLanguageChange}
                           sx={{
+                            minHeight: 'auto',
                             '& .MuiTab-root': {
-                              color: '#000',
-                              opacity: 0.7,
+                              color: '#8b949e',
+                              opacity: 0.8,
                               minWidth: 'auto',
                               px: 2,
-                              py: 1,
-                              fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
-                              fontWeight: 600,
+                              py: 0.5,
+                              fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
+                              fontWeight: 500,
+                              fontFamily: 'monospace',
+                              textTransform: 'uppercase',
                               '&.Mui-selected': {
-                                color: '#000',
+                                color: '#58a6ff',
                                 opacity: 1
+                              },
+                              '&:hover': {
+                                color: '#58a6ff',
+                                opacity: 0.9
                               }
                             },
                             '& .MuiTabs-indicator': {
-                              backgroundColor: codeExamples[selectedLanguage].textColor,
-                              height: 3
+                              backgroundColor: '#58a6ff',
+                              height: 2
                             }
                           }}
                         >
@@ -1041,16 +1087,19 @@ int main() {
                           sx={{
                             minWidth: 'auto',
                             p: 1,
-                            color: codeExamples[selectedLanguage].textColor,
+                            color: '#8b949e',
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
                             opacity: 0.8,
                             '&:hover': {
                               opacity: 1,
-                              bgcolor: 'rgba(255,255,255,0.1)'
+                              color: '#58a6ff',
+                              bgcolor: 'rgba(88, 166, 255, 0.1)'
                             }
                           }}
                           onClick={() => navigator.clipboard.writeText(codeExamples[selectedLanguage].code)}
                         >
-                          <CopyOutlined /> Copy
+                          <CopyOutlined style={{ marginRight: 4, fontSize: '0.9rem' }} /> COPY
                         </Button>
                       </Box>
 
@@ -1058,17 +1107,59 @@ int main() {
                       <CardContent sx={{ p: 0 }}>
                         <Box
                           sx={{
-                            background: '#1e1e1e',
-                            color: '#d4d4d4',
-                            p: 3,
-                            fontFamily: 'monospace',
-                            fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
-                            lineHeight: 1.5,
+                            background: '#0d1117',
+                            color: '#e6edf3',
+                            p: { xs: 2, sm: 3, md: 4 },
+                            fontFamily:
+                              '"JetBrains Mono", "Fira Code", "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                            fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
+                            lineHeight: 1.6,
                             overflow: 'auto',
-                            maxHeight: '500px'
+                            maxHeight: '500px',
+                            position: 'relative',
+                            '&::-webkit-scrollbar': {
+                              width: '8px',
+                              height: '8px'
+                            },
+                            '&::-webkit-scrollbar-track': {
+                              background: '#21262d'
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                              background: '#30363d',
+                              borderRadius: '4px',
+                              '&:hover': {
+                                background: '#484f58'
+                              }
+                            }
                           }}
                         >
-                          <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{codeExamples[selectedLanguage].code}</pre>
+                          {/* Terminal Prompt */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Typography
+                              sx={{
+                                color: '#7c3aed',
+                                fontWeight: 'bold',
+                                mr: 1
+                              }}
+                            >
+                              user@queuedroid:~$
+                            </Typography>
+                            <Typography sx={{ color: '#8b949e' }}>
+                              {selectedLanguage === 0 && 'node send-sms.js'}
+                              {selectedLanguage === 1 && 'python send-sms.py'}
+                              {selectedLanguage === 2 && 'gcc send-sms.c -lcurl && ./a.out'}
+                              {selectedLanguage === 3 && 'g++ send-sms.cpp -lcurl && ./a.out'}
+                            </Typography>
+                          </Box>
+                          <pre
+                            style={{
+                              margin: 0,
+                              whiteSpace: 'pre-wrap',
+                              color: '#e6edf3'
+                            }}
+                          >
+                            {codeExamples[selectedLanguage].code}
+                          </pre>
                         </Box>
                       </CardContent>
                     </Card>
