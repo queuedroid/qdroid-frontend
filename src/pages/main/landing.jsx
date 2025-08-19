@@ -815,16 +815,16 @@ int main() {
               </Grid>
             </Box>
 
-            {/* Management Section */}
+            {/* Build & Manage Section */}
             <Box
               sx={{
                 mt: { xs: 8, sm: 12, md: 16, lg: 16, xl: 25 },
                 mb: 6
               }}
             >
-              <Grid container columnSpacing={2} sx={{ alignItems: 'center', mx: 'auto' }}>
+              <Grid container columnSpacing={6} sx={{ alignItems: 'center', mx: 'auto', maxWidth: '1400px', px: { xs: 2, sm: 3, md: 4 } }}>
                 {/* Image Section */}
-                <Grid size={{ xs: 12, sm: 12, md: 4 }} sx={{ order: { xs: 2, sm: 2, md: 1 } }}>
+                <Grid size={{ xs: 12, sm: 12, md: 5 }} sx={{ order: { xs: 2, sm: 2, md: 1 } }}>
                   <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -835,27 +835,263 @@ int main() {
                       sx={{
                         display: 'flex',
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        position: 'relative',
+                        py: { xs: 4, sm: 6, md: 8 }
                       }}
                     >
+                      {/* Main Image */}
                       <Box
                         component="img"
                         src="/man-using-tablet.jpg"
-                        alt="QueueDroid Management Dashboard"
+                        alt="QueueDroid Build & Manage Dashboard"
                         sx={{
                           width: '100%',
                           height: '100%',
                           filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1))',
                           borderRadius: 4,
-                          border: '3px solid rgb(15, 15, 13)'
+                          border: '3px solid rgb(15, 15, 13)',
+                          position: 'relative',
+                          zIndex: 1
                         }}
                       />
+
+                      {/* Floating Chat Boxes */}
+                      {/* Order Confirmation - Top Left */}
+                      <motion.div
+                        initial={{ opacity: 0, y: -20, x: -20 }}
+                        whileInView={{ opacity: 1, y: 0, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                      >
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: { xs: '5%', sm: '8%', md: '-10%' },
+                            left: { xs: '-10%', sm: '-5%', md: '-20%' },
+                            background: 'white',
+                            color: 'black',
+                            padding: { xs: '8px 12px', sm: '10px 14px', md: '12px 16px' },
+                            borderRadius: '12px 12px 12px 4px',
+                            boxShadow: '0 8px 25px rgba(110, 142, 251, 0.3)',
+                            maxWidth: { xs: '140px', sm: '160px', md: '180px' },
+                            zIndex: 2,
+                            transform: 'rotate(-5deg)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(7, 6, 6, 0.9)'
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                              fontWeight: 500,
+                              lineHeight: 1.3,
+                              mb: 0.5
+                            }}
+                          >
+                            📦 Order #1234
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                              opacity: 0.95,
+                              lineHeight: 1.2
+                            }}
+                          >
+                            Your order has been confirmed and will ship within 24 hours.
+                          </Typography>
+                        </Box>
+                      </motion.div>
+
+                      {/* 2FA Code - Top Right */}
+                      <motion.div
+                        initial={{ opacity: 0, y: -20, x: 20 }}
+                        whileInView={{ opacity: 1, y: 0, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                      >
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: { xs: '15%', sm: '12%', md: '-5%' },
+                            right: { xs: '-8%', sm: '-4%', md: '-5%' },
+                            background: 'white',
+                            color: 'black',
+                            padding: { xs: '8px 12px', sm: '10px 14px', md: '12px 16px' },
+                            borderRadius: '12px 12px 4px 12px',
+                            boxShadow: '0 8px 25px rgba(34, 197, 94, 0.3)',
+                            maxWidth: { xs: '120px', sm: '140px', md: '160px' },
+                            zIndex: 2,
+                            transform: 'rotate(3deg)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(17, 15, 15, 0.89)'
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                              fontWeight: 600,
+                              lineHeight: 1.3,
+                              mb: 0.5
+                            }}
+                          >
+                            🔐 Security Code
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                              opacity: 0.95,
+                              lineHeight: 1.2
+                            }}
+                          >
+                            Your login code: 456789
+                          </Typography>
+                        </Box>
+                      </motion.div>
+
+                      {/* Marketing Campaign - Middle Left */}
+                      <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.7 }}
+                      >
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: { xs: '45%', sm: '50%', md: '75%' },
+                            left: { xs: '7%', sm: '7%', md: '-25%' },
+                            background: 'white',
+                            color: 'black',
+                            padding: { xs: '8px 12px', sm: '10px 14px', md: '12px 16px' },
+                            borderRadius: '12px 12px 12px 4px',
+                            boxShadow: '0 8px 25px rgba(245, 101, 101, 0.3)',
+                            maxWidth: { xs: '150px', sm: '170px', md: '190px' },
+                            zIndex: 2,
+                            transform: 'rotate(-3deg)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(7, 6, 6, 0.84)'
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                              fontWeight: 500,
+                              lineHeight: 1.3,
+                              mb: 0.5
+                            }}
+                          >
+                            🎉 Flash Sale!
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                              opacity: 0.95,
+                              lineHeight: 1.2
+                            }}
+                          >
+                            50% OFF everything! Use code FLASH50. Limited time only.
+                          </Typography>
+                        </Box>
+                      </motion.div>
+
+                      {/* Appointment Reminder - Bottom Right */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20, x: 20 }}
+                        whileInView={{ opacity: 1, y: 0, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.9 }}
+                      >
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: { xs: '10%', sm: '15%', md: '20%' },
+                            right: { xs: '-10%', sm: '-5%', md: '-4%' },
+                            background: 'white',
+                            color: 'black',
+                            padding: { xs: '8px 12px', sm: '10px 14px', md: '12px 16px' },
+                            borderRadius: '12px 12px 4px 12px',
+                            boxShadow: '0 8px 25px rgba(168, 85, 247, 0.3)',
+                            maxWidth: { xs: '140px', sm: '160px', md: '180px' },
+                            zIndex: 2,
+                            transform: 'rotate(4deg)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(10, 10, 10, 0.87)'
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                              fontWeight: 500,
+                              lineHeight: 1.3,
+                              mb: 0.5
+                            }}
+                          >
+                            Reminder
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                              opacity: 0.95,
+                              lineHeight: 1.2
+                            }}
+                          >
+                            Your appointment is tomorrow at 2:00 PM.
+                          </Typography>
+                        </Box>
+                      </motion.div>
+
+                      {/* Status Update - Bottom Left */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20, x: -20 }}
+                        whileInView={{ opacity: 1, y: 0, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 1.1 }}
+                      >
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: { xs: '5%', sm: '5%', md: '45%' },
+                            left: { xs: '-8%', sm: '-2%', md: '-15%' },
+                            background: 'white',
+                            color: 'black',
+                            padding: { xs: '8px 12px', sm: '10px 14px', md: '12px 16px' },
+                            borderRadius: '12px 12px 12px 4px',
+                            boxShadow: '0 8px 25px rgba(59, 130, 246, 0.3)',
+                            maxWidth: { xs: '130px', sm: '150px', md: '170px' },
+                            zIndex: 2,
+                            transform: 'rotate(-2deg)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(8, 8, 8, 0.84)'
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                              fontWeight: 500,
+                              lineHeight: 1.3,
+                              mb: 0.5
+                            }}
+                          >
+                            Report Ready
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                              opacity: 0.95,
+                              lineHeight: 1.2
+                            }}
+                          >
+                            Monthly analytics report is now available.
+                          </Typography>
+                        </Box>
+                      </motion.div>
                     </Box>
                   </motion.div>
                 </Grid>
 
-                {/* Text and Button Section */}
-                <Grid size={{ xs: 12, sm: 12, md: 8 }} sx={{ order: { xs: 1, sm: 1, md: 2 } }}>
+                {/* Content Section */}
+                <Grid size={{ xs: 12, sm: 12, md: 7 }} sx={{ order: { xs: 1, sm: 1, md: 2 } }}>
                   <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -866,45 +1102,267 @@ int main() {
                       sx={{
                         textAlign: { xs: 'center', md: 'left' }
                       }}
-                      justifyContent="center"
-                      alignItems="center"
-                      px={{ xs: 2, sm: 4, md: 2, lg: 2, xl: 7 }}
-                      py={{ xs: 3, sm: 4, md: 0 }}
+                      px={{ xs: 2, sm: 4, md: 3, lg: 4, xl: 6 }}
+                      py={{ xs: 4, sm: 5, md: 0 }}
                     >
                       <Typography
                         variant="h2"
                         sx={{
-                          fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.8rem' },
+                          fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
                           fontWeight: 700,
-                          mb: { xs: 2, sm: 3, md: 3 }
+                          mb: { xs: 3, sm: 4, md: 4 }
                         }}
                       >
-                        Manage Your SMS Campaigns
+                        Build & Manage What Matters
                       </Typography>
+
                       <Typography
                         variant="body1"
                         sx={{
-                          fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' },
-                          mb: 2,
+                          fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
+                          mb: { xs: 3, sm: 4, md: 4 },
                           opacity: 0.9,
-                          lineHeight: 1.6
+                          lineHeight: 1.7
                         }}
                       >
-                        Take control of your SMS operations with our comprehensive dashboard. Monitor delivery rates, track costs, schedule
-                        campaigns, and analyze performance metrics all from one centralized platform.
+                        From simple notifications to complex business workflows, QueueDroid empowers you to build powerful SMS solutions
+                        while providing the tools to manage them effectively.
                       </Typography>
+
+                      {/* Use Case List */}
+                      <Box sx={{ mb: { xs: 4, sm: 5, md: 5 } }}>
+                        <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                alignItems: { xs: 'center', sm: 'flex-start' },
+                                textAlign: { xs: 'center', sm: 'left' },
+                                mb: 2
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 28,
+                                  height: 28,
+                                  borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, rgba(110, 142, 251, 0.2) 0%, rgba(167, 119, 227, 0.2) 100%)',
+                                  border: '2px solid rgba(110, 142, 251, 0.4)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  mr: { xs: 0, sm: 2 },
+                                  mb: { xs: 1, sm: 0 },
+                                  mt: { xs: 0, sm: 0.5 },
+                                  flexShrink: 0
+                                }}
+                              >
+                                <MessageOutlined style={{ fontSize: '0.9rem', color: 'rgba(110, 142, 251, 1)' }} />
+                              </Box>
+                              <Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
+                                    fontWeight: 600,
+                                    mb: 0.5,
+                                    color: '#333'
+                                  }}
+                                >
+                                  Notification Systems
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                                    opacity: 0.8,
+                                    lineHeight: 1.5
+                                  }}
+                                >
+                                  Order confirmations, appointment reminders, security alerts
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
+
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                alignItems: { xs: 'center', sm: 'flex-start' },
+                                textAlign: { xs: 'center', sm: 'left' },
+                                mb: 2
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 28,
+                                  height: 28,
+                                  borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, rgba(245, 101, 101, 0.2) 0%, rgba(255, 158, 68, 0.2) 100%)',
+                                  border: '2px solid rgba(245, 101, 101, 0.4)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  mr: { xs: 0, sm: 2 },
+                                  mb: { xs: 1, sm: 0 },
+                                  mt: { xs: 0, sm: 0.5 },
+                                  flexShrink: 0
+                                }}
+                              >
+                                <LineChartOutlined style={{ fontSize: '0.9rem', color: 'rgba(245, 101, 101, 1)' }} />
+                              </Box>
+                              <Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
+                                    fontWeight: 600,
+                                    mb: 0.5,
+                                    color: '#333'
+                                  }}
+                                >
+                                  Marketing Campaigns
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                                    opacity: 0.8,
+                                    lineHeight: 1.5
+                                  }}
+                                >
+                                  Promotional messages, product launches, targeted campaigns
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
+
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                alignItems: { xs: 'center', sm: 'flex-start' },
+                                textAlign: { xs: 'center', sm: 'left' },
+                                mb: 2
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 28,
+                                  height: 28,
+                                  borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)',
+                                  border: '2px solid rgba(34, 197, 94, 0.4)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  mr: { xs: 0, sm: 2 },
+                                  mb: { xs: 1, sm: 0 },
+                                  mt: { xs: 0, sm: 0.5 },
+                                  flexShrink: 0
+                                }}
+                              >
+                                <SecurityScanOutlined style={{ fontSize: '0.9rem', color: 'rgba(34, 197, 94, 1)' }} />
+                              </Box>
+                              <Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
+                                    fontWeight: 600,
+                                    mb: 0.5,
+                                    color: '#333'
+                                  }}
+                                >
+                                  Two-Factor Authentication
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                                    opacity: 0.8,
+                                    lineHeight: 1.5
+                                  }}
+                                >
+                                  OTP delivery, account verification, password resets
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
+
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                alignItems: { xs: 'center', sm: 'flex-start' },
+                                textAlign: { xs: 'center', sm: 'left' },
+                                mb: 2
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 28,
+                                  height: 28,
+                                  borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%)',
+                                  border: '2px solid rgba(168, 85, 247, 0.4)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  mr: { xs: 0, sm: 2 },
+                                  mb: { xs: 1, sm: 0 },
+                                  mt: { xs: 0, sm: 0.5 },
+                                  flexShrink: 0
+                                }}
+                              >
+                                <DashboardOutlined style={{ fontSize: '0.9rem', color: 'rgba(168, 85, 247, 1)' }} />
+                              </Box>
+                              <Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1rem' },
+                                    fontWeight: 600,
+                                    mb: 0.5,
+                                    color: '#333'
+                                  }}
+                                >
+                                  Business Intelligence
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                                    opacity: 0.8,
+                                    lineHeight: 1.5
+                                  }}
+                                >
+                                  Automated reports, data alerts, status updates
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Box>
+
                       <Typography
                         variant="body1"
                         sx={{
-                          fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' },
-                          mb: { xs: 3, sm: 4, md: 3 },
+                          fontSize: { xs: '0.9rem', sm: '0.95rem', md: '1rem' },
+                          mb: { xs: 4, sm: 5, md: 4 },
                           opacity: 0.8,
                           lineHeight: 1.6
                         }}
                       >
-                        Our intuitive interface makes it easy to manage thousands of messages, set up automated workflows, and get real-time
-                        insights into your SMS performance.
+                        Our comprehensive dashboard gives you complete control over your SMS operations with real-time analytics, cost
+                        tracking, and delivery monitoring all in one intuitive interface.
                       </Typography>
+
                       <AnimateButton>
                         <Button
                           component={Link}
@@ -913,9 +1371,9 @@ int main() {
                           size="large"
                           startIcon={<DashboardOutlined />}
                           sx={{
-                            px: { xs: 3, sm: 4, md: 6 },
-                            py: { xs: 1.2, sm: 1.5, md: 1.8 },
-                            fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                            px: { xs: 4, sm: 5, md: 7 },
+                            py: { xs: 1.4, sm: 1.6, md: 2 },
+                            fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
                             borderRadius: '50px',
                             color: '#fff',
                             background: 'linear-gradient(135deg,rgb(182, 59, 22) 0%,rgb(141, 57, 8) 100%)',
@@ -923,11 +1381,11 @@ int main() {
                             '&:hover': {
                               background: 'linear-gradient(45deg,rgb(255, 122, 82) 30%,rgb(180, 58, 28) 90%)',
                               boxShadow: '0 12px 40px rgba(255, 107, 107, 0.4)',
-                              transform: 'translateX(2px)'
+                              transform: 'translateY(-2px)'
                             }
                           }}
                         >
-                          Get Started
+                          Start Building Today
                         </Button>
                       </AnimateButton>
                     </Box>
@@ -980,7 +1438,7 @@ int main() {
                 </Box>
 
                 {/* Code Examples with Tabs */}
-                <Box sx={{ maxWidth: '1000px', mx: 'auto' }}>
+                <Box sx={{ maxWidth: '1000px', mx: 'auto', px: { xs: 1, sm: 2, md: 0 } }}>
                   <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -989,86 +1447,220 @@ int main() {
                   >
                     <Card
                       sx={{
-                        borderRadius: 3,
-                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        overflow: 'hidden'
+                        borderRadius: { xs: 1, sm: 2 },
+                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                        border: '1px solid #333',
+                        overflow: 'hidden',
+                        background: '#0d1117'
                       }}
                     >
-                      {/* Language Tabs */}
+                      {/* Terminal Header */}
                       <Box
                         sx={{
-                          background: '#bdbbbbff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          px: 2,
-                          py: 1
+                          background: 'linear-gradient(135deg, #21262d 0%, #161b22 100%)',
+                          borderBottom: '1px solid #30363d'
                         }}
                       >
-                        <Tabs
-                          value={selectedLanguage}
-                          onChange={handleLanguageChange}
+                        {/* Top row with terminal dots and copy button */}
+                        <Box
                           sx={{
-                            '& .MuiTab-root': {
-                              color: '#000',
-                              opacity: 0.7,
-                              minWidth: 'auto',
-                              px: 2,
-                              py: 1,
-                              fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
-                              fontWeight: 600,
-                              '&.Mui-selected': {
-                                color: '#000',
-                                opacity: 1
-                              }
-                            },
-                            '& .MuiTabs-indicator': {
-                              backgroundColor: codeExamples[selectedLanguage].textColor,
-                              height: 3
-                            }
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            px: { xs: 2, sm: 3 },
+                            py: { xs: 1.5, sm: 2 }
                           }}
                         >
-                          {codeExamples.map((example, index) => (
-                            <Tab key={index} label={example.language} />
-                          ))}
-                        </Tabs>
+                          {/* Terminal Dots */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box
+                              sx={{
+                                width: { xs: 10, sm: 12 },
+                                height: { xs: 10, sm: 12 },
+                                borderRadius: '50%',
+                                background: '#ff5f56'
+                              }}
+                            />
+                            <Box
+                              sx={{
+                                width: { xs: 10, sm: 12 },
+                                height: { xs: 10, sm: 12 },
+                                borderRadius: '50%',
+                                background: '#ffbd2e'
+                              }}
+                            />
+                            <Box
+                              sx={{
+                                width: { xs: 10, sm: 12 },
+                                height: { xs: 10, sm: 12 },
+                                borderRadius: '50%',
+                                background: '#27ca3f'
+                              }}
+                            />
+                            <Typography
+                              sx={{
+                                ml: { xs: 1, sm: 2 },
+                                color: '#8b949e',
+                                fontSize: { xs: '0.7rem', sm: '0.9rem' },
+                                fontFamily: 'monospace',
+                                display: { xs: 'none', sm: 'block' }
+                              }}
+                            >
+                              @queuedroid: sending message...
+                            </Typography>
+                          </Box>
 
-                        {/* Copy Button */}
-                        <Button
-                          size="small"
+                          {/* Copy Button */}
+                          <Button
+                            size="small"
+                            sx={{
+                              minWidth: 'auto',
+                              p: { xs: 0.5, sm: 1 },
+                              color: '#8b949e',
+                              fontFamily: 'monospace',
+                              fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                              opacity: 0.8,
+                              '&:hover': {
+                                opacity: 1,
+                                color: '#58a6ff',
+                                bgcolor: 'rgba(88, 166, 255, 0.1)'
+                              }
+                            }}
+                            onClick={() => navigator.clipboard.writeText(codeExamples[selectedLanguage].code)}
+                          >
+                            <CopyOutlined style={{ marginRight: { xs: 2, sm: 4 }, fontSize: { xs: '0.8rem', sm: '0.9rem' } }} />
+                            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                              COPY
+                            </Box>
+                          </Button>
+                        </Box>
+
+                        {/* Tabs row - full width for better mobile experience */}
+                        <Box
                           sx={{
-                            minWidth: 'auto',
-                            p: 1,
-                            color: codeExamples[selectedLanguage].textColor,
-                            opacity: 0.8,
-                            '&:hover': {
-                              opacity: 1,
-                              bgcolor: 'rgba(255,255,255,0.1)'
-                            }
+                            px: { xs: 1, sm: 3 },
+                            pb: { xs: 1, sm: 1.5 }
                           }}
-                          onClick={() => navigator.clipboard.writeText(codeExamples[selectedLanguage].code)}
                         >
-                          <CopyOutlined /> Copy
-                        </Button>
+                          <Tabs
+                            value={selectedLanguage}
+                            onChange={handleLanguageChange}
+                            variant="scrollable"
+                            scrollButtons="auto"
+                            allowScrollButtonsMobile
+                            sx={{
+                              minHeight: 'auto',
+                              '& .MuiTabScrollButton-root': {
+                                color: '#8b949e',
+                                '&.Mui-disabled': {
+                                  opacity: 0.3
+                                }
+                              },
+                              '& .MuiTabs-scrollButtons': {
+                                '&.Mui-disabled': {
+                                  opacity: 0.3
+                                }
+                              },
+                              '& .MuiTab-root': {
+                                color: '#8b949e',
+                                opacity: 0.8,
+                                minWidth: { xs: 'auto', sm: 'auto' },
+                                px: { xs: 1.5, sm: 2 },
+                                py: { xs: 0.5, sm: 0.5 },
+                                fontSize: { xs: '0.65rem', sm: '0.8rem', md: '0.85rem' },
+                                fontWeight: 500,
+                                fontFamily: 'monospace',
+                                textTransform: 'uppercase',
+                                minHeight: { xs: '32px', sm: '40px' },
+                                '&.Mui-selected': {
+                                  color: '#58a6ff',
+                                  opacity: 1
+                                },
+                                '&:hover': {
+                                  color: '#58a6ff',
+                                  opacity: 0.9
+                                }
+                              },
+                              '& .MuiTabs-indicator': {
+                                backgroundColor: '#58a6ff',
+                                height: 2
+                              },
+                              '& .MuiTabs-flexContainer': {
+                                gap: { xs: 0.5, sm: 1 }
+                              }
+                            }}
+                          >
+                            {codeExamples.map((example, index) => (
+                              <Tab key={index} label={example.language} />
+                            ))}
+                          </Tabs>
+                        </Box>
                       </Box>
 
                       {/* Code Display */}
                       <CardContent sx={{ p: 0 }}>
                         <Box
                           sx={{
-                            background: '#1e1e1e',
-                            color: '#d4d4d4',
-                            p: 3,
-                            fontFamily: 'monospace',
-                            fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
-                            lineHeight: 1.5,
+                            background: '#0d1117',
+                            color: '#e6edf3',
+                            p: { xs: 1.5, sm: 3, md: 4 },
+                            fontFamily:
+                              '"JetBrains Mono", "Fira Code", "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                            fontSize: { xs: '0.65rem', sm: '0.8rem', md: '0.9rem' },
+                            lineHeight: 1.6,
                             overflow: 'auto',
-                            maxHeight: '500px'
+                            maxHeight: { xs: '400px', sm: '500px' },
+                            position: 'relative',
+                            '&::-webkit-scrollbar': {
+                              width: '8px',
+                              height: '8px'
+                            },
+                            '&::-webkit-scrollbar-track': {
+                              background: '#21262d'
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                              background: '#30363d',
+                              borderRadius: '4px',
+                              '&:hover': {
+                                background: '#484f58'
+                              }
+                            }
                           }}
                         >
-                          <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{codeExamples[selectedLanguage].code}</pre>
+                          {/* Terminal Prompt */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: { xs: 0.5, sm: 0 } }}>
+                            <Typography
+                              sx={{
+                                color: '#7c3aed',
+                                fontWeight: 'bold',
+                                mr: 1,
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }
+                              }}
+                            >
+                              user@queuedroid:~$
+                            </Typography>
+                            <Typography
+                              sx={{
+                                color: '#8b949e',
+                                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                                wordBreak: 'break-all'
+                              }}
+                            >
+                              {selectedLanguage === 0 && 'node send-sms.js'}
+                              {selectedLanguage === 1 && 'python send-sms.py'}
+                              {selectedLanguage === 2 && 'gcc send-sms.c -lcurl && ./a.out'}
+                              {selectedLanguage === 3 && 'g++ send-sms.cpp -lcurl && ./a.out'}
+                            </Typography>
+                          </Box>
+                          <pre
+                            style={{
+                              margin: 0,
+                              whiteSpace: 'pre-wrap',
+                              color: '#e6edf3'
+                            }}
+                          >
+                            {codeExamples[selectedLanguage].code}
+                          </pre>
                         </Box>
                       </CardContent>
                     </Card>

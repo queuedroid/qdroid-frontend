@@ -7,20 +7,32 @@ import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 
 // project imports
 import Profile from './Profile';
 import IconButton from 'components/@extended/IconButton';
 import Transitions from 'components/@extended/Transitions';
+import { useOnboardingTour } from '../../../../contexts/OnboardingTourContext';
 
 // assets
 import MoreOutlined from '@ant-design/icons/MoreOutlined';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 // ==============================|| HEADER CONTENT - MOBILE ||============================== //
 
 export default function MobileSection() {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
+  const { startTour, isCompleted, resetTour } = useOnboardingTour();
+
+  const handleTourClick = () => {
+    if (isCompleted) {
+      resetTour();
+    }
+    startTour();
+    setOpen(false); // Close the mobile menu
+  };
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -91,6 +103,28 @@ export default function MobileSection() {
               <ClickAwayListener onClickAway={handleClose}>
                 <AppBar color="inherit">
                   <Toolbar>
+                    {/* Tour Button in Mobile Menu */}
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<InfoCircleOutlined />}
+                      onClick={handleTourClick}
+                      data-tour="start-tour-mobile"
+                      sx={{
+                        mr: 2,
+                        textTransform: 'none',
+                        borderColor: 'primary.main',
+                        color: 'primary.main',
+                        fontSize: '0.75rem',
+                        whiteSpace: 'nowrap',
+                        '&:hover': {
+                          borderColor: 'primary.dark',
+                          backgroundColor: 'primary.50'
+                        }
+                      }}
+                    >
+                      {isCompleted ? 'Tour Again' : 'Take Tour'}
+                    </Button>
                     <Profile />
                   </Toolbar>
                 </AppBar>

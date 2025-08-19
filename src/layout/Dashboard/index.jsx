@@ -13,6 +13,8 @@ import Footer from './Footer';
 import Loader from 'components/Loader';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 import { GlobalComposeButton } from 'components/GlobalComposeMessage';
+import { OnboardingTourProvider } from '../../contexts/OnboardingTourContext';
+import TourPopover from '../../components/TourPopover';
 
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 
@@ -44,41 +46,46 @@ export default function DashboardLayout() {
   if (menuMasterLoading) return <Loader />;
 
   return (
-    <Box sx={{ display: 'flex', width: '100%' }}>
-      <Header />
-      <Drawer />
+    <OnboardingTourProvider>
+      <Box sx={{ display: 'flex', width: '100%' }}>
+        <Header />
+        <Drawer />
 
-      <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-        <Toolbar sx={{ mt: 'inherit' }} />
-        <Box
-          sx={{
-            ...{ px: { xs: 0, sm: 2 } },
-            position: 'relative',
-            minHeight: 'calc(100vh - 110px)',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          {pathname !== '/apps/profiles/account/my-account' && <Breadcrumbs />}
-          <Outlet />
-          <Footer />
+        <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+          <Toolbar sx={{ mt: 'inherit' }} />
+          <Box
+            sx={{
+              ...{ px: { xs: 0, sm: 2 } },
+              position: 'relative',
+              minHeight: 'calc(100vh - 110px)',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {pathname !== '/apps/profiles/account/my-account' && <Breadcrumbs />}
+            <Outlet />
+            <Footer />
+          </Box>
         </Box>
+
+        {/* Global Compose Message Button */}
+        <GlobalComposeButton onMessageSent={handleMessageSent} />
+
+        {/* Tour Popover */}
+        <TourPopover />
+
+        {/* Success Snackbar */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={4000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
-
-      {/* Global Compose Message Button */}
-      <GlobalComposeButton onMessageSent={handleMessageSent} />
-
-      {/* Success Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+    </OnboardingTourProvider>
   );
 }

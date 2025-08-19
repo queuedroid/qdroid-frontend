@@ -55,6 +55,20 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
   const textColor = 'text.primary';
   const iconSelectedColor = 'primary.main';
 
+  // Get tour data attribute based on item id
+  const getTourAttribute = () => {
+    switch (item.id) {
+      case 'exchange':
+        return 'create-exchange';
+      case 'api-keys':
+        return 'api-keys';
+      default:
+        return null;
+    }
+  };
+
+  const tourAttribute = getTourAttribute();
+
   return (
     <>
       <Box sx={{ position: 'relative' }}>
@@ -64,6 +78,7 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
           target={itemTarget}
           disabled={item.disabled}
           selected={isSelected}
+          {...(tourAttribute && { 'data-tour': tourAttribute })}
           sx={(theme) => ({
             zIndex: 1201,
             pl: drawerOpen ? `${level * 28}px` : 1.5,
