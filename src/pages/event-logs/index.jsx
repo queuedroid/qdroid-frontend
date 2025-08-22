@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -38,6 +39,7 @@ import { eventLogsAPI } from '../../utils/api';
 import { format } from 'date-fns';
 
 const MessageLogs = () => {
+  const navigate = useNavigate();
   const [eventLogs, setEventLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -117,6 +119,11 @@ const MessageLogs = () => {
   const handleStatusChange = (event) => {
     setStatus(event.target.value);
     setPage(0);
+  };
+
+  const handleQueueClick = (log) => {
+    // Navigate to exchange page - the exchange page will need to handle highlighting the specific queue
+    navigate('/dashboard/exchange');
   };
 
   const clearFilters = () => {
@@ -303,17 +310,33 @@ const MessageLogs = () => {
                         <Chip label={log.status} color={getStatusColor(log.status)} size="small" />
                       </TableCell>
                       <TableCell>
-                        <Tooltip title={log.description}>
+                        <Tooltip title={log.description || (log.status === 'QUEUED' ? 'Sent successfully' : 'No description')}>
                           <Typography variant="body2" noWrap>
-                            {truncateText(log.description, 40)}
+                            {truncateText(log.description || (log.status === 'QUEUED' ? 'Sent successfully' : 'No description'), 40)}
                           </Typography>
                         </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <Tooltip title={log.queue_id}>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                        <Tooltip title={`Click to view queue: ${log.queue_id}`}>
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => handleQueueClick(log)}
+                            sx={{
+                              fontFamily: 'monospace',
+                              fontSize: '0.875rem',
+                              textTransform: 'none',
+                              color: 'primary.main',
+                              '&:hover': {
+                                backgroundColor: 'primary.light',
+                                color: 'primary.contrastText'
+                              },
+                              padding: '4px 8px',
+                              minWidth: 'auto'
+                            }}
+                          >
                             {truncateText(log.queue_name || log.queue_id, 20)}
-                          </Typography>
+                          </Button>
                         </Tooltip>
                       </TableCell>
                       <TableCell>{log.carrier || '-'}</TableCell>

@@ -228,7 +228,7 @@ const parseCSVLine = (line) => {
 
   while (i < line.length) {
     const char = line[i];
-    
+
     if (char === '"') {
       if (inQuotes && line[i + 1] === '"') {
         // Escaped quote
@@ -249,7 +249,7 @@ const parseCSVLine = (line) => {
       i++;
     }
   }
-  
+
   // Add the last field
   result.push(current.trim());
   return result;
@@ -261,12 +261,12 @@ const parseCSVLine = (line) => {
 const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       try {
         const text = e.target.result;
         const lines = text.split('\n').filter((line) => line.trim());
-        
+
         if (lines.length === 0) {
           reject(new Error('CSV file is empty'));
           return;
@@ -294,14 +294,14 @@ const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
         for (let i = 1; i < lines.length; i++) {
           const cells = parseCSVLine(lines[i]);
           const phoneNumber = cells[phoneColumnIndex];
-          
+
           if (phoneNumber && phoneNumber.trim()) {
             // Use content from CSV if available, otherwise use provided messageContent
             let contentToUse = messageContent;
             if (contentColumnIndex !== -1 && cells[contentColumnIndex]) {
               contentToUse = cells[contentColumnIndex];
             }
-            
+
             // Ensure we have content for this row
             if (contentToUse && contentToUse.trim()) {
               newLines.push(`"${phoneNumber}","${exchangeId}","${contentToUse.replace(/"/g, '""')}"`);
@@ -319,14 +319,14 @@ const createModifiedCSV = async (originalFile, exchangeId, messageContent) => {
         const csvContent = newLines.join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv' });
         const modifiedFile = new File([blob], `modified_${originalFile.name}`, { type: 'text/csv' });
-        
+
         console.log('Created modified CSV:', {
           originalRows: lines.length - 1,
           processedRows: newLines.length - 1,
           hasContentColumn: contentColumnIndex !== -1,
           sampleContent: csvContent.split('\n').slice(0, 3).join('\n')
         });
-        
+
         resolve(modifiedFile);
       } catch (error) {
         reject(error);
@@ -362,11 +362,11 @@ export const messageAPI = {
   // Send multiple messages in bulk (CSV file upload)
   sendBulkCSV: async (csvFile, exchangeId, messageContent = '') => {
     const url = `${API_BASE_URL}/messages/bulk-send`;
-    
+
     try {
       // Create a modified CSV file that includes exchange_id and content columns
       const modifiedCsvFile = await createModifiedCSV(csvFile, exchangeId, messageContent);
-      
+
       const formData = new FormData();
       formData.append('file', modifiedCsvFile);
 
@@ -417,12 +417,12 @@ export const messageAPI = {
       return data;
     } catch (error) {
       console.error('CSV upload failed:', error);
-      
+
       // Handle CSV modification errors
       if (error.message && error.message.includes('CSV')) {
         throw new Error(`CSV processing error: ${error.message}`);
       }
-      
+
       throw error;
     }
   }

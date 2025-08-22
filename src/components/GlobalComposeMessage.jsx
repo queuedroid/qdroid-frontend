@@ -60,12 +60,14 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumbers, setPhoneNumbers] = useState(['']);
   const [messageContent, setMessageContent] = useState('');
+  const [messageGroups, setMessageGroups] = useState([{ phoneNumbers: [''], message: '' }]);
   const [loading, setLoading] = useState(false);
   const [exchangesLoading, setExchangesLoading] = useState(false);
   const [error, setError] = useState('');
   const [minimized, setMinimized] = useState(false);
   const [messageMode, setMessageMode] = useState('single'); // 'single' or 'bulk'
   const [bulkInputMethod, setBulkInputMethod] = useState('manual'); // 'manual' or 'csv'
+  const [bulkMessageMode, setBulkMessageMode] = useState('single'); // 'single' or 'multiple' for bulk messages
   const [csvFile, setCsvFile] = useState(null);
   const [csvPreview, setCsvPreview] = useState([]);
   const [csvError, setCsvError] = useState('');
@@ -222,8 +224,10 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
       return;
     }
 
-    // Check message content requirement - skip if CSV has content column
-    const messageContentRequired = !(messageMode === 'bulk' && bulkInputMethod === 'csv' && csvHasContentColumn);
+    // Check message content requirement - skip if CSV upload or multiple message mode
+    const messageContentRequired =
+      !(messageMode === 'bulk' && bulkInputMethod === 'csv') &&
+      !(messageMode === 'bulk' && bulkInputMethod === 'manual' && bulkMessageMode === 'multiple');
     if (messageContentRequired && !messageContent.trim()) {
       setError('Please enter a message');
       return;
@@ -236,10 +240,26 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
 
     if (messageMode === 'bulk') {
       if (bulkInputMethod === 'manual') {
-        const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
-        if (validPhoneNumbers.length === 0) {
-          setError('Please enter at least one phone number');
-          return;
+        if (bulkMessageMode === 'single') {
+          const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
+          if (validPhoneNumbers.length === 0) {
+            setError('Please enter at least one phone number');
+            return;
+          }
+        } else {
+          // Multiple messages mode - validate each group
+          let hasValidGroup = false;
+          for (const group of messageGroups) {
+            const validPhones = group.phoneNumbers.filter((phone) => phone.trim());
+            if (validPhones.length > 0 && group.message.trim()) {
+              hasValidGroup = true;
+              break;
+            }
+          }
+          if (!hasValidGroup) {
+            setError('Please enter at least one phone number and message in each group');
+            return;
+          }
         }
       } else if (bulkInputMethod === 'csv') {
         if (!csvFile) {
@@ -248,6 +268,10 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
         }
         if (csvError) {
           setError('Please fix CSV file errors before sending');
+          return;
+        }
+        if (!csvHasContentColumn) {
+          setError('CSV file must contain a content/message column for bulk messaging');
           return;
         }
       }
@@ -268,22 +292,40 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
         };
         response = await messageAPI.sendSingle(messageData);
       } else if (messageMode === 'bulk' && bulkInputMethod === 'manual') {
-        const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
-        const messages = validPhoneNumbers.map((phone) => ({
-          content: messageContent,
-          exchange_id: selectedExchange.exchange_id,
-          phone_number: phone
-        }));
+        let messages = [];
+
+        if (bulkMessageMode === 'single') {
+          // Single message to all phone numbers
+          const validPhoneNumbers = phoneNumbers.filter((phone) => phone.trim());
+          messages = validPhoneNumbers.map((phone) => ({
+            content: messageContent,
+            exchange_id: selectedExchange.exchange_id,
+            phone_number: phone
+          }));
+        } else {
+          // Multiple messages - each group has its own message
+          for (const group of messageGroups) {
+            const validPhones = group.phoneNumbers.filter((phone) => phone.trim());
+            if (validPhones.length > 0 && group.message.trim()) {
+              const groupMessages = validPhones.map((phone) => ({
+                content: group.message,
+                exchange_id: selectedExchange.exchange_id,
+                phone_number: phone
+              }));
+              messages.push(...groupMessages);
+            }
+          }
+        }
 
         messageData = { messages };
         response = await messageAPI.sendBulk(messageData);
       } else if (messageMode === 'bulk' && bulkInputMethod === 'csv') {
-        // CSV file upload
-        response = await messageAPI.sendBulkCSV(csvFile, selectedExchange.exchange_id, messageContent || '');
+        // CSV file upload - messages are in the CSV file
+        response = await messageAPI.sendBulkCSV(csvFile, selectedExchange.exchange_id, '');
         messageData = {
           file: csvFile.name,
           exchange_id: selectedExchange.exchange_id,
-          content: csvHasContentColumn ? 'Individual messages from CSV' : messageContent
+          content: 'Individual messages from CSV file'
         };
       }
 
@@ -296,9 +338,11 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
       setPhoneNumber('');
       setPhoneNumbers(['']);
       setMessageContent('');
+      setMessageGroups([{ phoneNumbers: [''], message: '' }]);
       setSelectedExchange(null);
       setMessageMode('single');
       setBulkInputMethod('manual');
+      setBulkMessageMode('single');
       removeCSVFile();
 
       // Close dialog
@@ -318,11 +362,13 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     setPhoneNumber('');
     setPhoneNumbers(['']);
     setMessageContent('');
+    setMessageGroups([{ phoneNumbers: [''], message: '' }]);
     setSelectedExchange(null);
     setError('');
     setMinimized(false);
     setMessageMode('single');
     setBulkInputMethod('manual');
+    setBulkMessageMode('single');
     removeCSVFile();
     onClose();
   };
@@ -342,6 +388,7 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
   const handleBulkInputMethodChange = (event) => {
     const newMethod = event.target.value;
     setBulkInputMethod(newMethod);
+    setBulkMessageMode('single'); // Reset to single message mode
     setError('');
     if (newMethod === 'manual') {
       removeCSVFile();
@@ -363,6 +410,44 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
     const newPhoneNumbers = [...phoneNumbers];
     newPhoneNumbers[index] = value;
     setPhoneNumbers(newPhoneNumbers);
+  };
+
+  // Message group functions for multi-message bulk messaging
+  const addMessageGroup = () => {
+    setMessageGroups([...messageGroups, { phoneNumbers: [''], message: '' }]);
+  };
+
+  const removeMessageGroup = (groupIndex) => {
+    if (messageGroups.length > 1) {
+      const newGroups = messageGroups.filter((_, i) => i !== groupIndex);
+      setMessageGroups(newGroups);
+    }
+  };
+
+  const updateMessageGroupMessage = (groupIndex, message) => {
+    const newGroups = [...messageGroups];
+    newGroups[groupIndex].message = message;
+    setMessageGroups(newGroups);
+  };
+
+  const addPhoneNumberToGroup = (groupIndex) => {
+    const newGroups = [...messageGroups];
+    newGroups[groupIndex].phoneNumbers.push('');
+    setMessageGroups(newGroups);
+  };
+
+  const removePhoneNumberFromGroup = (groupIndex, phoneIndex) => {
+    const newGroups = [...messageGroups];
+    if (newGroups[groupIndex].phoneNumbers.length > 1) {
+      newGroups[groupIndex].phoneNumbers = newGroups[groupIndex].phoneNumbers.filter((_, i) => i !== phoneIndex);
+      setMessageGroups(newGroups);
+    }
+  };
+
+  const updatePhoneNumberInGroup = (groupIndex, phoneIndex, value) => {
+    const newGroups = [...messageGroups];
+    newGroups[groupIndex].phoneNumbers[phoneIndex] = value;
+    setMessageGroups(newGroups);
   };
 
   if (minimized) {
@@ -401,10 +486,15 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
               ? csvFile
                 ? `CSV: ${csvFile.name}`
                 : 'No CSV file'
-              : `${phoneNumbers.filter((p) => p.trim()).length} recipients`}
+              : bulkMessageMode === 'single'
+                ? `${phoneNumbers.filter((p) => p.trim()).length} recipients`
+                : `${messageGroups.reduce((total, group) => total + group.phoneNumbers.filter((p) => p.trim()).length, 0)} recipients (${messageGroups.length} groups)`}
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.9 }}>
-          Mode: {messageMode === 'single' ? 'Single' : `Bulk (${bulkInputMethod})`}
+          Mode:{' '}
+          {messageMode === 'single'
+            ? 'Single'
+            : `Bulk (${bulkInputMethod}${bulkInputMethod === 'manual' && bulkMessageMode === 'multiple' ? ' - Multiple Messages' : ''})`}
         </Typography>
       </Paper>
     );
@@ -558,62 +648,178 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
 
               {bulkInputMethod === 'manual' ? (
                 <>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="subtitle2">Phone Numbers * ({phoneNumbers.filter((p) => p.trim()).length})</Typography>
-                    <Button size="small" startIcon={<AddIcon />} onClick={addPhoneNumber} variant="outlined">
-                      Add Number
-                    </Button>
-                  </Box>
-                  <Stack spacing={1}>
-                    {phoneNumbers.map((phone, index) => (
-                      <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        <Box
-                          sx={{
-                            flex: 1,
-                            '& .PhoneInput': {
-                              border: '1px solid #d3d4d5',
-                              bgcolor: 'white',
-                              borderRadius: '8px',
-                              padding: '12px',
-                              '&:focus-within': {
-                                borderColor: '#1976d2',
-                                borderWidth: '2px'
-                              }
-                            },
-                            '& .PhoneInputInput': {
-                              border: 'none',
-                              bgcolor: '#fff',
-                              color: '#333',
-                              outline: 'none',
-                              fontSize: '14px',
-                              marginLeft: '8px'
-                            }
-                          }}
-                        >
-                          <PhoneInput
-                            placeholder={`Phone number ${index + 1}`}
-                            value={phone}
-                            onChange={(value) => updatePhoneNumber(index, value)}
-                            defaultCountry="CM"
-                            international
-                          />
-                        </Box>
-                        {phoneNumbers.length > 1 && (
-                          <IconButton onClick={() => removePhoneNumber(index)} color="error" size="small">
-                            <RemoveIcon />
-                          </IconButton>
-                        )}
+                  {/* Message Mode Selection for Manual Bulk */}
+                  <FormControl component="fieldset" sx={{ mb: 2 }}>
+                    <FormLabel component="legend" sx={{ fontSize: '0.875rem', fontWeight: 600, mb: 1 }}>
+                      Message Configuration
+                    </FormLabel>
+                    <RadioGroup value={bulkMessageMode} onChange={(e) => setBulkMessageMode(e.target.value)} row>
+                      <FormControlLabel value="single" control={<Radio size="small" />} label="Same message for all recipients" />
+                      <FormControlLabel value="multiple" control={<Radio size="small" />} label="Different messages" />
+                    </RadioGroup>
+                  </FormControl>
+
+                  {bulkMessageMode === 'single' ? (
+                    <>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2">Phone Numbers * ({phoneNumbers.filter((p) => p.trim()).length})</Typography>
+                        <Button size="small" startIcon={<AddIcon />} onClick={addPhoneNumber} variant="outlined">
+                          Add Number
+                        </Button>
                       </Box>
-                    ))}
-                  </Stack>
-                  {phoneNumbers.filter((p) => p.trim()).length > 0 && (
-                    <Chip
-                      label={`${phoneNumbers.filter((p) => p.trim()).length} recipients selected`}
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      sx={{ mt: 1 }}
-                    />
+                      <Stack spacing={1}>
+                        {phoneNumbers.map((phone, index) => (
+                          <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                            <Box
+                              sx={{
+                                flex: 1,
+                                '& .PhoneInput': {
+                                  border: '1px solid #d3d4d5',
+                                  bgcolor: 'white',
+                                  borderRadius: '8px',
+                                  padding: '12px',
+                                  '&:focus-within': {
+                                    borderColor: '#1976d2',
+                                    borderWidth: '2px'
+                                  }
+                                },
+                                '& .PhoneInputInput': {
+                                  border: 'none',
+                                  bgcolor: '#fff',
+                                  color: '#333',
+                                  outline: 'none',
+                                  fontSize: '14px',
+                                  marginLeft: '8px'
+                                }
+                              }}
+                            >
+                              <PhoneInput
+                                placeholder={`Phone number ${index + 1}`}
+                                value={phone}
+                                onChange={(value) => updatePhoneNumber(index, value)}
+                                defaultCountry="CM"
+                                international
+                              />
+                            </Box>
+                            {phoneNumbers.length > 1 && (
+                              <IconButton onClick={() => removePhoneNumber(index)} color="error" size="small">
+                                <RemoveIcon />
+                              </IconButton>
+                            )}
+                          </Box>
+                        ))}
+                      </Stack>
+                      {phoneNumbers.filter((p) => p.trim()).length > 0 && (
+                        <Chip
+                          label={`${phoneNumbers.filter((p) => p.trim()).length} recipients selected`}
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                          sx={{ mt: 1 }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Multiple Messages Mode */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="subtitle2">Message Groups</Typography>
+                        <Button size="small" startIcon={<AddIcon />} onClick={addMessageGroup} variant="outlined">
+                          Add Message Group
+                        </Button>
+                      </Box>
+                      <Stack spacing={2}>
+                        {messageGroups.map((group, groupIndex) => (
+                          <Paper key={groupIndex} variant="outlined" sx={{ p: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                              <Typography variant="subtitle2" color="primary">
+                                Group {groupIndex + 1}
+                              </Typography>
+                              {messageGroups.length > 1 && (
+                                <IconButton onClick={() => removeMessageGroup(groupIndex)} color="error" size="small">
+                                  <DeleteIcon />
+                                </IconButton>
+                              )}
+                            </Box>
+
+                            {/* Phone numbers for this group */}
+                            <Box sx={{ mb: 2 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography variant="body2">Phone Numbers ({group.phoneNumbers.filter((p) => p.trim()).length})</Typography>
+                                <Button
+                                  size="small"
+                                  startIcon={<AddIcon />}
+                                  onClick={() => addPhoneNumberToGroup(groupIndex)}
+                                  variant="text"
+                                >
+                                  Add
+                                </Button>
+                              </Box>
+                              <Stack spacing={1}>
+                                {group.phoneNumbers.map((phone, phoneIndex) => (
+                                  <Box key={phoneIndex} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                    <Box
+                                      sx={{
+                                        flex: 1,
+                                        '& .PhoneInput': {
+                                          border: '1px solid #d3d4d5',
+                                          bgcolor: 'white',
+                                          borderRadius: '8px',
+                                          padding: '8px',
+                                          '&:focus-within': {
+                                            borderColor: '#1976d2',
+                                            borderWidth: '2px'
+                                          }
+                                        },
+                                        '& .PhoneInputInput': {
+                                          border: 'none',
+                                          bgcolor: '#fff',
+                                          color: '#333',
+                                          outline: 'none',
+                                          fontSize: '14px',
+                                          marginLeft: '8px'
+                                        }
+                                      }}
+                                    >
+                                      <PhoneInput
+                                        placeholder={`Phone number ${phoneIndex + 1}`}
+                                        value={phone}
+                                        onChange={(value) => updatePhoneNumberInGroup(groupIndex, phoneIndex, value)}
+                                        defaultCountry="CM"
+                                        international
+                                      />
+                                    </Box>
+                                    {group.phoneNumbers.length > 1 && (
+                                      <IconButton
+                                        onClick={() => removePhoneNumberFromGroup(groupIndex, phoneIndex)}
+                                        color="error"
+                                        size="small"
+                                      >
+                                        <RemoveIcon />
+                                      </IconButton>
+                                    )}
+                                  </Box>
+                                ))}
+                              </Stack>
+                            </Box>
+
+                            {/* Message for this group */}
+                            <TextField
+                              label="Message for this group"
+                              placeholder="Type your message here..."
+                              value={group.message}
+                              onChange={(e) => updateMessageGroupMessage(groupIndex, e.target.value)}
+                              multiline
+                              rows={3}
+                              fullWidth
+                              size="small"
+                              inputProps={{ maxLength: 1000 }}
+                              helperText={`${group.message.length}/1000 characters`}
+                            />
+                          </Paper>
+                        ))}
+                      </Stack>
+                    </>
                   )}
                 </>
               ) : (
@@ -633,8 +839,8 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
                           </Button>
                         </label>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                          CSV should contain a column with phone numbers (e.g., "phone_number", "phone", "mobile"). The exchange ID and
-                          message content will be automatically added to each row.
+                          CSV should contain columns for phone numbers and message content (e.g., "phone_number", "content"). Each row
+                          should have the recipient's phone number and their personalized message.
                         </Typography>
                       </Box>
                     ) : (
@@ -666,11 +872,18 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
 
                         {csvPreview.length > 0 && !csvError && (
                           <Box>
-                            {csvHasContentColumn && (
+                            {csvHasContentColumn ? (
                               <Alert severity="success" sx={{ mb: 2 }}>
                                 <Typography variant="body2">
-                                  <strong>Individual messages detected!</strong> Your CSV contains a 'content' column with personalized
-                                  messages for each recipient. The message field above is now optional.
+                                  <strong>Perfect!</strong> Your CSV contains both phone numbers and message content. Each recipient will
+                                  receive their personalized message from the CSV file.
+                                </Typography>
+                              </Alert>
+                            ) : (
+                              <Alert severity="warning" sx={{ mb: 2 }}>
+                                <Typography variant="body2">
+                                  <strong>Missing message content!</strong> Your CSV only contains phone numbers. Please add a 'content' or
+                                  'message' column with the message text for each recipient.
                                 </Typography>
                               </Alert>
                             )}
@@ -713,22 +926,21 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
             </Box>
           )}
 
-          {/* Message Content */}
-          <TextField
-            label={`Message ${csvHasContentColumn ? '(Optional - CSV contains messages)' : ''}`}
-            placeholder={csvHasContentColumn ? 'Optional: Override messages from CSV' : 'Type your message here...'}
-            value={messageContent}
-            onChange={(e) => setMessageContent(e.target.value)}
-            multiline
-            rows={4}
-            required={!(messageMode === 'bulk' && bulkInputMethod === 'csv' && csvHasContentColumn)}
-            inputProps={{ maxLength: 1000 }}
-            helperText={
-              csvHasContentColumn
-                ? `Optional field - CSV contains individual messages. ${messageContent.length}/1000 characters`
-                : `${messageContent.length}/1000 characters`
-            }
-          />
+          {/* Message Content - Only show when needed */}
+          {!(messageMode === 'bulk' && bulkInputMethod === 'csv') &&
+            !(messageMode === 'bulk' && bulkInputMethod === 'manual' && bulkMessageMode === 'multiple') && (
+              <TextField
+                label="Message"
+                placeholder="Type your message here..."
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+                multiline
+                rows={4}
+                required
+                inputProps={{ maxLength: 1000 }}
+                helperText={`${messageContent.length}/1000 characters`}
+              />
+            )}
         </Stack>
       </DialogContent>
 
@@ -741,18 +953,29 @@ const GlobalComposeMessage = ({ open, onClose, onSend }) => {
           disabled={
             loading ||
             !selectedExchange ||
-            // Message content validation: skip if CSV has content column
-            (!(messageMode === 'bulk' && bulkInputMethod === 'csv' && csvHasContentColumn) && !messageContent.trim()) ||
+            // Message content validation: skip if CSV upload or multiple message mode
+            (!(messageMode === 'bulk' && bulkInputMethod === 'csv') &&
+              !(messageMode === 'bulk' && bulkInputMethod === 'manual' && bulkMessageMode === 'multiple') &&
+              !messageContent.trim()) ||
             (messageMode === 'single' && !phoneNumber) ||
-            (messageMode === 'bulk' && bulkInputMethod === 'manual' && phoneNumbers.filter((p) => p.trim()).length === 0) ||
-            (messageMode === 'bulk' && bulkInputMethod === 'csv' && (!csvFile || csvError))
+            (messageMode === 'bulk' &&
+              bulkInputMethod === 'manual' &&
+              bulkMessageMode === 'single' &&
+              phoneNumbers.filter((p) => p.trim()).length === 0) ||
+            (messageMode === 'bulk' &&
+              bulkInputMethod === 'manual' &&
+              bulkMessageMode === 'multiple' &&
+              !messageGroups.some((group) => group.phoneNumbers.filter((p) => p.trim()).length > 0 && group.message.trim())) ||
+            (messageMode === 'bulk' && bulkInputMethod === 'csv' && (!csvFile || csvError || !csvHasContentColumn))
           }
         >
           {messageMode === 'single'
             ? 'Send'
             : bulkInputMethod === 'csv'
               ? `Send to CSV Recipients`
-              : `Send to ${phoneNumbers.filter((p) => p.trim()).length} recipients`}
+              : bulkMessageMode === 'single'
+                ? `Send to ${phoneNumbers.filter((p) => p.trim()).length} recipients`
+                : `Send to ${messageGroups.reduce((total, group) => total + group.phoneNumbers.filter((p) => p.trim()).length, 0)} recipients (${messageGroups.length} groups)`}
         </Button>
       </DialogActions>
     </Dialog>
