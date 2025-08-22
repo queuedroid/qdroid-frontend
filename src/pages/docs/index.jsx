@@ -15,10 +15,12 @@ import {
   Link,
   Divider,
   IconButton,
-  Chip
+  Chip,
+  AppBar,
+  Toolbar,
+  useMediaQuery
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import {
   Dashboard as DashboardIcon,
   Send as SendIcon,
@@ -31,14 +33,18 @@ import {
   Speed as SpeedIcon,
   Webhook as WebhookIcon,
   Home as HomeIcon,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  Menu as MenuIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 
 const DocsPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const [selectedSection, setSelectedSection] = useState('introduction');
   const [selectedLanguage, setSelectedLanguage] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const codeExamples = [
     {
       language: 'JavaScript',
@@ -129,8 +135,16 @@ send_sms()`
   }, {});
 
   const sidebarContent = (
-    <Box sx={{ width: 280, p: 3 }}>
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: '#ee5a52' }}>
+    <Box sx={{ width: isMobile ? '100vw' : 280, p: { xs: 2, sm: 3 } }}>
+      <Typography
+        variant={isMobile ? 'h6' : 'h5'}
+        sx={{
+          mb: 3,
+          fontWeight: 'bold',
+          color: '#ee5a52',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' }
+        }}
+      >
         QueueDroid Documentation
       </Typography>
 
@@ -143,7 +157,7 @@ send_sms()`
               display: 'block',
               fontWeight: 600,
               color: 'text.secondary',
-              fontSize: '0.75rem',
+              fontSize: { xs: '0.7rem', sm: '0.75rem' },
               letterSpacing: 1
             }}
           >
@@ -154,11 +168,16 @@ send_sms()`
               <ListItem
                 key={section.id}
                 button
-                onClick={() => setSelectedSection(section.id)}
+                onClick={() => {
+                  setSelectedSection(section.id);
+                  if (isMobile) {
+                    setMobileMenuOpen(false);
+                  }
+                }}
                 sx={{
                   borderRadius: 1,
                   mb: 0.5,
-                  py: 1,
+                  py: { xs: 1.5, sm: 1 },
                   backgroundColor: selectedSection === section.id ? 'rgba(238, 90, 82, 0.1)' : 'transparent',
                   '&:hover': {
                     backgroundColor: selectedSection === section.id ? 'rgba(238, 90, 82, 0.1)' : 'rgba(238, 90, 82, 0.05)'
@@ -171,7 +190,7 @@ send_sms()`
                     '& .MuiTypography-root': {
                       fontWeight: selectedSection === section.id ? 600 : 400,
                       color: selectedSection === section.id ? '#ee5a52' : 'inherit',
-                      fontSize: '0.875rem'
+                      fontSize: { xs: '0.9rem', sm: '0.875rem' }
                     }
                   }}
                 />
@@ -203,12 +222,12 @@ send_sms()`
         return (
           <Box>
             {renderBreadcrumb()}
-            <Typography variant="h3" sx={{ mb: 3, fontWeight: 'bold' }}>
+            <Typography variant="h3" sx={{ mb: 3, fontWeight: 'bold', fontSize: { xs: '1.75rem', sm: '2.125rem', md: '3rem' } }}>
               Welcome to QueueDroid
             </Typography>
 
             <Alert severity="info" sx={{ mb: 4 }}>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                 <strong>New to QueueDroid?</strong> Start with our{' '}
                 <Link component="button" onClick={() => setSelectedSection('quickstart')} sx={{ textDecoration: 'none' }}>
                   Quick Start Guide
@@ -217,46 +236,46 @@ send_sms()`
               </Typography>
             </Alert>
 
-            <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8, fontSize: '1.1rem' }}>
+            <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
               QueueDroid is a powerful, enterprise-grade SMS messaging platform designed for developers who need reliable, scalable bulk
               messaging with advanced routing capabilities. Built with modern microservices architecture, QueueDroid handles everything from
               single messages to massive campaigns with intelligent carrier optimization.
             </Typography>
 
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+              <Typography variant="h4" sx={{ mb: 3, fontWeight: 600, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
                 Key Features
               </Typography>
 
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Smart Routing: Automatic MCC/MNC-based carrier routing ensures optimal delivery rates and cost efficiency for your messages
                 across different networks.
               </Typography>
 
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Real-time Analytics: Track message delivery status, view detailed analytics, and monitor system performance with
                 comprehensive dashboard and reporting tools.
               </Typography>
 
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Bulk Messaging: Send thousands of messages efficiently with CSV upload support, personalized content, and intelligent queue
                 management for optimal throughput.
               </Typography>
             </Box>
 
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+            <Typography variant="h4" sx={{ mb: 3, fontWeight: 600, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
               Core Concepts
             </Typography>
 
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h5" sx={{ mb: 2, color: '#ee5a52' }}>
+              <Typography variant="h5" sx={{ mb: 2, color: '#ee5a52', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                 Exchanges & Queues
               </Typography>
-              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 QueueDroid organizes messaging through <strong>exchanges</strong> and <strong>queues</strong>. Exchanges act as message
                 routing centers, while queues handle the actual message delivery to specific carriers or networks.
               </Typography>
-              <Box component="ul" sx={{ mb: 3, '& li': { mb: 1 }, fontSize: '1.1rem' }}>
+              <Box component="ul" sx={{ mb: 3, '& li': { mb: 1 }, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 <li>
                   <strong>Exchange:</strong> A logical container for organizing related messaging traffic
                 </li>
@@ -270,33 +289,33 @@ send_sms()`
             </Box>
 
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h5" sx={{ mb: 2, color: '#ee5a52' }}>
+              <Typography variant="h5" sx={{ mb: 2, color: '#ee5a52', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                 Authentication & Security
               </Typography>
-              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 All API requests are secured using account tokens. Each user receives a unique token that must be included in the
                 Authorization header of every request.
               </Typography>
             </Box>
 
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+            <Typography variant="h4" sx={{ mb: 3, fontWeight: 600, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
               What You Can Build
             </Typography>
 
             <Box sx={{ mb: 4 }}>
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Notification Systems: Order confirmations, appointment reminders, security alerts, and system notifications.
               </Typography>
 
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Marketing Campaigns: Promotional messages, product launches, customer engagement, and targeted campaigns.
               </Typography>
 
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Two-Factor Authentication: OTP delivery, account verification, password resets, and security confirmations.
               </Typography>
 
-              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 Business Intelligence: Automated reports, data alerts, status updates, and business process notifications.
               </Typography>
             </Box>
@@ -343,7 +362,18 @@ send_sms()`
               </Alert>
 
               {/* Placeholder for dashboard screenshot */}
-              <Box component="img" src="dashboard.png" alt="Dashboard Screenshot" sx={{ width: '100%' }} />
+              <Box
+                component="img"
+                src="dashboard.png"
+                alt="Dashboard Screenshot"
+                sx={{
+                  width: '100%',
+                  height: 'auto',
+                  maxWidth: '100%',
+                  borderRadius: 1,
+                  boxShadow: 2
+                }}
+              />
             </Box>
 
             <Box sx={{ mb: 4 }}>
@@ -362,7 +392,18 @@ send_sms()`
               </Box>
 
               {/* Placeholder for exchange creation screenshot */}
-              <Box component="img" src="create-exchange.png" alt="Dashboard Screenshot" sx={{ width: '100%' }} />
+              <Box
+                component="img"
+                src="create-exchange.png"
+                alt="Exchange Creation Screenshot"
+                sx={{
+                  width: '100%',
+                  height: 'auto',
+                  maxWidth: '100%',
+                  borderRadius: 1,
+                  boxShadow: 2
+                }}
+              />
             </Box>
 
             <Box sx={{ mb: 4 }}>
@@ -396,10 +437,15 @@ send_sms()`
                   <Tabs
                     value={selectedLanguage}
                     onChange={(event, newValue) => setSelectedLanguage(newValue)}
+                    variant={isMobile ? 'scrollable' : 'standard'}
+                    scrollButtons={isMobile ? 'auto' : false}
+                    allowScrollButtonsMobile
                     sx={{
                       '& .MuiTab-root': {
                         textTransform: 'none',
-                        fontWeight: 600
+                        fontWeight: 600,
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        minWidth: { xs: 80, sm: 120 }
                       }
                     }}
                   >
@@ -412,14 +458,15 @@ send_sms()`
                   sx={{
                     backgroundColor: '#1e1e1e',
                     color: '#d4d4d4',
-                    p: 3,
+                    p: { xs: 2, sm: 3 },
                     fontFamily: 'monospace',
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.8rem', sm: '0.9rem' },
                     lineHeight: 1.5,
-                    overflow: 'auto'
+                    overflow: 'auto',
+                    maxWidth: '100%'
                   }}
                 >
-                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{codeExamples[selectedLanguage].code}</pre>
+                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{codeExamples[selectedLanguage].code}</pre>
                 </Box>
               </Paper>
             </Box>
@@ -958,15 +1005,17 @@ send_sms()`
               sx={{
                 backgroundColor: '#1e1e1e',
                 color: '#d4d4d4',
-                p: 3,
+                p: { xs: 2, sm: 3 },
                 fontFamily: 'monospace',
-                fontSize: '0.9rem',
+                fontSize: { xs: '0.8rem', sm: '0.9rem' },
                 lineHeight: 1.5,
                 borderRadius: 1,
-                mb: 3
+                mb: 3,
+                overflow: 'auto',
+                maxWidth: '100%'
               }}
             >
-              <pre style={{ margin: 0 }}>{`{
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{`{
   "phone_number": "+1234567890",     // Required: Phone number in E.164 format
   "content": "Your message",         // Required: Message content
   "exchange_id": "your-exchange-id", // Required: Exchange ID for routing
@@ -1114,10 +1163,11 @@ Content-Type: application/json
                 fontSize: '0.9rem',
                 lineHeight: 1.5,
                 borderRadius: 1,
-                mb: 3
+                mb: 3,
+                overflow: 'hidden'
               }}
             >
-              <pre style={{ margin: 0 }}>{`phone_number,name,content
+              <pre style={{ margin: 0, overflow: 'auto' }}>{`phone_number,name,content
 +237123456789,"Hello John, your order #1234 is ready for pickup!",John Doe
 +237987654321,"Hi Jane, your appointment is confirmed for tomorrow at 3 PM",Jane Smith
 +237555444333,"Bob, your payment of $50 has been received. Thank you!",Bob Johnson`}</pre>
@@ -1187,7 +1237,7 @@ Content-Type: application/json
                 mb: 3
               }}
             >
-              <pre style={{ margin: 0 }}>{`HTTP/1.1 202 Accepted
+              <pre style={{ margin: 0, overflow: 'auto' }}>{`HTTP/1.1 202 Accepted
 
 {
   "count": 5,
@@ -1204,11 +1254,25 @@ Content-Type: application/json
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#fafafa' }}>
-      {/* Sidebar */}
+      {/* Mobile AppBar */}
+      {isMobile && (
+        <AppBar position="fixed" sx={{ backgroundColor: 'white', color: 'text.primary', zIndex: theme.zIndex.drawer + 1 }}>
+          <Toolbar>
+            <IconButton edge="start" onClick={() => setMobileMenuOpen(true)} sx={{ mr: 2, color: '#ee5a52' }}>
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" sx={{ flexGrow: 1, color: '#ee5a52', fontWeight: 'bold' }}>
+              QueueDroid Docs
+            </Typography>
+          </Toolbar>
+        </AppBar>
+      )}
+
+      {/* Desktop Sidebar */}
       {!isMobile && (
         <Box
           sx={{
-            width: 280,
+            width: isTablet ? 250 : 280,
             backgroundColor: 'white',
             borderRight: 1,
             borderColor: 'divider',
@@ -1225,13 +1289,23 @@ Content-Type: application/json
       {isMobile && (
         <Drawer
           variant="temporary"
-          open={false}
+          open={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
           sx={{
             '& .MuiDrawer-paper': {
-              width: 280
+              width: '85vw',
+              maxWidth: 320
             }
           }}
+          ModalProps={{
+            keepMounted: true // Better open performance on mobile
+          }}
         >
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+            <IconButton onClick={() => setMobileMenuOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
           {sidebarContent}
         </Drawer>
       )}
@@ -1240,12 +1314,29 @@ Content-Type: application/json
       <Box
         sx={{
           flexGrow: 1,
-          ml: isMobile ? 0 : '280px',
-          p: 4
+          ml: isMobile ? 0 : isTablet ? '250px' : '280px',
+          mt: isMobile ? '64px' : 0,
+          p: { xs: 2, sm: 3, md: 4 },
+          maxWidth: '100%',
+          overflow: 'hidden'
         }}
       >
-        <Container maxWidth="lg">
-          <Box sx={{ p: 4, minHeight: 'calc(100vh - 100px)' }}>{renderContent()}</Box>
+        <Container
+          maxWidth="lg"
+          sx={{
+            px: { xs: 1, sm: 2, md: 3 },
+            maxWidth: '100% !important'
+          }}
+        >
+          <Box
+            sx={{
+              p: { xs: 1, sm: 2, md: 4 },
+              minHeight: 'calc(100vh - 100px)',
+              maxWidth: '100%'
+            }}
+          >
+            {renderContent()}
+          </Box>
         </Container>
       </Box>
     </Box>
